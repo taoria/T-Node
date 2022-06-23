@@ -1,5 +1,5 @@
-﻿
-using TNode.Tools;
+﻿using TNode.Cache;
+using TNode.Models;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -46,14 +46,15 @@ namespace TNode.BaseViews{
         }
         //A Constructor for the DataGraphView ,never to override it
         public DataGraphView(){
+            
+            styleSheets.Add(Resources.Load<StyleSheet>("GraphViewBackground"));
+            var grid = new GridBackground();
+            Insert(0,grid);
+            grid.StretchToParentSize();
             this.AddManipulator(new ContentDragger());
             this.AddManipulator(new SelectionDragger());
             this.AddManipulator(new RectangleSelector());
             SetupZoom(ContentZoomer.DefaultMinScale, ContentZoomer.DefaultMaxScale);
-            
-            //Default Color
-            style.backgroundColor = new Color(0.1f, 0.1f, 0.1f, 1);
-            // ReSharper disable once VirtualMemberCallInConstructor
             OnInit();
         }
         //OnDataChanged event

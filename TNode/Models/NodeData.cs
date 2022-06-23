@@ -1,9 +1,10 @@
 ﻿using System;
+using TNode.BaseModels;
 using UnityEngine;
 
-namespace TNode{
+namespace TNode.Models{
     [Serializable]
-    public class NodeData{
+    public class NodeData:IModel{
    
         public NodeData() : base(){
             //Object Registration
