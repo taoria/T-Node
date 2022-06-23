@@ -25,11 +25,9 @@ namespace TNode.BaseViews{
                 BuildWindow(uxml);
             }
         }
-
         public SimpleGraphSubWindow(VisualTreeAsset visualTreeAsset){
             ConstructWindowBasicSetting();
             BuildWindow(visualTreeAsset);
         }
-        
     }
 }

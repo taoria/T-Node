@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Dialogue;
 using UnityEngine;
 
-namespace TNode{
+namespace TNode.Models{
     [Serializable]
     public class GraphData:ScriptableObject{
 

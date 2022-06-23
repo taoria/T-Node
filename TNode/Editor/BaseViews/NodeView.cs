@@ -1,4 +1,5 @@
 ﻿using Dialogue;
+using TNode.Models;
 using UnityEditor.Experimental.GraphView;
 
 namespace TNode.BaseViews{

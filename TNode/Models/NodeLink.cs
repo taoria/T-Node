@@ -1,6 +1,7 @@
 ﻿using System;
+using Dialogue;
 
-namespace Dialogue{
+namespace TNode.Models{
     //Node links are stored in output side of the two node port.
     [Serializable]
     public class NodeLink{

@@ -1,5 +1,6 @@
 ﻿using Dialogue;
 using TNode.Attribute;
+using TNode.Models;
 
 namespace TNode.TNodeSample{
     public class NodeDataTest:NodeData{

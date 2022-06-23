@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using TNode.Attribute;
 using TNode.BaseViews;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
-namespace TNode.Tools{
+namespace TNode.Cache{
     internal class NodeEditorSingleton{
         private static NodeEditorSingleton _instance;
         public readonly Dictionary<Type,Type> FromGenericToSpecific = new Dictionary<Type, Type>();
