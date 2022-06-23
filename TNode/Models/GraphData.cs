@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Dialogue;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace TNode.Models{
@@ -15,5 +16,6 @@ namespace TNode.Models{
         [HideInInspector]
         [SerializeReference]
         public NodeData entryNode;
+        
     }
 }

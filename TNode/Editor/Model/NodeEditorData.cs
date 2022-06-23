@@ -1,13 +1,12 @@
 ﻿using System;
+using TNode.Models;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-namespace TNode.Models{
+namespace TNode.Editor.Model{
     [Serializable]
-    public class NodeEditorData<T> where T:NodeData{
-        [SerializeReference]
-        private T nodeData;
-        
+
+    public class NodeEditorData{
+        [SerializeReference] public NodeData nodeData;
         public Rect nodePos;
     }
 }
