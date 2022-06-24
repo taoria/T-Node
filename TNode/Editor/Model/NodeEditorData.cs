@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace TNode.Editor.Model{
     [Serializable]
-
-    public class NodeEditorData{
+    
+    public class NodeEditorData:ScriptableObject{
         [SerializeReference] public NodeData nodeData;
         public Rect nodePos;
     }

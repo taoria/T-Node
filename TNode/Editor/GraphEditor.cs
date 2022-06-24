@@ -1,6 +1,7 @@
 using Codice.CM.Common;
 using TNode.BaseViews;
 using TNode.Cache;
+using TNode.Editor.Model;
 using TNode.Models;
 using UnityEditor;
 using UnityEngine;
@@ -9,16 +10,21 @@ using UnityEngine.UIElements;
 
 namespace TNode.Editor{
     
+    
     public abstract class GraphEditor<T> : EditorWindow where T:GraphData{ 
         protected DataGraphView<T> _graphView;
         [FormerlySerializedAs("m_VisualTreeAsset")] [SerializeField]
+        
+        
         private VisualTreeAsset mVisualTreeAsset = default;
+        //Persist editor data ,such as node position,node size ,etc ,in this script object
+        public NodeEditorData nodeEditorData;
     
-        public void CreateGUI()
-        {
+        public void CreateGUI(){
+            
             // Each editor window contains a root VisualElement object
             VisualElement root = rootVisualElement;
-        
+            
             // Instantiate UXML
             VisualElement labelFromUXML = mVisualTreeAsset.Instantiate();
             root.Add(labelFromUXML);
@@ -66,5 +72,6 @@ namespace TNode.Editor{
         protected virtual void OnCreate(){
             
         }
+  
     }
 }
