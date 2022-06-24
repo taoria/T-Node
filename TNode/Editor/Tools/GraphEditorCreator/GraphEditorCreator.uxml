@@ -1,0 +1,14 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Assets/TNode/Editor/Tools/GraphEditorCreator/GraphEditorCreator.uss?fileID=7433441132597879392&amp;guid=7cf956c2afedd274db0f9b45392e90f5&amp;type=3#GraphEditorCreator" />
+    <ui:VisualElement name="Root">
+        <ui:VisualElement name="EditorName" style="flex-direction: row;">
+            <ui:TextField picking-mode="Ignore" label="Your Editor Class Name" value="filler text" text="filler text" name="EditorClassNameTextField" style="width: 306px;" />
+            <ui:Label tabindex="-1" text=".cs" display-tooltip-when-elided="true" style="-unity-text-align: middle-left;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="GraphName" style="flex-direction: row;">
+            <ui:TextField picking-mode="Ignore" label="Your Editor Class Name" value="filler text" text="filler text" name="GraphClassNameTextField" style="width: 306px;" />
+            <ui:Label tabindex="-1" text=".cs" display-tooltip-when-elided="true" style="-unity-text-align: middle-left;" />
+        </ui:VisualElement>
+        <ui:Button tabindex="-1" text="Create Editor" display-tooltip-when-elided="true" name="CreateButton" />
+    </ui:VisualElement>
+</ui:UXML>
