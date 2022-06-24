@@ -1,10 +1,4 @@
-﻿using TNode.Editor;
-using UnityEditor;
-using UnityEditor.Callbacks;
-using UnityEditor.Experimental.GraphView;
-using UnityEngine;
-using UnityEngine.UIElements;
-
+﻿using TNode.Models;
 public class $GraphClassName$ : GraphData{
     
 }

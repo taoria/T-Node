@@ -23,14 +23,14 @@ namespace TNode.Editor.Tools.GraphEditorCreator{
             var source = template.text.Replace("$EditorClassName$",editorClassName).Replace("$GraphClassName$",graphClassName);
             return source;
         }
-        public string GenerateGraph(string graphClassName,string templatePath){
+        public string GenerateGraph(string graphClassName,string templateName="NewGraph.cs"){
+            TextAsset template = Resources.Load<TextAsset>("ScriptTemplates/"+templateName);
             //Check if graph class name is valid
             var regex = new System.Text.RegularExpressions.Regex("^[a-zA-Z0-9_]+$");
             if(!Regex.IsMatch(graphClassName)){
                 Debug.LogError("The graph class name is invalid. It must be a valid C# identifier.");
             }
-            var template = File.ReadAllText(templatePath);
-            var source = template.Replace("$GraphClassName$",graphClassName);
+            var source = template.text.Replace("$GraphClassName$",graphClassName);
             return source;
         }
     }
