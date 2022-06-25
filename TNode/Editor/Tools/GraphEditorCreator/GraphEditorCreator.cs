@@ -1,4 +1,5 @@
 using System.IO;
+using System.Text.RegularExpressions;
 using TNode.Editor.Model;
 using UnityEditor;
 using UnityEngine;
@@ -13,6 +14,10 @@ namespace TNode.Editor.Tools.GraphEditorCreator{
     {
         [SerializeField]
         private VisualTreeAsset m_VisualTreeAsset = default;
+
+        private TextField _editorClassNameTextField;
+        private TextField _graphClassNameTextField;
+        private Button _createButton;
 
         [MenuItem("Assets/Create/TNode/Create New Graph Editor")]
         [MenuItem("TNode/Create New Graph Editor")]
@@ -42,8 +47,43 @@ namespace TNode.Editor.Tools.GraphEditorCreator{
             root.Add(labelFromUXML);
             
             //Register a callback when Create Button is clicked
-            Button createButton = root.Q<Button>("CreateButton");
-            createButton.clickable.clicked += OnCreateButtonClicked;
+            _createButton = root.Q<Button>("CreateButton");
+            _createButton.clickable.clicked += OnCreateButtonClicked;
+
+            _editorClassNameTextField = root.Q<TextField>("EditorClassNameTextField");
+            _graphClassNameTextField = root.Q<TextField>("GraphClassNameTextField");
+            
+            _editorClassNameTextField.RegisterCallback<ChangeEvent<string>>((evt) => {
+                CheckIfTextValid();
+            });
+            _graphClassNameTextField.RegisterCallback<ChangeEvent<string>>((evt) => {
+                CheckIfTextValid();
+            });
+
+        }
+
+        public void CheckIfTextValid(){
+            Regex regex = new System.Text.RegularExpressions.Regex("^[a-zA-Z0-9_]+$");
+            var matchEditor = regex.IsMatch(_editorClassNameTextField.value);
+            var matchGraph = regex.IsMatch(_graphClassNameTextField.value);
+            if (matchEditor){
+                //Set background color to green
+                _editorClassNameTextField.style.backgroundColor = new Color(0.5f, 1f, 0.5f);
+            }
+            else{
+                //Set background color to red
+                _editorClassNameTextField.style.backgroundColor = new Color(1f, 0.5f, 0.5f);
+            }
+            if (matchGraph){
+                //Set background color to green
+                _graphClassNameTextField.style.backgroundColor = new Color(0.5f, 1f, 0.5f);
+            }
+            else{
+                //Set background color to red
+                _graphClassNameTextField.style.backgroundColor = new Color(1f, 0.5f, 0.5f);
+            }
+            _createButton.SetEnabled(matchGraph && matchEditor);
+         
             
         }
 
@@ -65,8 +105,8 @@ namespace TNode.Editor.Tools.GraphEditorCreator{
                 path = path + "/Editor";
             }
             //Query the name of the graph editor
-            string editorName = rootVisualElement.Q<TextField>("EditorClassNameTextField").text;
-            string graphName = rootVisualElement.Q<TextField>("GraphClassNameTextField").text;
+            string editorName =_editorClassNameTextField.text;
+            string graphName = _graphClassNameTextField.text;
             if (editorName == "")
             {
                 editorName = "NewGraphEditor";

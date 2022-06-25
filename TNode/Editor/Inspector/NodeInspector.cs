@@ -1,8 +1,8 @@
-﻿using TNode.Models;
-using UnityEditor.Experimental.GraphView;
+﻿using TNode.BaseViews;
+using TNode.Models;
 
-namespace TNode.BaseViews{
-    public class NodeInspector<T>:SimpleGraphSubWindow{
+namespace TNode.Editor.BaseViews{
+    public class NodeInspector:SimpleGraphSubWindow{
         private NodeData _data;
 
         public NodeData Data{
@@ -15,8 +15,13 @@ namespace TNode.BaseViews{
 
         private void UpdateData(){
             if (_data != null){
-                
+                RefreshInspector();
             }
         }
+
+        private void RefreshInspector(){
+            
+        }
+        
     }
 }
