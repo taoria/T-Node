@@ -18,5 +18,9 @@ namespace TNode.Editor.Inspector{
         public string BindingPath{ get; set; }
         public NodeData BindingNodeData{ get; set; }
         public T Value => GetValue();
+
+        public void OnBindingDataUpdate(){
+            
+        }
     }
 }
