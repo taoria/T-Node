@@ -7,7 +7,6 @@ using UnityEngine;
 namespace TNode.Models{
     [Serializable]
     public class GraphData:ScriptableObject{
-
         [SerializeReference] 
         public List<NodeData> nodes;
 
