@@ -28,8 +28,17 @@ namespace TNode.Editor.Inspector{
                 
             }
         }
-  
 
- 
+        public  InspectorItem(){
+            OnValueChanged+= OnValueChangedHandler;
+        }
+
+        private void OnValueChangedHandler(){
+
+
+        }
+        ~InspectorItem(){
+            OnValueChanged-= OnValueChangedHandler;
+        }
     }
 }

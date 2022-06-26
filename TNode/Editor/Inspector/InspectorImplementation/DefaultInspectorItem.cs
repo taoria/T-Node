@@ -2,14 +2,14 @@
 
 namespace TNode.Editor.Inspector.InspectorImplementation{
     public class DefaultInspectorItem<T>:InspectorItem<T>{
-        public Foldout FoldOut;
+        public readonly Foldout foldOut;
         public DefaultInspectorItem(){
-            var foldout = new Foldout{
+            foldOut = new Foldout{
                 text = ""
             };
-            this.Add(foldout);
+            this.Add(foldOut);
             OnValueChanged += () => {
-                foldout.text = this.BindingPath;
+                foldOut.text = this.BindingPath;
             };
         }
     }

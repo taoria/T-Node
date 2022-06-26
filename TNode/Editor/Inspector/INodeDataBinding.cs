@@ -2,7 +2,7 @@
 using UnityEngine;
 
 namespace TNode.Editor.Inspector{
-    public interface INodeDataBinding<out T>{
+    public interface INodeDataBinding<out T>:INodeDataBindingBase{
         protected T GetValue(){
         
             var fieldInfo = typeof(T).GetField(BindingPath, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
@@ -15,8 +15,7 @@ namespace TNode.Editor.Inspector{
             }
             return default;
         }        
-        public string BindingPath{ get; set; }
-        public NodeData BindingNodeData{ get; set; }
+
         public T Value => GetValue();
 
         public void OnBindingDataUpdate(){

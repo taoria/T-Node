@@ -4,14 +4,14 @@ using UnityEditor.Callbacks;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
-
+using System;
 public class $EditorClassName$ : GraphEditor<$GraphClassName$>{
         [OnOpenAsset]
         public static bool OnOpenAsset(int instanceID, int line){
             var graph = EditorUtility.InstanceIDToObject(instanceID) as $GraphClassName$;
             if (graph != null)
             {
-                $GraphClassName$ wnd = GetWindow<$EditorClassName$>();
+                var wnd = GetWindow<$EditorClassName$>();
                 wnd.titleContent = new GUIContent("$GraphClassName$ Editor");
                 wnd.CreateGUI();
                 wnd._graphView.Data = graph;

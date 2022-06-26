@@ -1,6 +1,7 @@
 using Codice.CM.Common;
 using TNode.BaseViews;
 using TNode.Cache;
+using TNode.Editor.BaseViews;
 using TNode.Editor.Model;
 using TNode.Models;
 using UnityEditor;
@@ -28,14 +29,9 @@ namespace TNode.Editor{
             // Instantiate UXML
             VisualElement labelFromUXML = mVisualTreeAsset.Instantiate();
             root.Add(labelFromUXML);
-           
+       
             BuildGraphView();
-            
-      
-            
             DefineGraphEditorActions();
-            
-            
             OnCreate();
         }
         private void BuildGraphView(){

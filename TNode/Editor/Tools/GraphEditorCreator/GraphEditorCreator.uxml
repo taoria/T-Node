@@ -6,7 +6,7 @@
             <ui:Label tabindex="-1" text=".cs" display-tooltip-when-elided="true" style="-unity-text-align: middle-left;" />
         </ui:VisualElement>
         <ui:VisualElement name="GraphName" style="flex-direction: row;">
-            <ui:TextField picking-mode="Ignore" label="Your Editor Class Name" value="filler text" text="filler text" name="GraphClassNameTextField" style="width: 306px;" />
+            <ui:TextField picking-mode="Ignore" label="Your Graph Class Name" value="filler text" text="filler text" name="GraphClassNameTextField" style="width: 306px;" />
             <ui:Label tabindex="-1" text=".cs" display-tooltip-when-elided="true" style="-unity-text-align: middle-left;" />
         </ui:VisualElement>
         <ui:Button tabindex="-1" text="Create Editor" display-tooltip-when-elided="true" name="CreateButton" />

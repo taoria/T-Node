@@ -21,7 +21,7 @@ namespace TNode.Editor.Inspector{
         public static InspectorItem<T> DefaultInspectorItem<T>(){
             DefaultInspectorItem<T> item = new DefaultInspectorItem<T>();
             if (typeof(string) == typeof(T)){
-                item.FoldOut.Add(new TextField(){
+                item.foldOut.Add(new TextField(){
                     name = "StringTextField"
                 });
             }
