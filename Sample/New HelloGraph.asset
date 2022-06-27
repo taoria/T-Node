@@ -9,17 +9,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cde084f079a7426daa86ed86cb80ed1b, type: 3}
-  m_Name: HelloWorld
+  m_Script: {fileID: 11500000, guid: 9eda9b79596ecc746bb59fa8939c6ac3, type: 3}
+  m_Name: New HelloGraph
   m_EditorClassIdentifier: 
-  nodeData:
+  nodes: []
+  nodeLinks: []
+  entryNode:
     rid: -2
-  nodePos:
-    serializedVersion: 2
-    x: 0
-    y: 0
-    width: 0
-    height: 0
   references:
     version: 2
     RefIds:

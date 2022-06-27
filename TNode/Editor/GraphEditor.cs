@@ -1,9 +1,11 @@
 using Codice.CM.Common;
 using TNode.BaseViews;
 using TNode.Cache;
+using TNode.Editor.BaseViews;
 using TNode.Editor.Model;
 using TNode.Models;
 using UnityEditor;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UIElements;
@@ -28,20 +30,35 @@ namespace TNode.Editor{
             // Instantiate UXML
             VisualElement labelFromUXML = mVisualTreeAsset.Instantiate();
             root.Add(labelFromUXML);
-           
+       
             BuildGraphView();
-            
-      
-            
             DefineGraphEditorActions();
-            
-            
             OnCreate();
         }
         private void BuildGraphView(){
             _graphView = NodeEditorExtensions.CreateInstance<DataGraphView<T>>();
             rootVisualElement.Add(_graphView);
             _graphView.StretchToParentSize();
+            
+            
+            _graphView.ConstructViewContextualMenu(evt => {
+                
+                //Current issue is that the search window don't show up at  the exact position of the mouse click by dma.eventInfo.mousePosition
+                //So I have to manually set the position of the search window to fit the mouse click position by add an offset driven by Editor's position
+                //Maybe a better way exists to fix this issue
+                Vector2 editorPosition = this.position.position;
+                
+                
+                evt.menu.AppendAction("Create Node", dma => {
+                    var dmaPos = dma.eventInfo.mousePosition+editorPosition;
+                    SearchWindowContext searchWindowContext = new SearchWindowContext(dmaPos,200,200);
+                    SearchWindow.Open(searchWindowContext, ScriptableObject.CreateInstance<SearchWindowProvider>());
+                });
+            });
+        }
+        private void ConstructSearchWindow(){
+            //Register a search window
+            
         }
 
         private void DefineGraphEditorActions(){

@@ -1,6 +1,7 @@
 ﻿using TNode.Models;
 using UnityEngine;
 using UnityEditor;
+using System;
 [CreateAssetMenu(fileName = "New $GraphClassName$", menuName = "TNode/$GraphClassName$")]
 [Serializable]
 public class $GraphClassName$ : GraphData{

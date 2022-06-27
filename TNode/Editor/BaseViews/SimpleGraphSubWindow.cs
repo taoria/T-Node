@@ -6,13 +6,13 @@ namespace TNode.BaseViews{
     public class SimpleGraphSubWindow:GraphElement{
         private readonly Dragger _dragger = new Dragger();
 
-        private void ConstructWindowBasicSetting(){
+        protected void ConstructWindowBasicSetting(){
             RegisterCallback<WheelEvent>(evt => { evt.StopPropagation(); });
             focusable = false;
             capabilities |= Capabilities.Movable | Capabilities.Resizable;
             this.AddManipulator(_dragger);
         }
-        private void BuildWindow(VisualTreeAsset visualTreeAsset){
+        protected void BuildWindow(VisualTreeAsset visualTreeAsset){
             if(visualTreeAsset != null){
                 visualTreeAsset.CloneTree(this);
             }

@@ -59,6 +59,8 @@ namespace TNode.Editor.Tools.GraphEditorCreator{
             _graphClassNameTextField.RegisterCallback<ChangeEvent<string>>((evt) => {
                 CheckIfTextValid();
             });
+            
+            CheckIfTextValid();
 
         }
 
@@ -107,6 +109,7 @@ namespace TNode.Editor.Tools.GraphEditorCreator{
             //Query the name of the graph editor
             string editorName =_editorClassNameTextField.text;
             string graphName = _graphClassNameTextField.text;
+            string graphViewName = graphName+"View";
             if (editorName == "")
             {
                 editorName = "NewGraphEditor";
@@ -117,35 +120,32 @@ namespace TNode.Editor.Tools.GraphEditorCreator{
             var source = sourceGeneratorForGraphEditor.GenerateGraphEditor(editorName,graphName);
 
             var sourceGraph = sourceGeneratorForGraphEditor.GenerateGraph(graphName);
+
+            var sourceGraphView = sourceGeneratorForGraphEditor.GenerateGraphView(graphViewName,graphName);
             string editorPath = Path.Combine(path, editorName + ".cs");
             string graphPath = Path.Combine(path, graphName + ".cs");
+            string graphViewPath = Path.Combine(path, graphViewName + ".cs");
             File.WriteAllText(editorPath, source);
-
             File.WriteAllText(graphPath, sourceGraph);
-            
-           
-            
+            File.WriteAllText(graphViewPath, sourceGraphView);
             //Refresh the AssetDatabase to import the new file
-            
             AssetDatabase.Refresh();
-            
+  
             //Wait for the new file to be imported
             while (!AssetDatabase.LoadAssetAtPath<MonoScript>(editorPath))
             {
                 EditorUtility.DisplayProgressBar("Generating Graph Editor", "Please wait while the new graph editor is being imported", 0.5f);
                 EditorApplication.update();
             }
-            //Create an Node Editor Data Instance for the new graph editor
+            
+            //Create an NodeAttribute Editor Data Instance for the new graph editor
             NodeEditorData nodeEditorData = ScriptableObject.CreateInstance<NodeEditorData>();
             nodeEditorData.name = editorName;
-            
             EditorUtility.SetDirty(nodeEditorData);
             
             //Save it at the same folder as the new graph editor
             string nodeEditorDataPath = Path.Combine(path, editorName + ".asset");
             AssetDatabase.CreateAsset(nodeEditorData, nodeEditorDataPath);
-            AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
             //Wait for the new file to be imported
             while (!AssetDatabase.LoadAssetAtPath<NodeEditorData>(nodeEditorDataPath))
             {
@@ -153,18 +153,12 @@ namespace TNode.Editor.Tools.GraphEditorCreator{
                 EditorApplication.update();
             }
             var script = AssetDatabase.LoadAssetAtPath<MonoScript>(editorPath);
-            
-            
             //Set the mono importer to the current graph editor script
             MonoImporter monoImporter = AssetImporter.GetAtPath(editorPath) as MonoImporter;
 
             if (monoImporter != null)
                 monoImporter.SetDefaultReferences(new string[]{"nodeEditorData"}, new Object[]{nodeEditorData});
-         
             
-            
-
-
    
             //Refresh the asset ann close it
             //Mark it dirty

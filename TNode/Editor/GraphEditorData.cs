@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace TNode.Editor{
     
-    [CreateAssetMenu(fileName = "Node Editor Config", menuName = "TNode/Node Editor Config")]
+    [CreateAssetMenu(fileName = "NodeAttribute Editor Config", menuName = "TNode/NodeAttribute Editor Config")]
     public class GraphEditorData:ScriptableObject{
         public List<NodeEditorData> nodesData;
         

@@ -4,7 +4,7 @@ using UnityEditor.Experimental.GraphView;
 
 namespace TNode.BaseViews{
     
-    //A Node monitor some type of node in the graph
+    //A NodeAttribute monitor some type of node in the graph
     
     public abstract class NodeView<T> : Node where T:NodeData,new(){
         protected T _data;
