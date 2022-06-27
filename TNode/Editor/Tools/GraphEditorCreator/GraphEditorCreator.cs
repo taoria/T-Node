@@ -138,7 +138,7 @@ namespace TNode.Editor.Tools.GraphEditorCreator{
                 EditorApplication.update();
             }
             
-            //Create an Node Editor Data Instance for the new graph editor
+            //Create an NodeAttribute Editor Data Instance for the new graph editor
             NodeEditorData nodeEditorData = ScriptableObject.CreateInstance<NodeEditorData>();
             nodeEditorData.name = editorName;
             EditorUtility.SetDirty(nodeEditorData);

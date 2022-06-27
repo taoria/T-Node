@@ -2,7 +2,7 @@
 using Dialogue;
 
 namespace TNode.Models{
-    //Node links are stored in output side of the two node port.
+    //NodeAttribute links are stored in output side of the two node port.
     [Serializable]
     public class NodeLink{
        // public DialogueNodePortData From{ get; }

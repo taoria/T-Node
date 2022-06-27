@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using TNode.BaseViews;
 using TNode.Cache;
 using TNode.Models;
+using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -28,10 +30,10 @@ namespace TNode.Editor.BaseViews{
             RegisterCallback<ContextualMenuPopulateEvent>(evt => {
                 var pos = evt.mousePosition;
         
-                evt.menu.AppendAction("Add Node", (dropMenuAction) => {
+                evt.menu.AppendAction("Add NodeAttribute", (dropMenuAction) => {
                     DialogueNodeView nodeView = new DialogueNodeView{
                         GUID = Guid.NewGuid().ToString(),
-                        title = "New Node"
+                        title = "New NodeAttribute"
                     };
                     // make it a 200x100 box
                     nodeView.SetPosition(new Rect(pos.x - 100, pos.y - 50, 200, 100));
@@ -102,7 +104,7 @@ namespace TNode.Editor.BaseViews{
      */
     public  abstract  class DataGraphView<T>:GraphView where T:GraphData{
         private T _data;
-        
+        private SearchWindowProvider _searchWindowProvider;
         public T Data{
             get{ return _data; }
             set{
@@ -128,7 +130,7 @@ namespace TNode.Editor.BaseViews{
                 
                 //Get the node type
                 var nodeType = dataNode.GetType();
-                //Get the derived type of Node View from the node type
+                //Get the derived type of NodeAttribute View from the node type
                 var nodeViewType = typeof(NodeView<>).MakeGenericType(nodeType);
                 
                 //Fetch the node view from the node view type
@@ -156,7 +158,18 @@ namespace TNode.Editor.BaseViews{
         public event DataChangedEventHandler OnDataChanged;
         public delegate void DataChangedEventHandler(object sender, DataChangedEventArgs<T> e);
 
+        
+        private void ConstructDefaultBehaviour(){
+            //Register a right click context menu
+            //ConstructContextualMenuOption();
+        }
+
+        public void ConstructViewContextualMenu(EventCallback<ContextualMenuPopulateEvent> callback){
+            RegisterCallback<ContextualMenuPopulateEvent>(callback);
+        }
+
         private void OnInit(){
+            ConstructDefaultBehaviour();
             OnGraphViewCreate();
         }
   
