@@ -53,7 +53,7 @@ namespace TNode.Editor{
                     var dmaPos = dma.eventInfo.mousePosition+editorPosition;
                     SearchWindowContext searchWindowContext = new SearchWindowContext(dmaPos,200,200);
                     var searchWindow = CreateInstance<SearchWindowProvider>();
-                    searchWindow.Setup(typeof(T),_graphView);
+                    searchWindow.Setup(typeof(T),_graphView,this);
                     Debug.Log(searchWindow);
                     SearchWindow.Open(searchWindowContext, searchWindow);
                 });

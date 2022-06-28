@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using TNode.BaseViews;
 using TNode.Cache;
 using TNode.Models;
+using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -11,9 +13,11 @@ namespace TNode.Editor{
     public class SearchWindowProvider:ScriptableObject,ISearchWindowProvider{
         private Type _graphType;
         private GraphView _graphView;
-        public void Setup(Type graph,GraphView graphView){
+        private EditorWindow _editor;
+        public void Setup(Type graph,GraphView graphView,EditorWindow editor){
             _graphType = graph;
             _graphView = graphView;
+            _editor = editor;
         }
         public List<SearchTreeEntry> CreateSearchTree(SearchWindowContext context){
             var nodeDataTypes = NodeEditorExtensions.GetGraphDataUsage(_graphType);
@@ -36,9 +40,14 @@ namespace TNode.Editor{
         }
         public bool OnSelectEntry(SearchTreeEntry SearchTreeEntry, SearchWindowContext context){
             var userData = SearchTreeEntry.userData;
+            var relativePos = context.screenMousePosition - _editor.position.position;
+            var localPos = _graphView.WorldToLocal(relativePos);
             if (userData is Type type){
-                var nodeView = NodeEditorExtensions.CreateNodeViewFromNodeType(type) as GraphElement;
-                _graphView.AddElement(nodeView);
+                if (NodeEditorExtensions.CreateNodeViewFromNodeType(type) is GraphElement nodeView){
+                    nodeView.SetPosition(
+                        new Rect(localPos.x, localPos.y, nodeView.layout.width, nodeView.layout.height));
+                    _graphView.AddElement(nodeView);
+                }
                 return true;
             }
             return false;
