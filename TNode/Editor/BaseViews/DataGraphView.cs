@@ -213,10 +213,14 @@ namespace TNode.Editor.BaseViews{
             }
         }
 
+        public void RemoveTNode(NodeData nodeData){
+            throw new NotImplementedException();
+        }
     }
 
     public interface IDataGraphView{
         public void AddTNode(NodeData nodeData, Rect rect);
+        public void RemoveTNode(NodeData nodeData);
     }
 
     public class DataChangedEventArgs<T>{
