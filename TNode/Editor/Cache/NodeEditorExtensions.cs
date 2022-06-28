@@ -89,8 +89,8 @@ namespace TNode.Cache{
             return instance;
         }
         public static bool HasSpecificType<T>() where T : class{
-            var implementedType = NodeEditorSingleton.Instance.FromGenericToSpecific[typeof(T)] as T;
-            return (T)implementedType!=null;
+
+            return NodeEditorSingleton.Instance.FromGenericToSpecific.ContainsKey(typeof(T));
         }
         public static List<Type> GetGraphDataUsage(Type t){
             if (NodeEditorSingleton.Instance.GraphDataUsage.ContainsKey(t)){

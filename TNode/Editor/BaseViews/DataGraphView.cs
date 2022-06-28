@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using TNode.BaseViews;
 using TNode.Cache;
+using TNode.Editor.Inspector;
 using TNode.Models;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
@@ -102,9 +103,11 @@ namespace TNode.Editor.BaseViews{
         }
     }
      */
-    public  abstract  class DataGraphView<T>:GraphView where T:GraphData{
+    public  abstract  class DataGraphView<T>:GraphView,IDataGraphView where T:GraphData{
         private T _data;
         private SearchWindowProvider _searchWindowProvider;
+        private bool _isInspectorOn;
+        private NodeInspector _nodeInspector;
         public T Data{
             get{ return _data; }
             set{
@@ -172,8 +175,16 @@ namespace TNode.Editor.BaseViews{
             ConstructDefaultBehaviour();
             OnGraphViewCreate();
         }
-  
-        
+
+        public virtual void CreateInspector(){
+            NodeInspector nodeInspector = new NodeInspector();
+            nodeInspector.SetPosition(new Rect(200,200,200,600));
+            this.Add(nodeInspector);
+            _nodeInspector = nodeInspector;
+            _isInspectorOn = true;
+        }
+
+
         
         public virtual void OnGraphViewCreate(){
             
@@ -184,14 +195,28 @@ namespace TNode.Editor.BaseViews{
         ~DataGraphView(){
             OnGraphViewDestroy();
         }
-        //rewrite function of the derived class in the comment  on the top of this script file in this class
-        // public abstract override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter);
-        //
-        // public void AddNode(NodeData nodeData){
-        //     
-        // }
-      
-        
+
+        public void AddTNode(NodeData nodeData, Rect rect){
+            if (NodeEditorExtensions.CreateNodeViewFromNodeType(nodeData.GetType()) is GraphElement nodeView){
+                nodeView.SetPosition(rect);
+                AddElement(nodeView);
+                //Add a select callback to the nodeView
+                nodeView.RegisterCallback<MouseDownEvent>(evt => {
+                    Debug.Log("NodeView Selected");
+                    if (evt.clickCount == 1){
+                        if (_isInspectorOn){
+                            _nodeInspector.Data = nodeData;
+                        }
+                    }
+                });
+                
+            }
+        }
+
+    }
+
+    public interface IDataGraphView{
+        public void AddTNode(NodeData nodeData, Rect rect);
     }
 
     public class DataChangedEventArgs<T>{

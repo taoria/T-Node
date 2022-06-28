@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using TNode.BaseViews;
 using TNode.Cache;
+using TNode.Editor.BaseViews;
 using TNode.Models;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
@@ -43,11 +44,14 @@ namespace TNode.Editor{
             var relativePos = context.screenMousePosition - _editor.position.position;
             var localPos = _graphView.WorldToLocal(relativePos);
             if (userData is Type type){
-                if (NodeEditorExtensions.CreateNodeViewFromNodeType(type) is GraphElement nodeView){
-                    nodeView.SetPosition(
-                        new Rect(localPos.x, localPos.y, nodeView.layout.width, nodeView.layout.height));
-                    _graphView.AddElement(nodeView);
+                //Check if type is derived from NodeData
+                if (typeof(NodeData).IsAssignableFrom(type)){
+                    //Make an instance of the type
+                    var nodeData = (NodeData) Activator.CreateInstance(type);
+                    nodeData.nodeName = "New Node";
+                    ((IDataGraphView)_graphView).AddTNode(nodeData,new Rect(localPos.x,localPos.y,100,100));
                 }
+
                 return true;
             }
             return false;

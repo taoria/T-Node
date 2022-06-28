@@ -13,17 +13,19 @@ namespace TNode.Editor.Inspector{
             set{
                 _data = value;
                 UpdateData();
+                
             }
         }
 
         private void UpdateData(){
+            Debug.Log(_data);
             if (_data != null){
                 RefreshInspector();
             }
         }
         public NodeInspector(){
+            style.position = new StyleEnum<Position>(Position.Absolute);
             var visualTreeAsset = Resources.Load<VisualTreeAsset>("NodeInspector");
-            
             Debug.Log(visualTreeAsset);
             ConstructWindowBasicSetting();
             BuildWindow(visualTreeAsset);
@@ -31,8 +33,10 @@ namespace TNode.Editor.Inspector{
 
         private void RefreshInspector(){
             //iterate field of data and get name of every fields,create a new inspector item of appropriate type and add it to the inspector for each field
-            foreach (var field in GetType().GetFields(BindingFlags.Instance | BindingFlags.Public)){
+            this.Q("InspectorBody").Clear();
+            foreach (var field in _data.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public)){
                 var bindingPath = field.Name;
+          
                 var type = field.FieldType;
                 DefaultInspectorItemFactory defaultInspectorItemFactory = new DefaultInspectorItemFactory();
                 //Invoke generic function Create<> of default inspector item factory to create an inspector item of appropriate type by reflection
@@ -40,7 +44,7 @@ namespace TNode.Editor.Inspector{
                 if (methodInfo != null){
                     var genericMethod = methodInfo.MakeGenericMethod(type);
                     var createdInspector  = genericMethod.Invoke(defaultInspectorItemFactory,null) as VisualElement;
-                    Add(createdInspector);
+                    this.Q("InspectorBody").Add(createdInspector);
                     if (createdInspector is INodeDataBindingBase castedInspector){
                         castedInspector.BindingNodeData = _data;
                         castedInspector.BindingPath = bindingPath;

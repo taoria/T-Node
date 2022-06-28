@@ -7,7 +7,7 @@ namespace TNode.BaseViews{
         private readonly Dragger _dragger = new Dragger();
 
         protected void ConstructWindowBasicSetting(){
-            style.position = new StyleEnum<Position>(Position.Absolute);
+            
             RegisterCallback<WheelEvent>(evt => { evt.StopPropagation(); });
             focusable = false;
             capabilities |= Capabilities.Movable | Capabilities.Resizable;
@@ -20,6 +20,7 @@ namespace TNode.BaseViews{
         }
   
         public SimpleGraphSubWindow(string defaultUxml=null){
+            style.position = new StyleEnum<Position>(Position.Absolute);
             ConstructWindowBasicSetting();
             if (defaultUxml != null){
                 var uxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(defaultUxml);
@@ -27,6 +28,7 @@ namespace TNode.BaseViews{
             }
         }
         public SimpleGraphSubWindow(VisualTreeAsset visualTreeAsset){
+            style.position = new StyleEnum<Position>(Position.Absolute);
             ConstructWindowBasicSetting();
             BuildWindow(visualTreeAsset);
         }
