@@ -8,7 +8,7 @@ namespace TNode.Editor.Inspector{
     public class DefaultInspectorItemFactory{
       
         public InspectorItem<T> Create<T>(){
-            //Check type of T
+            //Check type of GraphDataType
             var hasSpecificType = NodeEditorExtensions.HasSpecificType<InspectorItem<T>>();
             if (hasSpecificType){
                 return NodeEditorExtensions.CreateInstance<InspectorItem<T>>();

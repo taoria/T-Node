@@ -52,7 +52,10 @@ namespace TNode.Editor{
                 evt.menu.AppendAction("Create Node", dma => {
                     var dmaPos = dma.eventInfo.mousePosition+editorPosition;
                     SearchWindowContext searchWindowContext = new SearchWindowContext(dmaPos,200,200);
-                    SearchWindow.Open(searchWindowContext, ScriptableObject.CreateInstance<SearchWindowProvider>());
+                    var searchWindow = CreateInstance<SearchWindowProvider>();
+                    searchWindow.Setup(typeof(T),_graphView,this);
+                    Debug.Log(searchWindow);
+                    SearchWindow.Open(searchWindowContext, searchWindow);
                 });
             });
         }
@@ -78,7 +81,7 @@ namespace TNode.Editor{
             {
                 string path = EditorUtility.SaveFilePanel("Save Graph", "", "", "asset");
                 if (path.Length != 0){
-                    //Create a new asset file with type of T
+                    //Create a new asset file with type of GraphDataType
                     T asset = ScriptableObject.CreateInstance<T>();
                     AssetDatabase.CreateAsset(asset, path);
                 }
