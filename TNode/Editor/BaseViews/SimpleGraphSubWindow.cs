@@ -7,6 +7,7 @@ namespace TNode.BaseViews{
         private readonly Dragger _dragger = new Dragger();
 
         protected void ConstructWindowBasicSetting(){
+            style.position = new StyleEnum<Position>(Position.Absolute);
             RegisterCallback<WheelEvent>(evt => { evt.StopPropagation(); });
             focusable = false;
             capabilities |= Capabilities.Movable | Capabilities.Resizable;

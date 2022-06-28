@@ -23,6 +23,8 @@ namespace TNode.Editor.Inspector{
         }
         public NodeInspector(){
             var visualTreeAsset = Resources.Load<VisualTreeAsset>("NodeInspector");
+            
+            Debug.Log(visualTreeAsset);
             ConstructWindowBasicSetting();
             BuildWindow(visualTreeAsset);
         }
