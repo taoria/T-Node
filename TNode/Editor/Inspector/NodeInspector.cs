@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using TNode.BaseViews;
+using TNode.Editor.BaseViews;
 using TNode.Models;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -17,6 +18,7 @@ namespace TNode.Editor.Inspector{
             }
         }
 
+        public INodeView NodeView;
         private void UpdateData(){
             Debug.Log(_data);
             if (_data != null){
@@ -33,21 +35,23 @@ namespace TNode.Editor.Inspector{
 
         private void RefreshInspector(){
             //iterate field of data and get name of every fields,create a new inspector item of appropriate type and add it to the inspector for each field
-            this.Q("InspectorBody").Clear();
+            var body = this.Q("InspectorBody");
+            body.Clear();
+            body.Add(new Label(_data.nodeName));
             foreach (var field in _data.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public)){
                 var bindingPath = field.Name;
-          
                 var type = field.FieldType;
                 DefaultInspectorItemFactory defaultInspectorItemFactory = new DefaultInspectorItemFactory();
                 //Invoke generic function Create<> of default inspector item factory to create an inspector item of appropriate type by reflection
                 MethodInfo methodInfo = defaultInspectorItemFactory.GetType().GetMethod("Create", BindingFlags.Instance | BindingFlags.Public);
                 if (methodInfo != null){
                     var genericMethod = methodInfo.MakeGenericMethod(type);
-                    var createdInspector  = genericMethod.Invoke(defaultInspectorItemFactory,null) as VisualElement;
-                    this.Q("InspectorBody").Add(createdInspector);
-                    if (createdInspector is INodeDataBindingBase castedInspector){
-                        castedInspector.BindingNodeData = _data;
-                        castedInspector.BindingPath = bindingPath;
+                    var createdItem  = genericMethod.Invoke(defaultInspectorItemFactory,null) as VisualElement;
+                  
+                    body.Add(createdItem);
+                    if (createdItem is INodeDataBindingBase castedItem){
+                        castedItem.BindingNodeData = _data;
+                        castedItem.BindingPath = bindingPath;
                     }
                 }
             }

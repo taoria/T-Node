@@ -206,10 +206,14 @@ namespace TNode.Editor.BaseViews{
                     if (evt.clickCount == 1){
                         if (_isInspectorOn){
                             _nodeInspector.Data = nodeData;
+                            _nodeInspector.NodeView = nodeView as INodeView;
                         }
                     }
                 });
                 
+                if(nodeView is INodeView nodeViewInterface){
+                    nodeViewInterface.SetNodeData(nodeData);
+                }
             }
         }
 

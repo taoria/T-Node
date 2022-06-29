@@ -47,11 +47,12 @@ namespace TNode.Editor{
                 //Check if type is derived from NodeData
                 if (typeof(NodeData).IsAssignableFrom(type)){
                     //Make an instance of the type
-                    var nodeData = (NodeData) Activator.CreateInstance(type);
-                    nodeData.nodeName = "New Node";
-                    ((IDataGraphView)_graphView).AddTNode(nodeData,new Rect(localPos.x,localPos.y,100,100));
+                    var nodeData = CreateInstance(type) as NodeData;
+                    if (nodeData != null){
+                        nodeData.nodeName = "New Node";
+                        ((IDataGraphView) _graphView).AddTNode(nodeData, new Rect(localPos.x, localPos.y, 100, 100));
+                    }
                 }
-
                 return true;
             }
             return false;

@@ -1,12 +1,13 @@
-﻿using Dialogue;
-using TNode.Models;
+﻿using TNode.Models;
+using UnityEditor;
 using UnityEditor.Experimental.GraphView;
+using UnityEditor.UIElements;
 
-namespace TNode.BaseViews{
+namespace TNode.Editor.BaseViews{
     
     //A NodeAttribute monitor some type of node in the graph
     
-    public abstract class NodeView<T> : Node where T:NodeData,new(){
+    public abstract class NodeView<T> : Node,INodeView where T:NodeData,new(){
         protected T _data;
         public T Data{
             get => _data;
@@ -20,9 +21,39 @@ namespace TNode.BaseViews{
             set => base.title = value;
         }
         public event System.Action<T> OnDataChanged;
-        
-        public NodeView(){
+
+        protected NodeView(){
+            OnDataChanged+=OnDataChangedHandler;
+        }
+
+        private void OnDataChangedHandler(T obj){
+            this.title = _data.nodeName;
+        }
+
+        public void SetNodeData(NodeData nodeData){
+            Data = (T)nodeData;
+        }
+
+        public NodeData GetNodeData(){
+            return _data;
+        }
+
+        public void OnDataModified(){
+           Refresh();
+        }
+
+        public void Refresh(){
+            title = _data.nodeName;
             
         }
+
+    }
+
+    public interface INodeView{
+        public void SetNodeData(NodeData nodeData);
+        public NodeData GetNodeData();
+        
+        public void OnDataModified();
+
     }
 }

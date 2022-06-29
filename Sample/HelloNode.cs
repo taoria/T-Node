@@ -1,5 +1,4 @@
-﻿using Sample.Editor;
-using TNode.Attribute;
+﻿using TNode.Attribute;
 using TNode.Models;
 
 namespace Sample{
