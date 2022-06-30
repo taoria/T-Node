@@ -16,11 +16,20 @@ namespace TNode.Editor.BaseViews{
         public T Data{
             get => _data;
             set{
+                if(_data!=null)
+                    ((NodeDataWrapper)_data).OnValueChanged -= OnDataValueChanged;
                 _data = value;
                 OnDataChanged?.Invoke(value);
+                if(_data!=null)
+                    ((NodeDataWrapper)_data).OnValueChanged += OnDataValueChanged;
    
             }
         }
+
+        private void OnDataValueChanged(NodeDataWrapper obj){
+            Refresh();
+        }
+
         public sealed override string title{
             get => base.title;
             set => base.title = value;
@@ -29,13 +38,11 @@ namespace TNode.Editor.BaseViews{
 
         protected NodeView(){
             OnDataChanged+=OnDataChangedHandler;
-
-           _nodeInspectorInNode = new NodeInspectorInNode(){
+            _nodeInspectorInNode = new NodeInspectorInNode(){
                 name = "nodeInspectorInNode"
             };
             this.extensionContainer.Add(_nodeInspectorInNode);
         }
-
         private void OnDataChangedHandler(T obj){
             this.title = _data.nodeName;
             if (_nodeInspectorInNode != null){
@@ -55,14 +62,12 @@ namespace TNode.Editor.BaseViews{
         }
 
         public void OnDataModified(){
-           Refresh();
+            Refresh();
         }
 
         public void Refresh(){
             title = _data.nodeName;
-            
         }
-
     }
 
     public interface INodeView{

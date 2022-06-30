@@ -12,8 +12,6 @@ namespace TNode.Editor.Inspector{
         public InspectorItem<T> Create<T>(){
             //Check type of GraphDataType
             var hasSpecificType = NodeEditorExtensions.HasSpecificType<InspectorItem<T>>();
-            Debug.Log(typeof(InspectorItem<T>));
-            Debug.Log(hasSpecificType);
             if (hasSpecificType){
                 return NodeEditorExtensions.CreateInstance<InspectorItem<T>>();
             }
