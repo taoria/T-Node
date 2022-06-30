@@ -1,11 +1,13 @@
 ﻿using System;
 using TNode.Cache;
 using TNode.Editor.Inspector.InspectorImplementation;
+using Unity.VisualScripting;
 using UnityEditor;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace TNode.Editor.Inspector{
-    public class DefaultInspectorItemFactory{
+    public class InspectorItemFactory{
       
         public InspectorItem<T> Create<T>(){
             //Check type of GraphDataType
@@ -13,22 +15,9 @@ namespace TNode.Editor.Inspector{
             if (hasSpecificType){
                 return NodeEditorExtensions.CreateInstance<InspectorItem<T>>();
             }
-            else{
-                return DefaultInspectorItem<T>();
-            }
+            return null;
         }
         
-        public static InspectorItem<T> DefaultInspectorItem<T>(){
-            DefaultInspectorItem<T> item = new DefaultInspectorItem<T>();
-            if (typeof(string) == typeof(T)){
-                item.foldOut.Add(new TextField(){
-                    name = "StringTextField"
-                });
-            }
-
-            return item;
-
-        }
     }
 }
     
