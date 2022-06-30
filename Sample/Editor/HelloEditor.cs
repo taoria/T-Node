@@ -18,5 +18,9 @@ namespace Sample.Editor{
             }
             return false;
         }
+
+        public HelloEditor(){
+            
+        }
     }
 }

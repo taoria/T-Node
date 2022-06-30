@@ -5,6 +5,7 @@ using TNode.Attribute;
 using TNode.BaseViews;
 using TNode.Editor;
 using TNode.Editor.BaseViews;
+using TNode.Editor.Inspector;
 using TNode.Models;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
@@ -57,14 +58,13 @@ namespace TNode.Cache{
                 }
             }
         }
-
+        private readonly Type[] _acceptedTypesForGenericToSpecific = new Type[]{typeof(NodeView<>),typeof(DataGraphView<>),typeof(InspectorItem<>)};
         private void SetNodeComponentAttribute(Type type){
             foreach (var attribute in type.GetCustomAttributes(typeof(NodeComponentAttribute), false)){
                 //fetch this type 's parent class
                 var parent = type.BaseType;
                 //Check if this type is a generic type and is a generic type of NodeView or DataGraphView
-                if (parent is{IsGenericType: true} && (parent.GetGenericTypeDefinition() == typeof(NodeView<>) ||
-                                                       parent.GetGenericTypeDefinition() == typeof(DataGraphView<>))){
+                if (parent is{IsGenericType: true} && _acceptedTypesForGenericToSpecific.Contains(parent.GetGenericTypeDefinition())){
                     //Get the generic type of this type
                     //Add this type to the dictionary
                     FromGenericToSpecific.Add(parent, type);

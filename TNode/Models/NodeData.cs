@@ -1,4 +1,5 @@
 ﻿using System;
+using TNode.Attribute;
 using TNode.BaseModels;
 using UnityEngine;
 
@@ -11,12 +12,13 @@ namespace TNode.Models{
     /// 
     /// </summary>
     [Serializable]
-    public class NodeData:ScriptableObject,IModel{
+    public class NodeData:IModel{
    
         public NodeData() : base(){
             //Object Registration
         }
         public string nodeName;
+        [ShowInNodeView]
         public bool entryPoint;
 // #if UNITY_EDITOR
 //         public Rect rect;

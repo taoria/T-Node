@@ -9,5 +9,7 @@ namespace Sample.Editor{
         public override void OnGraphViewCreate(){
             CreateInspector();
         }
+
+
     }
 }

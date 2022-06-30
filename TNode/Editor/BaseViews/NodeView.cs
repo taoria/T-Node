@@ -1,7 +1,9 @@
-﻿using TNode.Models;
+﻿using TNode.Editor.Inspector;
+using TNode.Models;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;
+using UnityEngine;
 
 namespace TNode.Editor.BaseViews{
     
@@ -9,11 +11,14 @@ namespace TNode.Editor.BaseViews{
     
     public abstract class NodeView<T> : Node,INodeView where T:NodeData,new(){
         protected T _data;
+        private readonly NodeInspectorInNode _nodeInspectorInNode;
+
         public T Data{
             get => _data;
             set{
                 _data = value;
                 OnDataChanged?.Invoke(value);
+   
             }
         }
         public sealed override string title{
@@ -24,14 +29,25 @@ namespace TNode.Editor.BaseViews{
 
         protected NodeView(){
             OnDataChanged+=OnDataChangedHandler;
+
+           _nodeInspectorInNode = new NodeInspectorInNode(){
+                name = "nodeInspectorInNode"
+            };
+            this.extensionContainer.Add(_nodeInspectorInNode);
         }
 
         private void OnDataChangedHandler(T obj){
             this.title = _data.nodeName;
+            if (_nodeInspectorInNode != null){
+                _nodeInspectorInNode.Data = obj;
+                this.RefreshExpandedState();
+                this.expanded = true;
+            }
         }
 
         public void SetNodeData(NodeData nodeData){
             Data = (T)nodeData;
+   
         }
 
         public NodeData GetNodeData(){

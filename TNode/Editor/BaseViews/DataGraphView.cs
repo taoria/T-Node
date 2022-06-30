@@ -178,12 +178,24 @@ namespace TNode.Editor.BaseViews{
 
         public virtual void CreateInspector(){
             NodeInspector nodeInspector = new NodeInspector();
-            nodeInspector.SetPosition(new Rect(200,200,200,600));
             this.Add(nodeInspector);
             _nodeInspector = nodeInspector;
             _isInspectorOn = true;
         }
+        public virtual void DestroyInspector(){
+            if(_nodeInspector!=null){
+                this.Remove(_nodeInspector);
+                _nodeInspector = null;
+            }
+            _isInspectorOn = false;
+        }
 
+        public virtual void SetInspector(NodeInspector nodeInspector){
+            _nodeInspector = nodeInspector;
+            if (!_isInspectorOn){
+                _isInspectorOn = true;
+            }
+        }
 
         
         public virtual void OnGraphViewCreate(){

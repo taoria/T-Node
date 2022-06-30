@@ -7,6 +7,7 @@ namespace TNode.Editor.Inspector{
     public abstract class InspectorItem<T>:VisualElement,INodeDataBinding<T>{
         private NodeData _bindingNodeData;
         private string _bindingFieldName;
+        protected BaseField<T> Bindable;
         protected event System.Action OnValueChanged;
 
         public string BindingPath{
@@ -46,13 +47,40 @@ namespace TNode.Editor.Inspector{
         }
 
         protected T Value => GetValue();
+
+        protected void SetValue(T value){
+            var fieldInfo = _bindingNodeData.GetType().GetField(BindingPath, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+            Debug.Log(fieldInfo);
+            Debug.Log(fieldInfo?.FieldType );
+            if (fieldInfo != null && fieldInfo.FieldType == typeof(T)){
+                fieldInfo.SetValue(_bindingNodeData,value);
+                
+                //if value changed ,notify node inspector's current inspecting node view
+                if (parent.parent is NodeInspector nodeInspector){
+                    nodeInspector.NodeView.OnDataModified();
+                }
+            }
+            else{
+                Debug.LogError("Wrong Type for current node data");
+            }
+        }
         public  InspectorItem(){
            
             OnValueChanged+= OnValueChangedHandler;
         }
-    
+        public void CreateBindable(BaseField<T> bindable){
+            Bindable = bindable;
+            this.Add(Bindable);
+            Bindable?.RegisterValueChangedCallback(e => {
+                SetValue(e.newValue);
+            });
+        }
         private void OnValueChangedHandler(){
-            
+            Bindable = this.Q<BaseField<T>>();
+            if(Bindable!= null){
+                Bindable.value = Value;
+                Bindable.label = BindingPath;
+            }
         }
         ~InspectorItem(){
             OnValueChanged-= OnValueChangedHandler;
