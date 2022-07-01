@@ -19,7 +19,7 @@ namespace TNode.Editor{
         [SerializeField]
         private VisualTreeAsset mVisualTreeAsset = default;
         //Persist editor data ,such as node position,node size ,etc ,in this script object
-        public NodeEditorData nodeEditorData;
+        public GraphEditorData nodeEditorData;
     
         public void CreateGUI(){
             

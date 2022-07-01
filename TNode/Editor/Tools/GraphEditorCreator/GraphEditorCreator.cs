@@ -143,17 +143,17 @@ namespace TNode.Editor.Tools.GraphEditorCreator{
             }
 
             //Create an NodeAttribute Editor Data Instance for the new graph editor
-            NodeEditorData nodeEditorData = ScriptableObject.CreateInstance<NodeEditorData>();
-            nodeEditorData.name = editorName;
+            var graphEditorData = ScriptableObject.CreateInstance<GraphEditorData>();
+            graphEditorData.name = editorName;
 
             VisualTreeAsset defaultEditorTree = Resources.Load<VisualTreeAsset>("GraphEditor");
-            EditorUtility.SetDirty(nodeEditorData);
+            EditorUtility.SetDirty(graphEditorData);
 
             //Save it at the same folder as the new graph editor
-            string nodeEditorDataPath = Path.Combine(path, editorName + ".asset");
-            AssetDatabase.CreateAsset(nodeEditorData, nodeEditorDataPath);
+            string grapEditorPath = Path.Combine(path, editorName + ".asset");
+            AssetDatabase.CreateAsset(graphEditorData, grapEditorPath);
             //Wait for the new file to be imported
-            while (!AssetDatabase.LoadAssetAtPath<NodeEditorData>(nodeEditorDataPath)){
+            while (!AssetDatabase.LoadAssetAtPath<GraphEditorData>(grapEditorPath)){
                 EditorUtility.DisplayProgressBar("Generating Graph Editor",
                     "Please wait while the new graph editor is being imported", 0.5f);
                 EditorApplication.update();
@@ -164,8 +164,8 @@ namespace TNode.Editor.Tools.GraphEditorCreator{
             MonoImporter monoImporter = AssetImporter.GetAtPath(editorPath) as MonoImporter;
 
             if (monoImporter != null)
-                monoImporter.SetDefaultReferences(new string[]{"nodeEditorData", "mVisualTreeAsset"},
-                    new Object[]{nodeEditorData, defaultEditorTree});
+                monoImporter.SetDefaultReferences(new string[]{"graphEditorData", "mVisualTreeAsset"},
+                    new Object[]{graphEditorData, defaultEditorTree});
 
 
             //Refresh the asset ann close it

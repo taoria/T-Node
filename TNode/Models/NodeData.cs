@@ -16,8 +16,9 @@ namespace TNode.Models{
    
         public NodeData() : base(){
             //Object Registration
+            id = Guid.NewGuid().ToString();
         }
-
+        [DisableOnInspector]
         public string id;
         public string nodeName;
         public bool entryPoint;

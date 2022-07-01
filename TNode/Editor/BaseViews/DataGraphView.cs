@@ -4,6 +4,7 @@ using System.Linq;
 using TNode.BaseViews;
 using TNode.Cache;
 using TNode.Editor.Inspector;
+using TNode.Editor.Model;
 using TNode.Models;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
@@ -189,6 +190,14 @@ namespace TNode.Editor.BaseViews{
             this.Add(miniMap);
             miniMap.SetPosition(rect);
         }
+
+        public void CreateBlackBoard(){
+            var blackboard = new Blackboard();
+            //Set black board to left side of the view
+            blackboard.SetPosition(new Rect(0,0,200,600));
+            this.Add(blackboard);
+            
+        }
         public virtual void DestroyInspector(){
             if(_nodeInspector!=null){
                 this.Remove(_nodeInspector);
@@ -204,6 +213,34 @@ namespace TNode.Editor.BaseViews{
             }
         }
 
+        public void SaveEditorData(GraphEditorData graphEditorData){
+            graphEditorData.nodesData.Clear();
+            //iterator nodes
+       
+            foreach (var node in this.nodes){
+                var nodeEditorData = new NodeEditorData{
+                    nodePos = node.GetPosition(),
+                };
+                if (node is INodeView nodeView){
+                    nodeEditorData.nodeGuid = nodeView.GetNodeData().id;
+                }
+                graphEditorData.nodesData.Add(nodeEditorData);
+            }
+        }
+        public void LoadEditorData(GraphEditorData graphEditorData){
+            //Load node position
+            foreach (var nodeEditorData in graphEditorData.nodesData){
+
+                var node = this.nodes.Select(x => x as INodeView).First(x=>x?.GetNodeData().id==nodeEditorData.nodeGuid);
+                
+                if (node != null){
+                    ((GraphElement)node).SetPosition(nodeEditorData.nodePos);
+                }
+            }
+        }
+        public  void SaveWithEditorData(GraphEditorData graphEditorData){
+            SaveEditorData(graphEditorData);
+        }
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter){
             return ports.Where(x => x.portType == startPort.portType).ToList();
         }
