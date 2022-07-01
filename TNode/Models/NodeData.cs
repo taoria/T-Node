@@ -17,8 +17,9 @@ namespace TNode.Models{
         public NodeData() : base(){
             //Object Registration
         }
+
+        public string id;
         public string nodeName;
-        [ShowInNodeView]
         public bool entryPoint;
 // #if UNITY_EDITOR
 //         public Rect rect;

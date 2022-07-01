@@ -16,9 +16,7 @@ namespace TNode.Editor{
     
     public abstract class GraphEditor<T> : EditorWindow where T:GraphData{ 
         protected DataGraphView<T> _graphView;
-        [FormerlySerializedAs("m_VisualTreeAsset")] [SerializeField]
-        
-        
+        [SerializeField]
         private VisualTreeAsset mVisualTreeAsset = default;
         //Persist editor data ,such as node position,node size ,etc ,in this script object
         public NodeEditorData nodeEditorData;
@@ -51,7 +49,6 @@ namespace TNode.Editor{
                     SearchWindowContext searchWindowContext = new SearchWindowContext(dmaPos,200,200);
                     var searchWindow = CreateInstance<SearchWindowProvider>();
                     searchWindow.Setup(typeof(T),_graphView,this);
-                    Debug.Log(searchWindow);
                     SearchWindow.Open(searchWindowContext, searchWindow);
                 });
             });

@@ -4,7 +4,7 @@ using UnityEditor.Experimental.GraphView;
 
 namespace TNode.Attribute{
     [MeansImplicitUse]
-    [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
     
     public class PortAttribute:System.Attribute{
         public string PortName;

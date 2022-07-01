@@ -25,7 +25,6 @@ namespace TNode.Editor.Inspector{
 
         private void RefreshInspector(){
             Clear();
-            Debug.Log("In Node node inspector refresh for new data " + _data);
             InspectorItemFactory inspectorItemFactory = new InspectorItemFactory();
             foreach (var field in _data.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public)){
                 var bindingPath = field.Name;

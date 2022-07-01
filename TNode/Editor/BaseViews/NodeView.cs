@@ -1,4 +1,7 @@
-﻿using TNode.Editor.Inspector;
+﻿using System;
+using TNode.Attribute;
+using TNode.Attribute.Ports;
+using TNode.Editor.Inspector;
 using TNode.Models;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
@@ -47,8 +50,35 @@ namespace TNode.Editor.BaseViews{
             this.title = _data.nodeName;
             if (_nodeInspectorInNode != null){
                 _nodeInspectorInNode.Data = obj;
-                this.RefreshExpandedState();
-                this.expanded = true;
+                
+                
+            }
+
+            BuildInputAndOutputPort();
+            this.expanded = true;
+            this.RefreshExpandedState();
+        }
+
+        private void BuildInputAndOutputPort(){
+            var propertyInfos = _data.GetType().GetProperties();
+   
+            foreach (var propertyInfo in propertyInfos){
+                Debug.Log(propertyInfos);
+                var attribute = propertyInfo.GetCustomAttributes(typeof(OutputAttribute),true);
+                if (attribute.Length > 0){
+                    Port port = InstantiatePort(Orientation.Horizontal, Direction.Output,Port.Capacity.Multi,propertyInfo.PropertyType);
+                    this.outputContainer.Add(port);
+                    port.portName = propertyInfo.Name;
+                }
+            }
+            foreach (var propertyInfo in propertyInfos){
+                Debug.Log(propertyInfos);
+                var attribute = propertyInfo.GetCustomAttributes(typeof(InputAttribute),true);
+                if (attribute.Length > 0){
+                    Port port = InstantiatePort(Orientation.Horizontal, Direction.Input,Port.Capacity.Multi,propertyInfo.PropertyType);
+                    this.inputContainer.Add(port);
+                    port.portName = propertyInfo.Name;
+                }
             }
         }
 

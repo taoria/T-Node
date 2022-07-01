@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using TNode.BaseViews;
 using TNode.Cache;
 using TNode.Editor.Inspector;
@@ -182,6 +183,12 @@ namespace TNode.Editor.BaseViews{
             _nodeInspector = nodeInspector;
             _isInspectorOn = true;
         }
+
+        public void CreateMiniMap(Rect rect){
+            var miniMap = new MiniMap();
+            this.Add(miniMap);
+            miniMap.SetPosition(rect);
+        }
         public virtual void DestroyInspector(){
             if(_nodeInspector!=null){
                 this.Remove(_nodeInspector);
@@ -197,7 +204,10 @@ namespace TNode.Editor.BaseViews{
             }
         }
 
-        
+        public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter){
+            return ports.Where(x => x.portType == startPort.portType).ToList();
+        }
+
         public virtual void OnGraphViewCreate(){
             
         }
