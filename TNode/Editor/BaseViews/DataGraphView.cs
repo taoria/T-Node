@@ -129,7 +129,7 @@ namespace TNode.Editor.BaseViews{
             foreach (var edge in edges){
                 RemoveElement(edge);
             }
-            foreach (var dataNode in _data.nodes){
+            foreach (var dataNode in _data.NodeDictionary.Values){
                 if(dataNode==null)
                     continue;
                 
@@ -225,6 +225,7 @@ namespace TNode.Editor.BaseViews{
                     nodeEditorData.nodeGuid = nodeView.GetNodeData().id;
                 }
                 graphEditorData.nodesData.Add(nodeEditorData);
+                EditorUtility.SetDirty(graphEditorData);
             }
         }
         public void LoadEditorData(GraphEditorData graphEditorData){
@@ -240,7 +241,14 @@ namespace TNode.Editor.BaseViews{
         }
         public  void SaveWithEditorData(GraphEditorData graphEditorData){
             SaveEditorData(graphEditorData);
+            SaveGraphData();
         }
+
+        private void SaveGraphData(){
+            EditorUtility.SetDirty(_data);
+            AssetDatabase.SaveAssets();
+        }
+
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter){
             return ports.Where(x => x.portType == startPort.portType).ToList();
         }
