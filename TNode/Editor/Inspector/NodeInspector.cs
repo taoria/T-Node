@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using TNode.Attribute;
 using TNode.BaseViews;
 using TNode.Editor.BaseViews;
 using TNode.Models;
@@ -54,11 +55,15 @@ namespace TNode.Editor.Inspector{
                 if (methodInfo != null){
                     var genericMethod = methodInfo.MakeGenericMethod(type);
                     var createdItem  = genericMethod.Invoke(inspectorItemFactory,null) as VisualElement;
-                  
                     body.Add(createdItem);
                     if (createdItem is INodeDataBindingBase castedItem){
                         castedItem.BindingNodeData = _data;
                         castedItem.BindingPath = bindingPath;
+                    }
+                    
+                    //Check if field has DisableOnInspector attribute and if so,disable it
+                    if (field.GetCustomAttribute<DisableOnInspectorAttribute>() != null){
+                        createdItem?.SetEnabled(false);
                     }
                 }
             }

@@ -76,13 +76,11 @@ namespace TNode.Cache{
     //Outer wrapper for the singleton class
     public static class NodeEditorExtensions{
         public static T CreateInstance<T>(){
-            Debug.Log($"Create A instance of {typeof(T)}");
             var implementedType = NodeEditorSingleton.Instance.FromGenericToSpecific[typeof(T)];
             var instance = (T)Activator.CreateInstance(implementedType);
             return instance;
         }
         public static object CreateInstance(Type t){
-            Debug.Log($"Create A instance of {t}");
             var implementedType = NodeEditorSingleton.Instance.FromGenericToSpecific[t];
             var instance = Activator.CreateInstance(implementedType);
             return instance;

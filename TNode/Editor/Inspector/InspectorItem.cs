@@ -54,7 +54,6 @@ namespace TNode.Editor.Inspector{
 
         protected void SetValue(T value){
             NodeDataWrapper wrapper = _bindingNodeData;
-            Debug.Log(wrapper);
             wrapper.SetValue(BindingPath,value);
         }
         public  InspectorItem(){

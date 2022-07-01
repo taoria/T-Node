@@ -14,13 +14,17 @@ namespace TNode.Attribute{
     [AttributeUsage(AttributeTargets.Class)]
     [BaseTypeRequired(typeof(NodeData))]
     public class GraphUsageAttribute:System.Attribute{
-        public Type GraphDataType;
-        public GraphUsageAttribute(Type t){
+        public readonly Type GraphDataType;
+        public string Category;
+        public GraphUsageAttribute(Type t,string category = null){
             //check if the type t is graph
             if(!typeof(GraphData).IsAssignableFrom(t)){
                 throw new Exception("The type must be a graph");
             }
             GraphDataType = t;
+            if (category != null){
+                Category = category;
+            }
         }
     }
 }

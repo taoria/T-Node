@@ -18,7 +18,7 @@ namespace TNode.Editor.Tools.GraphEditorCreator{
         private TextField _editorClassNameTextField;
         private TextField _graphClassNameTextField;
         private Button _createButton;
-
+        private readonly SourceGeneratorForGraphEditor _sourceGeneratorForGraphEditor = new SourceGeneratorForGraphEditor();
         [MenuItem("Assets/Create/TNode/Create New Graph Editor")]
         [MenuItem("TNode/Create New Graph Editor")]
         public static void ShowExample()
@@ -88,23 +88,25 @@ namespace TNode.Editor.Tools.GraphEditorCreator{
          
             
         }
-
+        
         private void OnCreateButtonClicked(){
             //Create a new .cs file at current opened asset folder
             string path = AssetDatabase.GetAssetPath(Selection.activeObject);
-            if (path == "")
-            {
+            if (path == ""){
                 path = "Assets";
+               
             }
-            else if (Path.GetExtension(path) != "")
-            {
+            else if (Path.GetExtension(path) != ""){
                 path = path.Replace(Path.GetFileName(AssetDatabase.GetAssetPath(Selection.activeObject)), "");
+              
             }
+            var pathBeforeEditor = path;
             //if the path is not named with editor, create a new folder called editor at the path
-            if (!path.EndsWith("Editor"))
+            if (!path.EndsWith("/Editor"))
             {
                 AssetDatabase.CreateFolder(path, "Editor");
-                path = path + "/Editor";
+                pathBeforeEditor = path;
+                path += "/Editor";
             }
             //Query the name of the graph editor
             string editorName =_editorClassNameTextField.text;
@@ -114,55 +116,61 @@ namespace TNode.Editor.Tools.GraphEditorCreator{
             {
                 editorName = "NewGraphEditor";
             }
-    
-            SourceGeneratorForGraphEditor sourceGeneratorForGraphEditor = new SourceGeneratorForGraphEditor();
             
-            var source = sourceGeneratorForGraphEditor.GenerateGraphEditor(editorName,graphName);
+            CreateResource(editorName, graphName, graphViewName, path, pathBeforeEditor);
+        }
 
-            var sourceGraph = sourceGeneratorForGraphEditor.GenerateGraph(graphName);
+        private void CreateResource(string editorName, string graphName, string graphViewName, string path,
+            string pathBeforeEditor){
+            var source = _sourceGeneratorForGraphEditor.GenerateGraphEditor(editorName, graphName);
 
-            var sourceGraphView = sourceGeneratorForGraphEditor.GenerateGraphView(graphViewName,graphName);
+            var sourceGraph = _sourceGeneratorForGraphEditor.GenerateGraph(graphName);
+            var sourceGraphView = _sourceGeneratorForGraphEditor.GenerateGraphView(graphViewName, graphName);
             string editorPath = Path.Combine(path, editorName + ".cs");
-            string graphPath = Path.Combine(path, graphName + ".cs");
+            string graphPath = Path.Combine(pathBeforeEditor, graphName + ".cs");
             string graphViewPath = Path.Combine(path, graphViewName + ".cs");
             File.WriteAllText(editorPath, source);
             File.WriteAllText(graphPath, sourceGraph);
             File.WriteAllText(graphViewPath, sourceGraphView);
             //Refresh the AssetDatabase to import the new file
             AssetDatabase.Refresh();
-  
+
             //Wait for the new file to be imported
-            while (!AssetDatabase.LoadAssetAtPath<MonoScript>(editorPath))
-            {
-                EditorUtility.DisplayProgressBar("Generating Graph Editor", "Please wait while the new graph editor is being imported", 0.5f);
+            while (!AssetDatabase.LoadAssetAtPath<MonoScript>(editorPath)){
+                EditorUtility.DisplayProgressBar("Generating Graph Editor",
+                    "Please wait while the new graph editor is being imported", 0.5f);
                 EditorApplication.update();
             }
-            
+
             //Create an NodeAttribute Editor Data Instance for the new graph editor
-            NodeEditorData nodeEditorData = ScriptableObject.CreateInstance<NodeEditorData>();
-            nodeEditorData.name = editorName;
-            EditorUtility.SetDirty(nodeEditorData);
-            
+            var graphEditorData = ScriptableObject.CreateInstance<GraphEditorData>();
+            graphEditorData.name = editorName;
+
+            VisualTreeAsset defaultEditorTree = Resources.Load<VisualTreeAsset>("GraphEditor");
+            EditorUtility.SetDirty(graphEditorData);
+
             //Save it at the same folder as the new graph editor
-            string nodeEditorDataPath = Path.Combine(path, editorName + ".asset");
-            AssetDatabase.CreateAsset(nodeEditorData, nodeEditorDataPath);
+            string grapEditorPath = Path.Combine(path, editorName + ".asset");
+            AssetDatabase.CreateAsset(graphEditorData, grapEditorPath);
             //Wait for the new file to be imported
-            while (!AssetDatabase.LoadAssetAtPath<NodeEditorData>(nodeEditorDataPath))
-            {
-                EditorUtility.DisplayProgressBar("Generating Graph Editor", "Please wait while the new graph editor is being imported", 0.5f);
+            while (!AssetDatabase.LoadAssetAtPath<GraphEditorData>(grapEditorPath)){
+                EditorUtility.DisplayProgressBar("Generating Graph Editor",
+                    "Please wait while the new graph editor is being imported", 0.5f);
                 EditorApplication.update();
             }
+
             var script = AssetDatabase.LoadAssetAtPath<MonoScript>(editorPath);
             //Set the mono importer to the current graph editor script
             MonoImporter monoImporter = AssetImporter.GetAtPath(editorPath) as MonoImporter;
 
             if (monoImporter != null)
-                monoImporter.SetDefaultReferences(new string[]{"nodeEditorData"}, new Object[]{nodeEditorData});
-            
-   
+                monoImporter.SetDefaultReferences(new string[]{"graphEditorData", "mVisualTreeAsset"},
+                    new Object[]{graphEditorData, defaultEditorTree});
+
+
             //Refresh the asset ann close it
             //Mark it dirty
-            
+
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
             Close();
