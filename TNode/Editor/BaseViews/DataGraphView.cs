@@ -129,6 +129,8 @@ namespace TNode.Editor.BaseViews{
             foreach (var edge in edges){
                 RemoveElement(edge);
             }
+            Dictionary<string,Node> nodeDict = new Dictionary<string, Node>();
+            if (nodeDict == null) throw new ArgumentNullException(nameof(nodeDict));
             foreach (var dataNode in _data.NodeDictionary.Values){
                 if(dataNode==null)
                     continue;
@@ -143,8 +145,27 @@ namespace TNode.Editor.BaseViews{
                 
                 //Cast the node view to the nodeViewType
                 AddElement((Node)nodeView);
-
+                
+                ((INodeView)nodeView).SetNodeData(dataNode);
+                
+                //Add the node view to the node dictionary
+                nodeDict.Add(dataNode.id, (Node)nodeView);
             }
+
+            foreach (var edge in _data.NodeLinks){
+                var inputNode = _data.NodeDictionary[edge.inPort.nodeDataId];
+                var outputNode = _data.NodeDictionary[edge.outPort.nodeDataId];
+                var inputNodeView = nodeDict[inputNode.id];
+                var outputNodeView = nodeDict[outputNode.id];
+                Edge newEdge = new Edge(){
+                    input = inputNodeView.inputContainer.Q<Port>(edge.inPort.portName),
+                    output = outputNodeView.outputContainer.Q<Port>(edge.outPort.portName)
+                };
+                newEdge.input?.Connect(newEdge);
+                newEdge.output?.Connect(newEdge);
+                AddElement(newEdge);
+            }
+            nodeDict.Clear();
         }
         //A Constructor for the DataGraphView ,never to override it
         public DataGraphView(){
@@ -239,12 +260,43 @@ namespace TNode.Editor.BaseViews{
                 }
             }
         }
+
+
         public  void SaveWithEditorData(GraphEditorData graphEditorData){
             SaveEditorData(graphEditorData);
             SaveGraphData();
         }
 
         private void SaveGraphData(){
+            foreach (var node in nodes){
+                if (node is INodeView nodeView){
+                    var nodeData = nodeView.GetNodeData();
+                    if (!_data.NodeDictionary.ContainsKey(nodeData.id)){
+                        _data.NodeDictionary.Add(nodeData.id, nodeData);
+                    }
+                }
+            }
+            //force edge to write as links
+            foreach (var edge in edges){
+                var inputNode = edge.input.node as INodeView;
+                var outputNode = edge.output.node as INodeView;
+                var links = new List<NodeLink>();
+                if (inputNode != null && outputNode != null){
+                    var inputNodeData = inputNode.GetNodeData();
+                    var outputNodeData = outputNode.GetNodeData();
+                    var newNodeLink = new NodeLink(new PortInfo(){
+                        nodeDataId = inputNodeData.id,
+                        portName = edge.input.name
+
+                    }, new PortInfo(){
+                        nodeDataId = outputNodeData.id,
+                        portName = edge.output.name
+                    });
+                }
+
+                _data.NodeLinks = links;
+                
+            }
             EditorUtility.SetDirty(_data);
             AssetDatabase.SaveAssets();
         }

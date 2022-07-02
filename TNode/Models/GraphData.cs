@@ -8,6 +8,7 @@ namespace TNode.Models{
     public class GraphData:ScriptableObject,ISerializationCallbackReceiver{
         [SerializeField]
         public Dictionary<string,NodeData> NodeDictionary = new Dictionary<string,NodeData>();
+        public List<NodeLink> NodeLinks = new List<NodeLink>();
 
         [SerializeField]
         [HideInInspector]
