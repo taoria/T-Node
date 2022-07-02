@@ -19,7 +19,7 @@ namespace TNode.Editor{
         [SerializeField]
         private VisualTreeAsset mVisualTreeAsset = default;
         //Persist editor data ,such as node position,node size ,etc ,in this script object
-        public GraphEditorData nodeEditorData;
+        [FormerlySerializedAs("nodeEditorData")] public GraphEditorData graphEditorData;
     
         public void CreateGUI(){
             
@@ -53,10 +53,6 @@ namespace TNode.Editor{
                 });
             });
         }
-        private void ConstructSearchWindow(){
-            //Register a search window
-            
-        }
 
         private void DefineGraphEditorActions(){
             //Register a  event when user press ctrl + s
@@ -78,7 +74,11 @@ namespace TNode.Editor{
                     //Create a new asset file with type of GraphDataType
                     T asset = ScriptableObject.CreateInstance<T>();
                     AssetDatabase.CreateAsset(asset, path);
+                    AssetDatabase.SaveAssets();
                 }
+            }
+            else{
+                _graphView.SaveWithEditorData(graphEditorData);
             }
   
         }
