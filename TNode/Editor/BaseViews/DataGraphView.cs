@@ -116,7 +116,8 @@ namespace TNode.Editor.BaseViews{
         private NodeInspector _nodeInspector;
         public GraphEditor<T> Owner;
         private Dictionary<string,Node> _nodeDict = new();
-        
+        private Blackboard _blackboard;
+
         public T Data{
             get{ return _data; }
             set{
@@ -234,7 +235,7 @@ namespace TNode.Editor.BaseViews{
         }
 
         public void CreateBlackboard(){
-            var blackboard = new Blackboard();
+            _blackboard = new Blackboard();
             //Blackboard add "Add Node" button
             // blackboard.Add(new BlackboardSection(){
             //     title = "Hello World",
@@ -245,40 +246,60 @@ namespace TNode.Editor.BaseViews{
             // };
             //
             //Set black board to left side of the view
-            blackboard.SetPosition(new Rect(0,0,200,600));
-            Add(blackboard);
+            _blackboard.SetPosition(new Rect(0,0,200,600));
+            Add(_blackboard);
             //Check the type of the blackboard
             
-            OnDataChanged+= (sender, e) => {
-              
-                if (_data.blackboardData==null||_data.blackboardData.GetType()==typeof(BlackboardData)){
-                    _data.blackboardData = NodeEditorExtensions.GetAppropriateBlackboardData(_data.GetType());
-          
-                    if(_data.blackboardData==null) return;
-
-                }  
-                Debug.Log(_data.blackboardData);
-                //Iterate field of the blackboard and add a button for each field
-                foreach (var field in _data.blackboardData.GetType()
-                             .GetFields(BindingFlags.Public|BindingFlags.NonPublic | BindingFlags.Instance)){
-                    Debug.Log(field);
-                    //if the field is MonoBehaviour,add a property field for blackboard
-                    if(typeof(UnityEngine.Object).IsAssignableFrom(field.FieldType)){
-                        var propertyField = new BlackboardField(null,field.Name,null){
-                            
-                        };
-                        blackboard.Add(propertyField);
-                    }
-                    if(typeof(string).IsAssignableFrom(field.FieldType)){
-                        var propertyField = new BlackboardField(null,field.Name,null){
-                            
-                        };
-                        blackboard.Add(propertyField);
-                    }
-                }
-            };
+            OnDataChanged+= (sender, e) => { BlackboardUpdate(); };
 
         }
+
+        private void BlackboardUpdate(){
+            if (_data.blackboardData == null || _data.blackboardData.GetType() == typeof(BlackboardData)){
+                _data.blackboardData = NodeEditorExtensions.GetAppropriateBlackboardData(_data.GetType());
+
+                if (_data.blackboardData == null) return;
+            }
+
+            Debug.Log(_data.blackboardData);
+            //Iterate field of the blackboard and add a button for each field
+            foreach (var field in _data.blackboardData.GetType()
+                         .GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)){
+                Debug.Log(field);
+                //if the field is MonoBehaviour,add a property field for blackboard
+                if (typeof(UnityEngine.Object).IsAssignableFrom(field.FieldType)){
+                    var propertyField = new BlackboardField(null, field.Name, null){
+                    };
+                    _blackboard.Add(propertyField);
+                    //register a drag event for the property field to drag the object from blackboard to the graph
+
+                    propertyField.RegisterCallback<DragUpdatedEvent>(evt => {
+                        if (evt.target is GraphView graphView){
+                            var type = field.FieldType;
+                            //Get Generic Constructor of the BlackDragNodeData<>
+                            var genericConstructor = typeof(BlackDragNodeData<>).MakeGenericType(type).GetConstructor(
+                                BindingFlags.Instance | BindingFlags.NonPublic,
+                                null,
+                                new Type[]{typeof(string), typeof(object)},
+                                null);
+                            if (genericConstructor != null){
+                                NodeData nodeData = null;
+                                nodeData =
+                                    genericConstructor.Invoke(null, new object[]{field.Name, _data.blackboardData}) as NodeData;
+                                this.AddTNode(nodeData, new Rect(evt.localMousePosition, new Vector2(200, 200)));
+                            }
+                        }
+                    });
+                }
+
+                if (typeof(string).IsAssignableFrom(field.FieldType)){
+                    var propertyField = new BlackboardField(null, field.Name, null){
+                    };
+                    _blackboard.Add(propertyField);
+                }
+            }
+        }
+
         public virtual void DestroyInspector(){
             if(_nodeInspector!=null){
                 this.Remove(_nodeInspector);
