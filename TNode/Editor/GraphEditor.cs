@@ -39,19 +39,6 @@ namespace TNode.Editor{
             _graphView = NodeEditorExtensions.CreateInstance<DataGraphView<T>>();
             rootVisualElement.Add(_graphView);
             _graphView.StretchToParentSize();
-            _graphView.ConstructViewContextualMenu(evt => {
-                //Current issue is that the search window don't show up at  the exact position of the mouse click by dma.eventInfo.mousePosition
-                //So I have to manually set the position of the search window to fit the mouse click position by add an offset driven by Editor's position
-                //Maybe a better way exists to fix this issue
-                Vector2 editorPosition = this.position.position;
-                evt.menu.AppendAction("Create Node", dma => {
-                    var dmaPos = dma.eventInfo.mousePosition+editorPosition;
-                    SearchWindowContext searchWindowContext = new SearchWindowContext(dmaPos,200,200);
-                    var searchWindow = CreateInstance<SearchWindowProvider>();
-                    searchWindow.Setup(typeof(T),_graphView,this);
-                    SearchWindow.Open(searchWindowContext, searchWindow);
-                });
-            });
         }
 
         private void DefineGraphEditorActions(){

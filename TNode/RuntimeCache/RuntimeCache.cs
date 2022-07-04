@@ -34,13 +34,18 @@ namespace TNode.RuntimeCache{
             var type = typeof(T);
             if(!CachedDelegatesForGettingValue.ContainsKey(type)){
                 CachedDelegatesForGettingValue.Add(type, new List<GetValueDelegate>());
+                var properties = type.GetProperties();
+                foreach(var property in properties){
+                    var getValueDelegate = GetValueDelegateForProperty(property);
+                    CachedDelegatesForGettingValue[type].Add(getValueDelegate);
+                }
             }
-            //iterate properties of the nodeData and add them to the cache
-            var properties = type.GetProperties();
-            foreach(var property in properties){
-                var getValueDelegate = GetValueDelegateForProperty(property);
-                CachedDelegatesForGettingValue[type].Add(getValueDelegate);
+            else{
+                //Cache already exists for this type
+                
             }
+       
+    
             
         }
 
