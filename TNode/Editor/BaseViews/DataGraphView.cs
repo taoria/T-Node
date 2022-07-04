@@ -111,7 +111,7 @@ namespace TNode.Editor.BaseViews{
         private T _data;
         private bool _isInspectorOn;
         
-        private SearchWindowProvider _searchWindowProvider;
+        private NodeSearchWindowProvider _nodeSearchWindowProvider;
         private NodeInspector _nodeInspector;
         public GraphEditor<T> Owner;
         private Dictionary<string,Node> _nodeDict = new();
@@ -158,7 +158,7 @@ namespace TNode.Editor.BaseViews{
                 evt.menu.AppendAction("Create Node", dma => {
                     var dmaPos = dma.eventInfo.mousePosition+editorPosition;
                     SearchWindowContext searchWindowContext = new SearchWindowContext(dmaPos,200,200);
-                    var searchWindow = ScriptableObject.CreateInstance<SearchWindowProvider>();
+                    var searchWindow = ScriptableObject.CreateInstance<NodeSearchWindowProvider>();
                     searchWindow.Setup(typeof(T),this,Owner);
                     SearchWindow.Open(searchWindowContext, searchWindow);
                 });
@@ -234,6 +234,15 @@ namespace TNode.Editor.BaseViews{
 
         public void CreateBlackBoard(){
             var blackboard = new Blackboard();
+            //Blackboard add "Add Node" button
+            blackboard.Add(new BlackboardSection(){
+                title = "Hello World",
+            });
+            blackboard.addItemRequested = (item) => {
+                //Create a sub window for the blackboard to show the selection
+                var subWindow = ScriptableObject.CreateInstance<NodeSearchWindowProvider>();
+            };
+            
             //Set black board to left side of the view
             blackboard.SetPosition(new Rect(0,0,200,600));
             this.Add(blackboard);

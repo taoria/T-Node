@@ -12,7 +12,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace TNode.Editor{
-    public class SearchWindowProvider:ScriptableObject,ISearchWindowProvider{
+    public class NodeSearchWindowProvider:ScriptableObject,ISearchWindowProvider{
         private Type _graphType;
         private GraphView _graphView;
         private EditorWindow _editor;
@@ -58,7 +58,7 @@ namespace TNode.Editor{
             return false;
         }
         
-        public SearchWindowProvider(){
+        public NodeSearchWindowProvider(){
         }
     }
 }
