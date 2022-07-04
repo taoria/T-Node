@@ -21,6 +21,12 @@ namespace TNode.Models{
         public string id;
         public string nodeName;
         public bool entryPoint;
+
+
+        public virtual void OnProcess(){
+            
+        }
+        
 // #if UNITY_EDITOR
 //         public Rect rect;
 // #endif
