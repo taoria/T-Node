@@ -12,9 +12,8 @@ namespace TNode.Models{
         public Dictionary<string,NodeData> NodeDictionary = new Dictionary<string,NodeData>();
         public List<NodeLink> nodeLinks = new List<NodeLink>();
         
-
+        [HideInInspector]
         [SerializeField]
-        [TextArea]
         //[HideInInspector]
         private string jsonObject;
 

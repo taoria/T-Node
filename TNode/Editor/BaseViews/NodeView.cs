@@ -15,7 +15,7 @@ namespace TNode.Editor.BaseViews{
     public abstract class NodeView<T> : Node,INodeView where T:NodeData,new(){
         protected T _data;
         private readonly NodeInspectorInNode _nodeInspectorInNode;
-
+        
         public T Data{
             get => _data;
             set{

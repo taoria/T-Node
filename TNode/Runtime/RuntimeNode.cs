@@ -5,17 +5,22 @@ using System.Linq;
 using TNode.Models;
 
 namespace TNode.Runtime{
-    public class RuntimeNode<T> where T:NodeData{
-        public T NodeData{ get; set; }
+    public abstract class RuntimeNode{
+        public object NodeData;
+        public List<NodeLink> NodeLinks;
+        public void ProcessThisNode(){
+            
+        }
+
+    }
+    public class RuntimeNode<T>:RuntimeNode where T:NodeData{
+        public new T NodeData{ get; set; }
 
         //Links related to runtime node,for fast access.only remember out links
         public List<NodeLink> NodeLinks;
 
-
-        public void Process(){
-      
-            var outputPorts = NodeLinks.Select(x => x.outPort.portName);
+        public void OnCreate(){
+            RuntimeCache.RuntimeCache.Instance.RegisterRuntimeNode<T>();
         }
- 
     }
 }

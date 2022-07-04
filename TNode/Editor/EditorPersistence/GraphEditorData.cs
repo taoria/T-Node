@@ -2,14 +2,12 @@
 using TNode.Editor.EditorPersistence;
 using TNode.Editor.Model;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace TNode.Editor{
     
-    [CreateAssetMenu(fileName = "NodeAttribute Editor Config", menuName = "TNode/NodeAttribute Editor Config")]
+    [CreateAssetMenu(fileName = "Graph Editor Data", menuName = "TNode/Graph Editor Data")]
     public class GraphEditorData:ScriptableObject{
-        public List<NodeEditorData> nodesData;
-        public List<NodeEditorData> subWindowPos;
-        
-        public List<IGraphViewPersistence> graphViewPersistence;
+        public List<GraphElementEditorData> graphElementsData;
     }
 }

@@ -6,8 +6,8 @@ using UnityEngine.Serialization;
 namespace TNode.Editor.Model{
     [Serializable]
     
-    public class NodeEditorData{
-        public string nodeGuid;
-        public Rect nodePos;
+    public class GraphElementEditorData{
+        public string guid;
+        public Rect pos;
     }
 }

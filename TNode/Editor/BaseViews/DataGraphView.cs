@@ -126,7 +126,51 @@ namespace TNode.Editor.BaseViews{
                 ResetGraphView();
             }
         }
+        public event DataChangedEventHandler OnDataChanged;
+        public delegate void DataChangedEventHandler(object sender, DataChangedEventArgs<T> e);
      
+        //A Constructor for the DataGraphView ,never to override it
+        public DataGraphView(){
+            
+            styleSheets.Add(Resources.Load<StyleSheet>("GraphViewBackground"));
+            var grid = new GridBackground();
+            Insert(0,grid);
+            grid.StretchToParentSize();
+            this.AddManipulator(new ContentDragger());
+            this.AddManipulator(new SelectionDragger());
+            this.AddManipulator(new RectangleSelector());
+            SetupZoom(ContentZoomer.DefaultMinScale, ContentZoomer.DefaultMaxScale);
+            OnInit();
+        }
+        private void ConstructDefaultBehaviour(){
+            //Register a right click context menu
+            ConstructViewContextualMenu();
+        }
+
+        public void ConstructViewContextualMenu(){
+            
+            //Rebuild the contextual menu
+            
+            this.RegisterCallback<ContextualMenuPopulateEvent>(evt => {
+                Vector2 editorPosition = Owner.position.position;
+                //Remove all the previous menu items
+                evt.menu.MenuItems().Clear();
+                evt.menu.AppendAction("Create Node", dma => {
+                    var dmaPos = dma.eventInfo.mousePosition+editorPosition;
+                    SearchWindowContext searchWindowContext = new SearchWindowContext(dmaPos,200,200);
+                    var searchWindow = ScriptableObject.CreateInstance<SearchWindowProvider>();
+                    searchWindow.Setup(typeof(T),this,Owner);
+                    SearchWindow.Open(searchWindowContext, searchWindow);
+                });
+ 
+            });
+           
+        }
+
+        private void OnInit(){
+            ConstructDefaultBehaviour();
+            OnGraphViewCreate();
+        }
         public void ResetGraphView(){
             //Clear all nodes
             foreach (var node in nodes){
@@ -145,8 +189,8 @@ namespace TNode.Editor.BaseViews{
                 var nodeType = dataNode.GetType();
                 //Get the derived type of NodeAttribute View from the node type
            
-                var nodePos = Owner.graphEditorData.nodesData.
-                    FirstOrDefault(x => x.nodeGuid == dataNode.id)?.nodePos??new Rect(0,0,200,200);
+                var nodePos = Owner.graphEditorData.graphElementsData.
+                    FirstOrDefault(x => x.guid == dataNode.id)?.pos??new Rect(0,0,200,200);
                 
                 AddTNode(dataNode,nodePos);
             }
@@ -166,37 +210,11 @@ namespace TNode.Editor.BaseViews{
             }
             _nodeDict.Clear();
         }
-        //A Constructor for the DataGraphView ,never to override it
-        public DataGraphView(){
-            
-            styleSheets.Add(Resources.Load<StyleSheet>("GraphViewBackground"));
-            var grid = new GridBackground();
-            Insert(0,grid);
-            grid.StretchToParentSize();
-            this.AddManipulator(new ContentDragger());
-            this.AddManipulator(new SelectionDragger());
-            this.AddManipulator(new RectangleSelector());
-            SetupZoom(ContentZoomer.DefaultMinScale, ContentZoomer.DefaultMaxScale);
-            OnInit();
-        }
         //OnDataChanged event
-        public event DataChangedEventHandler OnDataChanged;
-        public delegate void DataChangedEventHandler(object sender, DataChangedEventArgs<T> e);
+
 
         
-        private void ConstructDefaultBehaviour(){
-            //Register a right click context menu
-            //ConstructContextualMenuOption();
-        }
 
-        public void ConstructViewContextualMenu(EventCallback<ContextualMenuPopulateEvent> callback){
-            RegisterCallback<ContextualMenuPopulateEvent>(callback);
-        }
-
-        private void OnInit(){
-            ConstructDefaultBehaviour();
-            OnGraphViewCreate();
-        }
 
         public virtual void CreateInspector(){
             NodeInspector nodeInspector = new NodeInspector();
@@ -234,19 +252,19 @@ namespace TNode.Editor.BaseViews{
         }
 
         public void SaveEditorData(GraphEditorData graphEditorData){
-            graphEditorData.nodesData?.Clear();
+            graphEditorData.graphElementsData?.Clear();
             //iterator nodes
-            if (graphEditorData.nodesData == null){
-                graphEditorData.nodesData = new List<NodeEditorData>();
+            if (graphEditorData.graphElementsData == null){
+                graphEditorData.graphElementsData = new List<GraphElementEditorData>();
             }
             foreach (var node in this.nodes){
-                var nodeEditorData = new NodeEditorData{
-                    nodePos = node.GetPosition(),
+                var nodeEditorData = new GraphElementEditorData{
+                    pos = node.GetPosition(),
                 };
                 if (node is INodeView nodeView){
-                    nodeEditorData.nodeGuid = nodeView.GetNodeData().id;
+                    nodeEditorData.guid = nodeView.GetNodeData().id;
                 }
-                graphEditorData.nodesData.Add(nodeEditorData);
+                graphEditorData.graphElementsData.Add(nodeEditorData);
                 EditorUtility.SetDirty(graphEditorData);
             }
         }
@@ -335,6 +353,32 @@ namespace TNode.Editor.BaseViews{
                     nodeViewInterface.SetNodeData(nodeData);
                 }
                 _nodeDict.Add(nodeData.id, nodeView);
+                
+                //register an callback ,when right click context menu
+                nodeView.RegisterCallback<ContextClickEvent>(evt => {
+                    var menu = new GenericMenu();
+                    menu.AddItem(new GUIContent("Delete"), false, () => {
+                        RemoveElement(nodeView);
+                        if (nodeView is INodeView tNodeView){
+                            var nodeData1 = tNodeView.GetNodeData();
+                            _data.NodeDictionary.Remove(nodeData1.id);
+                            _nodeDict.Remove(nodeData1.id);
+                            //Break all edges connected to this node
+                            foreach (var edge in edges){
+                                if (edge.input.node == nodeView || edge.output.node == nodeView){
+                                    RemoveElement(edge);
+                                }
+                            }
+                            Owner.graphEditorData.graphElementsData.RemoveAll(x => x.guid == nodeData1.id);
+                        }
+                    });
+                    menu.ShowAsContext();
+                });
+                
+                
+                
+   
+                
             }
         }
 

@@ -41,7 +41,7 @@ namespace TNode.BaseViews{
         }
 
         public void ResetPos(GraphEditorData editorData){
-            var res = editorData.subWindowPos.FirstOrDefault(x => x.nodeGuid == this.GetPersistenceId());
+            var res = editorData.graphElementsData.FirstOrDefault(x => x.guid == this.GetPersistenceId());
         }
 
         public void SavePos(GraphEditorData editorData){
