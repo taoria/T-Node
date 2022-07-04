@@ -81,9 +81,21 @@ namespace TNode.Cache{
             return instance;
         }
         public static object CreateInstance(Type t){
-            var implementedType = NodeEditorSingleton.Instance.FromGenericToSpecific[t];
-            var instance = Activator.CreateInstance(implementedType);
-            return instance;
+            if (NodeEditorSingleton.Instance.FromGenericToSpecific.ContainsKey(t)){
+                var implementedType = NodeEditorSingleton.Instance.FromGenericToSpecific[t];
+                var instance = Activator.CreateInstance(implementedType);
+                return instance;
+            }
+            else{
+                Debug.Log($"No given type found {t}");
+                //check if t is a generic type node view
+                if (t is{IsGenericType: true} && t.GetGenericTypeDefinition() == typeof(NodeView<>)){
+                    var instance = Activator.CreateInstance(typeof(NodeView<NodeData>));
+                    return instance;
+                }
+           
+                return null;
+            }
         }
         public static bool HasSpecificType<T>() where T : class{
 

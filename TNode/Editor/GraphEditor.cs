@@ -75,10 +75,13 @@ namespace TNode.Editor{
                     T asset = ScriptableObject.CreateInstance<T>();
                     AssetDatabase.CreateAsset(asset, path);
                     AssetDatabase.SaveAssets();
+                    
                 }
             }
             else{
                 _graphView.SaveWithEditorData(graphEditorData);
+                AssetDatabase.Refresh();
+                
             }
   
         }

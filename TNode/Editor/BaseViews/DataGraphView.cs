@@ -6,10 +6,12 @@ using TNode.Cache;
 using TNode.Editor.Inspector;
 using TNode.Editor.Model;
 using TNode.Models;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Edge = UnityEditor.Experimental.GraphView.Edge;
 
 namespace TNode.Editor.BaseViews{
     /*
@@ -107,9 +109,13 @@ namespace TNode.Editor.BaseViews{
      */
     public  abstract  class DataGraphView<T>:GraphView,IDataGraphView where T:GraphData{
         private T _data;
-        private SearchWindowProvider _searchWindowProvider;
         private bool _isInspectorOn;
+        
+        private SearchWindowProvider _searchWindowProvider;
         private NodeInspector _nodeInspector;
+        public GraphEditor<T> Owner;
+        private Dictionary<string,Node> _nodeDict = new();
+        
         public T Data{
             get{ return _data; }
             set{
@@ -129,8 +135,8 @@ namespace TNode.Editor.BaseViews{
             foreach (var edge in edges){
                 RemoveElement(edge);
             }
-            Dictionary<string,Node> nodeDict = new Dictionary<string, Node>();
-            if (nodeDict == null) throw new ArgumentNullException(nameof(nodeDict));
+      
+            if (_nodeDict == null) throw new ArgumentNullException(nameof(_nodeDict));
             foreach (var dataNode in _data.NodeDictionary.Values){
                 if(dataNode==null)
                     continue;
@@ -138,25 +144,18 @@ namespace TNode.Editor.BaseViews{
                 //Get the node type
                 var nodeType = dataNode.GetType();
                 //Get the derived type of NodeAttribute View from the node type
-                var nodeViewType = typeof(NodeView<>).MakeGenericType(nodeType);
+           
+                var nodePos = Owner.graphEditorData.nodesData.
+                    FirstOrDefault(x => x.nodeGuid == dataNode.id)?.nodePos??new Rect(0,0,200,200);
                 
-                //Fetch the node view from the node view type
-                var nodeView = NodeEditorExtensions.CreateInstance(nodeViewType);
-                
-                //Cast the node view to the nodeViewType
-                AddElement((Node)nodeView);
-                
-                ((INodeView)nodeView).SetNodeData(dataNode);
-                
-                //Add the node view to the node dictionary
-                nodeDict.Add(dataNode.id, (Node)nodeView);
+                AddTNode(dataNode,nodePos);
             }
 
-            foreach (var edge in _data.NodeLinks){
+            foreach (var edge in _data.nodeLinks){
                 var inputNode = _data.NodeDictionary[edge.inPort.nodeDataId];
                 var outputNode = _data.NodeDictionary[edge.outPort.nodeDataId];
-                var inputNodeView = nodeDict[inputNode.id];
-                var outputNodeView = nodeDict[outputNode.id];
+                var inputNodeView = _nodeDict[inputNode.id];
+                var outputNodeView = _nodeDict[outputNode.id];
                 Edge newEdge = new Edge(){
                     input = inputNodeView.inputContainer.Q<Port>(edge.inPort.portName),
                     output = outputNodeView.outputContainer.Q<Port>(edge.outPort.portName)
@@ -165,7 +164,7 @@ namespace TNode.Editor.BaseViews{
                 newEdge.output?.Connect(newEdge);
                 AddElement(newEdge);
             }
-            nodeDict.Clear();
+            _nodeDict.Clear();
         }
         //A Constructor for the DataGraphView ,never to override it
         public DataGraphView(){
@@ -235,9 +234,11 @@ namespace TNode.Editor.BaseViews{
         }
 
         public void SaveEditorData(GraphEditorData graphEditorData){
-            graphEditorData.nodesData.Clear();
+            graphEditorData.nodesData?.Clear();
             //iterator nodes
-       
+            if (graphEditorData.nodesData == null){
+                graphEditorData.nodesData = new List<NodeEditorData>();
+            }
             foreach (var node in this.nodes){
                 var nodeEditorData = new NodeEditorData{
                     nodePos = node.GetPosition(),
@@ -249,25 +250,14 @@ namespace TNode.Editor.BaseViews{
                 EditorUtility.SetDirty(graphEditorData);
             }
         }
-        public void LoadEditorData(GraphEditorData graphEditorData){
-            //Load node position
-            foreach (var nodeEditorData in graphEditorData.nodesData){
-
-                var node = this.nodes.Select(x => x as INodeView).First(x=>x?.GetNodeData().id==nodeEditorData.nodeGuid);
-                
-                if (node != null){
-                    ((GraphElement)node).SetPosition(nodeEditorData.nodePos);
-                }
-            }
-        }
-
-
+        
         public  void SaveWithEditorData(GraphEditorData graphEditorData){
             SaveEditorData(graphEditorData);
             SaveGraphData();
         }
 
-        private void SaveGraphData(){
+        private void SaveNode(){
+        
             foreach (var node in nodes){
                 if (node is INodeView nodeView){
                     var nodeData = nodeView.GetNodeData();
@@ -276,11 +266,13 @@ namespace TNode.Editor.BaseViews{
                     }
                 }
             }
-            //force edge to write as links
+        }
+        private void SaveEdge(){
             foreach (var edge in edges){
                 var inputNode = edge.input.node as INodeView;
                 var outputNode = edge.output.node as INodeView;
                 var links = new List<NodeLink>();
+                Debug.Log($"Edge{inputNode},{outputNode}");
                 if (inputNode != null && outputNode != null){
                     var inputNodeData = inputNode.GetNodeData();
                     var outputNodeData = outputNode.GetNodeData();
@@ -292,14 +284,23 @@ namespace TNode.Editor.BaseViews{
                         nodeDataId = outputNodeData.id,
                         portName = edge.output.name
                     });
+                    links.Add(newNodeLink);
                 }
 
-                _data.NodeLinks = links;
+                _data.nodeLinks = links;
                 
             }
-            EditorUtility.SetDirty(_data);
-            AssetDatabase.SaveAssets();
         }
+        private void SaveGraphData(){
+            _data.NodeDictionary.Clear();
+  
+            SaveNode();
+            SaveEdge();
+   
+            EditorUtility.SetDirty(_data);
+        }
+
+   
 
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter){
             return ports.Where(x => x.portType == startPort.portType).ToList();
@@ -316,7 +317,7 @@ namespace TNode.Editor.BaseViews{
         }
 
         public void AddTNode(NodeData nodeData, Rect rect){
-            if (NodeEditorExtensions.CreateNodeViewFromNodeType(nodeData.GetType()) is GraphElement nodeView){
+            if (NodeEditorExtensions.CreateNodeViewFromNodeType(nodeData.GetType()) is Node nodeView){
                 nodeView.SetPosition(rect);
                 AddElement(nodeView);
                 //Add a select callback to the nodeView
@@ -333,6 +334,7 @@ namespace TNode.Editor.BaseViews{
                 if(nodeView is INodeView nodeViewInterface){
                     nodeViewInterface.SetNodeData(nodeData);
                 }
+                _nodeDict.Add(nodeData.id, nodeView);
             }
         }
 

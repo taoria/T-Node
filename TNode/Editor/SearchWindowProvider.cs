@@ -4,6 +4,7 @@ using System.Drawing;
 using TNode.BaseViews;
 using TNode.Cache;
 using TNode.Editor.BaseViews;
+using TNode.Editor.Tools.NodeCreator;
 using TNode.Models;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
@@ -47,7 +48,7 @@ namespace TNode.Editor{
                 //Check if type is derived from NodeData
                 if (typeof(NodeData).IsAssignableFrom(type)){
                     //Make an instance of the type
-                    if (Activator.CreateInstance(type) is NodeData nodeData){
+                    if (NodeHelper.InstantiateNodeData(type) is { } nodeData){
                         nodeData.nodeName = "New Node";
                         ((IDataGraphView) _graphView).AddTNode(nodeData, new Rect(localPos.x, localPos.y, 100, 100));
                     }

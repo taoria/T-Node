@@ -1,9 +1,12 @@
-﻿using UnityEditor;
+﻿using System.Linq;
+using TNode.Editor;
+using TNode.Editor.EditorPersistence;
+using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
 
 namespace TNode.BaseViews{
-    public class SimpleGraphSubWindow:GraphElement{
+    public class SimpleGraphSubWindow:GraphElement,IGraphViewPersistence{
         private readonly Dragger _dragger = new Dragger();
 
         protected void ConstructWindowBasicSetting(){
@@ -32,5 +35,23 @@ namespace TNode.BaseViews{
             ConstructWindowBasicSetting();
             BuildWindow(visualTreeAsset);
         }
+
+        public string GetPersistenceId(){
+            throw new System.NotImplementedException();
+        }
+
+        public void ResetPos(GraphEditorData editorData){
+            var res = editorData.subWindowPos.FirstOrDefault(x => x.nodeGuid == this.GetPersistenceId());
+        }
+
+        public void SavePos(GraphEditorData editorData){
+          
+        }
+
+        public void OnRemoveFromGraph(GraphEditorData editorData){
+            
+        }
     }
+
+
 }
