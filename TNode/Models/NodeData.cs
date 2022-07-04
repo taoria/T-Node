@@ -1,6 +1,5 @@
 ﻿using System;
 using TNode.Attribute;
-using TNode.BaseModels;
 using UnityEngine;
 
 namespace TNode.Models{
@@ -12,11 +11,11 @@ namespace TNode.Models{
     /// 
     /// </summary>
     [Serializable]
-    public class NodeData:IModel{
+    public class NodeData{
    
         public NodeData() : base(){
             //Object Registration
-            id = Guid.NewGuid().ToString();
+           
         }
         [DisableOnInspector]
         public string id;

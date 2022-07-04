@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using TNode.Models;
+using UnityEngine;
 
 namespace TNode.Editor{
     public class NodeDataWrapper{
@@ -33,6 +34,7 @@ namespace TNode.Editor{
             if (wrapper == null)
                 return null;
             return wrapper._data;
+     
         }
         public static implicit operator NodeDataWrapper(NodeData unWrapper){
             if (unWrapper == null)
