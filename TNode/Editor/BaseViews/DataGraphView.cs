@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using TNode.BaseViews;
 using TNode.Cache;
 using TNode.Editor.Inspector;
@@ -152,7 +153,7 @@ namespace TNode.Editor.BaseViews{
             //Rebuild the contextual menu
             
             this.RegisterCallback<ContextualMenuPopulateEvent>(evt => {
-                Vector2 editorPosition = Owner.position.position;
+                Vector2 editorPosition = Owner==null?Vector2.zero:Owner.position.position;
                 //Remove all the previous menu items
                 evt.menu.MenuItems().Clear();
                 evt.menu.AppendAction("Create Node", dma => {
@@ -232,21 +233,51 @@ namespace TNode.Editor.BaseViews{
             miniMap.SetPosition(rect);
         }
 
-        public void CreateBlackBoard(){
+        public void CreateBlackboard(){
             var blackboard = new Blackboard();
             //Blackboard add "Add Node" button
-            blackboard.Add(new BlackboardSection(){
-                title = "Hello World",
-            });
-            blackboard.addItemRequested = (item) => {
-                //Create a sub window for the blackboard to show the selection
-                var subWindow = ScriptableObject.CreateInstance<NodeSearchWindowProvider>();
-            };
-            
+            // blackboard.Add(new BlackboardSection(){
+            //     title = "Hello World",
+            // });
+            // blackboard.addItemRequested = (item) => {
+            //     //Create a sub window for the blackboard to show the selection
+            //     var subWindow = ScriptableObject.CreateInstance<NodeSearchWindowProvider>();
+            // };
+            //
             //Set black board to left side of the view
             blackboard.SetPosition(new Rect(0,0,200,600));
-            this.Add(blackboard);
+            Add(blackboard);
+            //Check the type of the blackboard
             
+            OnDataChanged+= (sender, e) => {
+              
+                if (_data.blackboardData==null||_data.blackboardData.GetType()==typeof(BlackboardData)){
+                    _data.blackboardData = NodeEditorExtensions.GetAppropriateBlackboardData(_data.GetType());
+          
+                    if(_data.blackboardData==null) return;
+
+                }  
+                Debug.Log(_data.blackboardData);
+                //Iterate field of the blackboard and add a button for each field
+                foreach (var field in _data.blackboardData.GetType()
+                             .GetFields(BindingFlags.Public|BindingFlags.NonPublic | BindingFlags.Instance)){
+                    Debug.Log(field);
+                    //if the field is MonoBehaviour,add a property field for blackboard
+                    if(typeof(UnityEngine.Object).IsAssignableFrom(field.FieldType)){
+                        var propertyField = new BlackboardField(null,field.Name,null){
+                            
+                        };
+                        blackboard.Add(propertyField);
+                    }
+                    if(typeof(string).IsAssignableFrom(field.FieldType)){
+                        var propertyField = new BlackboardField(null,field.Name,null){
+                            
+                        };
+                        blackboard.Add(propertyField);
+                    }
+                }
+            };
+
         }
         public virtual void DestroyInspector(){
             if(_nodeInspector!=null){

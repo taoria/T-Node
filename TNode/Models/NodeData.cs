@@ -11,7 +11,7 @@ namespace TNode.Models{
     /// 
     /// </summary>
     [Serializable]
-    public class NodeData{
+    public class NodeData:IModel{
    
         public NodeData() : base(){
             //Object Registration

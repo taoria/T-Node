@@ -17,7 +17,6 @@ namespace TNode.Editor.Inspector{
         }
 
         private void UpdateData(){
-            Debug.Log(_data);
             if (_data != null){
                 RefreshInspector();
             }
