@@ -14,11 +14,11 @@ namespace TNode.RuntimeCache{
             get{ return _instance ??= new RuntimeCache(); }
         }
         //delegate return a value from a nodedata
-        public delegate object GetValueDelegate(NodeData nodeData);
+        public delegate object GetValueDelegate(IModel nodeData);
 
         public readonly Dictionary<Type, List<GetValueDelegate>> CachedDelegatesForGettingValue =
             new ();
-
+        
         public void ExecuteOutput<T>(T nodeData) where  T:NodeData{
             var type = typeof(T);
             if(!CachedDelegatesForGettingValue.ContainsKey(type)){
@@ -29,7 +29,7 @@ namespace TNode.RuntimeCache{
                 var value = delegateInstance(nodeData);
             }
         }
-
+        private static readonly string[] ExcludedAssemblies = new string[]{"Microsoft", "UnityEngine","UnityEditor","mscorlib","System"};
         public void RegisterRuntimeNode<T>() where T:NodeData{
             var type = typeof(T);
             if(!CachedDelegatesForGettingValue.ContainsKey(type)){
@@ -44,9 +44,20 @@ namespace TNode.RuntimeCache{
                 //Cache already exists for this type
                 
             }
-       
-    
-            
+        }
+        public void RegisterRuntimeBlackboard(Type type){
+            if(!CachedDelegatesForGettingValue.ContainsKey(type)){
+                CachedDelegatesForGettingValue.Add(type, new List<GetValueDelegate>());
+                var properties = type.GetProperties();
+                foreach(var property in properties){
+                    //if the property only has a setter ,skip 
+                    if(property.GetMethod == null){
+                        continue;
+                    }
+                    var getValueDelegate = GetValueDelegateForProperty(property);
+                    CachedDelegatesForGettingValue[type].Add(getValueDelegate);
+                }
+            }
         }
 
         private GetValueDelegate GetValueDelegateForProperty(PropertyInfo property){

@@ -18,6 +18,7 @@ namespace TNode.Cache{
         private static NodeEditorSingleton _instance;
         public readonly Dictionary<Type,Type> FromGenericToSpecific = new Dictionary<Type, Type>();
         public readonly Dictionary<Type, List<Type>> GraphDataUsage = new Dictionary<Type, List<Type>>();
+        public Dictionary<Type, Type> GraphBlackboard = new();
         public static NodeEditorSingleton Instance{
             get{ return _instance ??= new NodeEditorSingleton(); }
         }
@@ -45,14 +46,30 @@ namespace TNode.Cache{
         private void SetGraphUsageAttribute(Type type){
             foreach (var attribute in type.GetCustomAttributes(typeof(GraphUsageAttribute), true)){
                 var parent = type.BaseType;
-                if (typeof(NodeData).IsAssignableFrom(type.BaseType)){
+                if (typeof(IModel).IsAssignableFrom(type.BaseType)){
                     //Check if GraphDataUsage dictionary has GraphDataType of attribute
-                    if (attribute is GraphUsageAttribute attributeCasted){
-                        if (GraphDataUsage.ContainsKey(attributeCasted.GraphDataType)){
-                            GraphDataUsage[attributeCasted.GraphDataType].Add(type);
+
+                    if (typeof(NodeData).IsAssignableFrom(type)){
+                        if (attribute is GraphUsageAttribute attributeCasted){
+                            if (GraphDataUsage.ContainsKey(attributeCasted.GraphDataType)){
+                                GraphDataUsage[attributeCasted.GraphDataType].Add(type);
+                            }
+                            else{
+                                GraphDataUsage.Add(attributeCasted.GraphDataType, new List<Type>{type});
+                            }
                         }
-                        else{
-                            GraphDataUsage.Add(attributeCasted.GraphDataType, new List<Type>{type});
+                    }
+
+                    if (typeof(BlackboardData).IsAssignableFrom(type)){
+                        if (attribute is GraphUsageAttribute attributeCasted){
+                            if (GraphBlackboard.ContainsKey(attributeCasted.GraphDataType)){
+                                GraphBlackboard[attributeCasted.GraphDataType] = type;
+                                
+                            }
+                            else{
+                                GraphBlackboard.Add(attributeCasted.GraphDataType, type);
+                            }
+            
                         }
                     }
                 }
@@ -106,6 +123,12 @@ namespace TNode.Cache{
                 return NodeEditorSingleton.Instance.GraphDataUsage[t];
             }
             return new List<Type>();
+        }
+        public static BlackboardData GetAppropriateBlackboardData(Type t){
+            if (NodeEditorSingleton.Instance.GraphBlackboard.ContainsKey(t)){
+                return (BlackboardData)Activator.CreateInstance(NodeEditorSingleton.Instance.GraphBlackboard[t]);
+            }
+            return null;
         }
         public static object CreateNodeViewFromNodeType<T>() where  T:NodeData,new(){
             //Check specific derived type exists or not.
