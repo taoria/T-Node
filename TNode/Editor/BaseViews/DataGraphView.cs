@@ -201,9 +201,12 @@ namespace TNode.Editor.BaseViews{
                 var inputNodeView = _nodeDict[inputNode.id];
                 var outputNodeView = _nodeDict[outputNode.id];
                 Edge newEdge = new Edge(){
+                 
                     input = inputNodeView.inputContainer.Q<Port>(edge.inPort.portName),
                     output = outputNodeView.outputContainer.Q<Port>(edge.outPort.portName)
                 };
+                Debug.Log(edge.inPort.portName);
+                Debug.Log(edge.outPort.portName);
                 newEdge.input?.Connect(newEdge);
                 newEdge.output?.Connect(newEdge);
                 AddElement(newEdge);
@@ -296,11 +299,11 @@ namespace TNode.Editor.BaseViews{
                     var outputNodeData = outputNode.GetNodeData();
                     var newNodeLink = new NodeLink(new PortInfo(){
                         nodeDataId = inputNodeData.id,
-                        portName = edge.input.name
+                        portName = edge.input.portName,
 
                     }, new PortInfo(){
                         nodeDataId = outputNodeData.id,
-                        portName = edge.output.name
+                        portName = edge.output.portName
                     });
                     links.Add(newNodeLink);
                 }

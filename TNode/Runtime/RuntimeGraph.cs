@@ -17,7 +17,6 @@ namespace TNode.Runtime{
         
         public void StartProcessNode(ProcessingStrategy strategy, RuntimeNode entry){
             
-            
         }
         
     }

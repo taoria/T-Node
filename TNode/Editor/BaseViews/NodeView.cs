@@ -69,6 +69,7 @@ namespace TNode.Editor.BaseViews{
                     Port port = InstantiatePort(Orientation.Horizontal, Direction.Output,Port.Capacity.Multi,propertyInfo.PropertyType);
                     this.outputContainer.Add(port);
                     port.portName = propertyInfo.Name;
+                    port.name = propertyInfo.Name;
                 }
             }
             foreach (var propertyInfo in propertyInfos){
@@ -78,6 +79,7 @@ namespace TNode.Editor.BaseViews{
                     Port port = InstantiatePort(Orientation.Horizontal, Direction.Input,Port.Capacity.Multi,propertyInfo.PropertyType);
                     this.inputContainer.Add(port);
                     port.portName = propertyInfo.Name;
+                    port.name = propertyInfo.Name;
                 }
             }
         }
