@@ -4,8 +4,10 @@ using System.Linq;
 using System.Reflection;
 using TNode.BaseViews;
 using TNode.Cache;
+using TNode.Editor.GraphBlackboard;
 using TNode.Editor.Inspector;
 using TNode.Editor.Model;
+
 using TNode.Models;
 using Unity.VisualScripting;
 using UnityEditor;
@@ -109,6 +111,11 @@ namespace TNode.Editor.BaseViews{
     }
      */
     public  abstract  class DataGraphView<T>:GraphView,IDataGraphView where T:GraphData{
+        #region variablesandproperties
+
+        
+
+   
         private T _data;
         private bool _isInspectorOn;
         
@@ -117,6 +124,7 @@ namespace TNode.Editor.BaseViews{
         public GraphEditor<T> Owner;
         private Dictionary<string,Node> _nodeDict = new();
         private Blackboard _blackboard;
+        
 
         public T Data{
             get{ return _data; }
@@ -129,11 +137,14 @@ namespace TNode.Editor.BaseViews{
             }
         }
         public event DataChangedEventHandler OnDataChanged;
+        #endregion
         public delegate void DataChangedEventHandler(object sender, DataChangedEventArgs<T> e);
      
         //A Constructor for the DataGraphView ,never to override it
+
+
+        #region construct default behaviour
         public DataGraphView(){
-            
             styleSheets.Add(Resources.Load<StyleSheet>("GraphViewBackground"));
             var grid = new GridBackground();
             Insert(0,grid);
@@ -142,6 +153,7 @@ namespace TNode.Editor.BaseViews{
             this.AddManipulator(new SelectionDragger());
             this.AddManipulator(new RectangleSelector());
             SetupZoom(ContentZoomer.DefaultMinScale, ContentZoomer.DefaultMaxScale);
+            RegisterDragEvent();
             OnInit();
         }
         private void ConstructDefaultBehaviour(){
@@ -150,10 +162,7 @@ namespace TNode.Editor.BaseViews{
         }
 
         public void ConstructViewContextualMenu(){
-            
-            //Rebuild the contextual menu
-            
-            this.RegisterCallback<ContextualMenuPopulateEvent>(evt => {
+            RegisterCallback<ContextualMenuPopulateEvent>(evt => {
                 Vector2 editorPosition = Owner==null?Vector2.zero:Owner.position.position;
                 //Remove all the previous menu items
                 evt.menu.MenuItems().Clear();
@@ -164,11 +173,50 @@ namespace TNode.Editor.BaseViews{
                     searchWindow.Setup(typeof(T),this,Owner);
                     SearchWindow.Open(searchWindowContext, searchWindow);
                 });
- 
             });
-           
         }
 
+        public void RegisterDragEvent(){
+            RegisterCallback<DragUpdatedEvent>(OnDragUpdated);
+            RegisterCallback<DragPerformEvent>(OnDragPerform);
+        }
+        #endregion
+
+        private void OnDragPerform(DragPerformEvent evt){
+        
+            if (DragAndDrop.GetGenericData("DragSelection") is List<ISelectable>{Count: > 0} data){
+                var blackboardFields = data.OfType<BlackboardPropertyField >();
+                foreach (var selectable in blackboardFields){
+                    if(selectable is { } field) {
+                        //Make a constructor of  BlackboardDragNodeData<field.PropertyType > by reflection
+                        var specifiedType =
+                            typeof(BlackboardDragNodeData<>).MakeGenericType(field.BlackboardProperty.PropertyType);
+                        //get specific constructor of specified type with two parameters, one is a string ,another is a blackboarddata
+                        var constructor = specifiedType.GetConstructor(new[] {typeof(string),typeof(BlackboardData)});
+                        //create a new instance of the specified type with the constructor and the two parameters
+                        if (constructor != null){
+                            var dragNodeData = constructor.Invoke(new object[]
+                                {field.BlackboardProperty.PropertyName, _data.blackboardData}) as NodeData;
+                            this.AddTNode(dragNodeData,new Rect(Owner.position.position+evt.mousePosition,new Vector2(100,100)));
+                        }
+                        
+                    }
+                }
+            }
+        }
+
+        private void OnDragUpdated(DragUpdatedEvent evt){
+            Debug.Log(evt);
+            
+            //check if the drag data is BlackboardField
+
+            if (DragAndDrop.GetGenericData("DragSelection") is List<ISelectable>{Count: > 0} data){
+                DragAndDrop.visualMode = DragAndDropVisualMode.Move;
+     
+            }
+            
+
+        }
         private void OnInit(){
             ConstructDefaultBehaviour();
             OnGraphViewCreate();
@@ -267,36 +315,8 @@ namespace TNode.Editor.BaseViews{
                          .GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)){
                 Debug.Log(field);
                 //if the field is MonoBehaviour,add a property field for blackboard
-                if (typeof(UnityEngine.Object).IsAssignableFrom(field.FieldType)){
-                    var propertyField = new BlackboardField(null, field.Name, null){
-                    };
-                    _blackboard.Add(propertyField);
-                    //register a drag event for the property field to drag the object from blackboard to the graph
-
-                    propertyField.RegisterCallback<DragUpdatedEvent>(evt => {
-                        if (evt.target is GraphView graphView){
-                            var type = field.FieldType;
-                            //Get Generic Constructor of the BlackDragNodeData<>
-                            var genericConstructor = typeof(BlackDragNodeData<>).MakeGenericType(type).GetConstructor(
-                                BindingFlags.Instance | BindingFlags.NonPublic,
-                                null,
-                                new Type[]{typeof(string), typeof(object)},
-                                null);
-                            if (genericConstructor != null){
-                                NodeData nodeData = null;
-                                nodeData =
-                                    genericConstructor.Invoke(null, new object[]{field.Name, _data.blackboardData}) as NodeData;
-                                this.AddTNode(nodeData, new Rect(evt.localMousePosition, new Vector2(200, 200)));
-                            }
-                        }
-                    });
-                }
-
-                if (typeof(string).IsAssignableFrom(field.FieldType)){
-                    var propertyField = new BlackboardField(null, field.Name, null){
-                    };
-                    _blackboard.Add(propertyField);
-                }
+                var propertyField = new BlackboardPropertyField(new BlackboardProperty(field.Name,field.FieldType));
+                _blackboard.Add(propertyField);
             }
         }
 
@@ -396,6 +416,10 @@ namespace TNode.Editor.BaseViews{
         }
         ~DataGraphView(){
             OnGraphViewDestroy();
+        }
+
+        public bool IsDroppable(){
+            return true;
         }
 
         public void AddTNode(NodeData nodeData, Rect rect){

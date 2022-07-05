@@ -15,6 +15,7 @@ namespace TNode.RuntimeCache{
         }
         //delegate return a value from a nodedata
         public delegate object GetValueDelegate(IModel nodeData);
+        public delegate object SetValueDelegate(IModel nodeData,object value);
 
         public readonly Dictionary<Type, Dictionary<string,GetValueDelegate>> CachedDelegatesForGettingValue =
             new ();
@@ -52,7 +53,7 @@ namespace TNode.RuntimeCache{
         }
 
 
-        
+     
     }
     public static class RuntimeExtension{
      
