@@ -48,8 +48,8 @@ namespace TNode.Editor{
                 //Check if type is derived from NodeData
                 if (typeof(NodeData).IsAssignableFrom(type)){
                     //Make an instance of the type
-                    if (NodeHelper.InstantiateNodeData(type) is { } nodeData){
-                        nodeData.nodeName = "New Node";
+                    if (NodeCreator.InstantiateNodeData(type) is { } nodeData){
+                        nodeData.nodeName = $"New {type.Name}";
                         ((IDataGraphView) _graphView).AddTNode(nodeData, new Rect(localPos.x, localPos.y, 100, 100));
                     }
                 }

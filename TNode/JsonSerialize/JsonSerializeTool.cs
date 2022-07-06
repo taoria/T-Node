@@ -21,7 +21,9 @@ namespace TNode.JsonSerialize{
             DateFormatString = "yyyy-MM-dd HH:mm:ss",
             Converters = new List<JsonConverter> { new Vector3Converter() },
             TypeNameHandling = TypeNameHandling.Auto,
-            ContractResolver = new WritablePropertiesOnlyResolver()
+            ContractResolver = new WritablePropertiesOnlyResolver(),
+            Formatting = Formatting.Indented
+            
 
         };
 

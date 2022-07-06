@@ -7,7 +7,7 @@ using TNode.Cache;
 using TNode.Editor.GraphBlackboard;
 using TNode.Editor.Inspector;
 using TNode.Editor.Model;
-
+using TNode.Editor.Tools.NodeCreator;
 using TNode.Models;
 using Unity.VisualScripting;
 using UnityEditor;
@@ -111,7 +111,7 @@ namespace TNode.Editor.BaseViews{
     }
      */
     public  abstract  class DataGraphView<T>:GraphView,IDataGraphView where T:GraphData{
-        #region variablesandproperties
+        #region variables and properties
 
         
 
@@ -138,7 +138,10 @@ namespace TNode.Editor.BaseViews{
         }
         public event DataChangedEventHandler OnDataChanged;
         #endregion
+        #region event declarations
         public delegate void DataChangedEventHandler(object sender, DataChangedEventArgs<T> e);
+        
+        #endregion
      
         //A Constructor for the DataGraphView ,never to override it
 
@@ -176,11 +179,18 @@ namespace TNode.Editor.BaseViews{
             });
         }
 
+        private void OnInit(){
+            ConstructDefaultBehaviour();
+            OnGraphViewCreate();
+        }
         public void RegisterDragEvent(){
             RegisterCallback<DragUpdatedEvent>(OnDragUpdated);
             RegisterCallback<DragPerformEvent>(OnDragPerform);
         }
+        
         #endregion
+
+        #region  event callbakc
 
         private void OnDragPerform(DragPerformEvent evt){
         
@@ -191,17 +201,12 @@ namespace TNode.Editor.BaseViews{
                         //Make a constructor of  BlackboardDragNodeData<field.PropertyType > by reflection
                         var specifiedType =
                             typeof(BlackboardDragNodeData<>).MakeGenericType(field.BlackboardProperty.PropertyType);
-                        //get specific constructor of specified type with two parameters, one is a string ,another is a blackboarddata
-                        var constructor = specifiedType.GetConstructor(new[] {typeof(string),typeof(BlackboardData)});
-                        //create a new instance of the specified type with the constructor and the two parameters
-                        if (constructor != null){
-                            var dragNodeData = constructor.Invoke(new object[]
-                                {field.BlackboardProperty.PropertyName, _data.blackboardData}) as NodeData;
-                            this.AddTNode(dragNodeData,new Rect(Owner.position.position+evt.mousePosition,new Vector2(100,100)));
-                        }
-                        
+                        //Create a new instance of specified type
+                        var dragNodeData = NodeCreator.InstantiateNodeData(specifiedType);
+                        this.AddTNode(dragNodeData,new Rect(evt.mousePosition,new Vector2(200,200)));
                     }
                 }
+             
             }
         }
 
@@ -217,10 +222,11 @@ namespace TNode.Editor.BaseViews{
             
 
         }
-        private void OnInit(){
-            ConstructDefaultBehaviour();
-            OnGraphViewCreate();
-        }
+
+        #endregion
+
+
+
         public void ResetGraphView(){
             //Clear all nodes
             foreach (var node in nodes){
@@ -268,7 +274,7 @@ namespace TNode.Editor.BaseViews{
 
         
 
-
+        
         public virtual void CreateInspector(){
             NodeInspector nodeInspector = new NodeInspector();
             this.Add(nodeInspector);
@@ -276,13 +282,13 @@ namespace TNode.Editor.BaseViews{
             _isInspectorOn = true;
         }
 
-        public void CreateMiniMap(Rect rect){
+        public virtual void CreateMiniMap(Rect rect){
             var miniMap = new MiniMap();
             this.Add(miniMap);
             miniMap.SetPosition(rect);
         }
 
-        public void CreateBlackboard(){
+        public virtual void CreateBlackboard(){
             _blackboard = new Blackboard();
             //Blackboard add "Add Node" button
             // blackboard.Add(new BlackboardSection(){
@@ -370,11 +376,10 @@ namespace TNode.Editor.BaseViews{
             }
         }
         private void SaveEdge(){
+            var links = new List<NodeLink>();
             foreach (var edge in edges){
                 var inputNode = edge.input.node as INodeView;
                 var outputNode = edge.output.node as INodeView;
-                var links = new List<NodeLink>();
-                Debug.Log($"Edge{inputNode},{outputNode}");
                 if (inputNode != null && outputNode != null){
                     var inputNodeData = inputNode.GetNodeData();
                     var outputNodeData = outputNode.GetNodeData();
@@ -388,17 +393,16 @@ namespace TNode.Editor.BaseViews{
                     });
                     links.Add(newNodeLink);
                 }
-
-                _data.nodeLinks = links;
                 
             }
+            
+            _data.nodeLinks = links;
         }
         private void SaveGraphData(){
             _data.NodeDictionary.Clear();
-  
+            _data.nodeLinks.Clear();
             SaveNode();
             SaveEdge();
-   
             EditorUtility.SetDirty(_data);
         }
 
@@ -436,7 +440,6 @@ namespace TNode.Editor.BaseViews{
                         }
                     }
                 });
-                
                 if(nodeView is INodeView nodeViewInterface){
                     nodeViewInterface.SetNodeData(nodeData);
                 }
@@ -448,30 +451,27 @@ namespace TNode.Editor.BaseViews{
                     menu.AddItem(new GUIContent("Delete"), false, () => {
                         RemoveElement(nodeView);
                         if (nodeView is INodeView tNodeView){
-                            var nodeData1 = tNodeView.GetNodeData();
-                            _data.NodeDictionary.Remove(nodeData1.id);
-                            _nodeDict.Remove(nodeData1.id);
-                            //Break all edges connected to this node
-                            foreach (var edge in edges){
-                                if (edge.input.node == nodeView || edge.output.node == nodeView){
-                                    RemoveElement(edge);
-                                }
-                            }
-                            Owner.graphEditorData.graphElementsData.RemoveAll(x => x.guid == nodeData1.id);
+                            RemoveTNode(tNodeView.GetNodeData());
                         }
                     });
                     menu.ShowAsContext();
                 });
                 
-                
-                
-   
-                
             }
         }
 
         public void RemoveTNode(NodeData nodeData){
-            throw new NotImplementedException();
+            
+            _data.NodeDictionary.Remove(nodeData.id);
+            var nodeView = _nodeDict[nodeData.id];
+            _nodeDict.Remove(nodeData.id);
+            //Break all edges connected to this node
+            foreach (var edge in edges){
+                if (edge.input.node == nodeView || edge.output.node == nodeView){
+                    RemoveElement(edge);
+                }
+            }
+            Owner.graphEditorData.graphElementsData.RemoveAll(x => x.guid == nodeData.id);
         }
     }
 

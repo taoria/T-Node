@@ -4,17 +4,17 @@ using TNode.Attribute.Ports;
 using TNode.RuntimeCache;
 
 namespace TNode.Models{
-    public class BlackboardDragNodeData<T>:NodeData where T:BlackboardData{
+    public class BlackboardDragNodeData<T>:NodeData{
         [JsonIgnore]
         private string _blackDragData;
         [JsonIgnore]
-        private T _blackboardData;
+        private BlackboardData _blackboardData;
 
         [Output] 
         public T Value => _blackboardData.GetValue<T>(_blackDragData);
-        public BlackboardDragNodeData(string blackDragData,T blackboardData){
-            _blackDragData = blackDragData;
-            _blackboardData = blackboardData;
+ 
+        public BlackboardDragNodeData(){
+            
         }
         
     }

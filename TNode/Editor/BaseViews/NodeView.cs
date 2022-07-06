@@ -7,6 +7,7 @@ using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace TNode.Editor.BaseViews{
     
@@ -41,10 +42,13 @@ namespace TNode.Editor.BaseViews{
 
         protected NodeView(){
             OnDataChanged+=OnDataChangedHandler;
+            
             _nodeInspectorInNode = new NodeInspectorInNode(){
                 name = "nodeInspectorInNode"
             };
             this.extensionContainer.Add(_nodeInspectorInNode);
+            
+            BuildDoubleClickRename();
         }
         private void OnDataChangedHandler(T obj){
             this.title = _data.nodeName;
@@ -81,6 +85,48 @@ namespace TNode.Editor.BaseViews{
                     port.name = propertyInfo.Name;
                 }
             }
+        }
+
+        public void StartARenameTitleTextField(){
+            var textField = new TextField{
+                value = title,
+                style ={
+                    //Make the text filed overlap the title container
+                    position = Position.Absolute,
+                    left = 0,
+                    top = 0,
+                    width = titleContainer.layout.width,
+                    height = titleContainer.layout.height
+                }
+            };
+            textField.StretchToParentSize();
+            textField.RegisterValueChangedCallback(evt2 => {
+                title = evt2.newValue;
+            });
+            textField.RegisterCallback<FocusOutEvent>(evt2 => {
+                title = textField.text;
+                ((NodeDataWrapper)_data).SetValue("nodeName",textField.text);
+                textField.RemoveFromHierarchy();
+            });
+            //if enter is pressed ,set the title and remove the text field
+            textField.RegisterCallback<KeyDownEvent>(evt2 => {
+                if (evt2.keyCode == KeyCode.Return){
+                    title = textField.text;
+                    ((NodeDataWrapper)_data).SetValue("nodeName",textField.text);
+                    textField.RemoveFromHierarchy();
+                }
+            });
+                    
+            titleContainer.Add(textField);
+            textField.Focus();
+        }
+        private void BuildDoubleClickRename(){
+            //when double click titleContainer ,create a textfield to rename the node
+            titleContainer.RegisterCallback<MouseDownEvent>(evt => {
+                if (evt.clickCount == 2){
+                  StartARenameTitleTextField();
+                }
+            });
         }
 
         public void SetNodeData(NodeData nodeData){

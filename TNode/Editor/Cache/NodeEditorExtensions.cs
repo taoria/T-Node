@@ -145,6 +145,9 @@ namespace TNode.Cache{
         }
         public static object CreateNodeViewFromNodeType(Type t){
             //Check the generic type of NodeView by t
+            Debug.Log(t);
+            Debug.Log(t.ToString());
+            Debug.Log(typeof(NodeData).IsAssignableFrom(t));
             var type = typeof(NodeView<>).MakeGenericType(t);
             if (NodeEditorSingleton.Instance.FromGenericToSpecific.ContainsKey(type)){
                 var implementedType = NodeEditorSingleton.Instance.FromGenericToSpecific[type];
