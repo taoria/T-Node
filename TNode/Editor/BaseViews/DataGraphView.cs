@@ -4,8 +4,10 @@ using System.Linq;
 using System.Reflection;
 using TNode.BaseViews;
 using TNode.Cache;
+using TNode.Editor.GraphBlackboard;
 using TNode.Editor.Inspector;
 using TNode.Editor.Model;
+using TNode.Editor.Tools.NodeCreator;
 using TNode.Models;
 using Unity.VisualScripting;
 using UnityEditor;
@@ -109,6 +111,11 @@ namespace TNode.Editor.BaseViews{
     }
      */
     public  abstract  class DataGraphView<T>:GraphView,IDataGraphView where T:GraphData{
+        #region variables and properties
+
+        
+
+   
         private T _data;
         private bool _isInspectorOn;
         
@@ -116,7 +123,9 @@ namespace TNode.Editor.BaseViews{
         private NodeInspector _nodeInspector;
         public GraphEditor<T> Owner;
         private Dictionary<string,Node> _nodeDict = new();
+        private Blackboard _blackboard;
         
+
         public T Data{
             get{ return _data; }
             set{
@@ -128,11 +137,17 @@ namespace TNode.Editor.BaseViews{
             }
         }
         public event DataChangedEventHandler OnDataChanged;
+        #endregion
+        #region event declarations
         public delegate void DataChangedEventHandler(object sender, DataChangedEventArgs<T> e);
+        
+        #endregion
      
         //A Constructor for the DataGraphView ,never to override it
+
+
+        #region construct default behaviour
         public DataGraphView(){
-            
             styleSheets.Add(Resources.Load<StyleSheet>("GraphViewBackground"));
             var grid = new GridBackground();
             Insert(0,grid);
@@ -141,6 +156,7 @@ namespace TNode.Editor.BaseViews{
             this.AddManipulator(new SelectionDragger());
             this.AddManipulator(new RectangleSelector());
             SetupZoom(ContentZoomer.DefaultMinScale, ContentZoomer.DefaultMaxScale);
+            RegisterDragEvent();
             OnInit();
         }
         private void ConstructDefaultBehaviour(){
@@ -149,10 +165,7 @@ namespace TNode.Editor.BaseViews{
         }
 
         public void ConstructViewContextualMenu(){
-            
-            //Rebuild the contextual menu
-            
-            this.RegisterCallback<ContextualMenuPopulateEvent>(evt => {
+            RegisterCallback<ContextualMenuPopulateEvent>(evt => {
                 Vector2 editorPosition = Owner==null?Vector2.zero:Owner.position.position;
                 //Remove all the previous menu items
                 evt.menu.MenuItems().Clear();
@@ -163,15 +176,57 @@ namespace TNode.Editor.BaseViews{
                     searchWindow.Setup(typeof(T),this,Owner);
                     SearchWindow.Open(searchWindowContext, searchWindow);
                 });
- 
             });
-           
         }
 
         private void OnInit(){
             ConstructDefaultBehaviour();
             OnGraphViewCreate();
         }
+        public void RegisterDragEvent(){
+            RegisterCallback<DragUpdatedEvent>(OnDragUpdated);
+            RegisterCallback<DragPerformEvent>(OnDragPerform);
+        }
+        
+        #endregion
+
+        #region  event callbakc
+
+        private void OnDragPerform(DragPerformEvent evt){
+        
+            if (DragAndDrop.GetGenericData("DragSelection") is List<ISelectable>{Count: > 0} data){
+                var blackboardFields = data.OfType<BlackboardPropertyField >();
+                foreach (var selectable in blackboardFields){
+                    if(selectable is { } field) {
+                        //Make a constructor of  BlackboardDragNodeData<field.PropertyType > by reflection
+                        var specifiedType =
+                            typeof(BlackboardDragNodeData<>).MakeGenericType(field.BlackboardProperty.PropertyType);
+                        //Create a new instance of specified type
+                        var dragNodeData = NodeCreator.InstantiateNodeData(specifiedType);
+                        this.AddTNode(dragNodeData,new Rect(evt.mousePosition,new Vector2(200,200)));
+                    }
+                }
+             
+            }
+        }
+
+        private void OnDragUpdated(DragUpdatedEvent evt){
+            Debug.Log(evt);
+            
+            //check if the drag data is BlackboardField
+
+            if (DragAndDrop.GetGenericData("DragSelection") is List<ISelectable>{Count: > 0} data){
+                DragAndDrop.visualMode = DragAndDropVisualMode.Move;
+     
+            }
+            
+
+        }
+
+        #endregion
+
+
+
         public void ResetGraphView(){
             //Clear all nodes
             foreach (var node in nodes){
@@ -206,8 +261,7 @@ namespace TNode.Editor.BaseViews{
                     input = inputNodeView.inputContainer.Q<Port>(edge.inPort.portName),
                     output = outputNodeView.outputContainer.Q<Port>(edge.outPort.portName)
                 };
-                Debug.Log(edge.inPort.portName);
-                Debug.Log(edge.outPort.portName);
+
                 newEdge.input?.Connect(newEdge);
                 newEdge.output?.Connect(newEdge);
                 AddElement(newEdge);
@@ -219,7 +273,7 @@ namespace TNode.Editor.BaseViews{
 
         
 
-
+        
         public virtual void CreateInspector(){
             NodeInspector nodeInspector = new NodeInspector();
             this.Add(nodeInspector);
@@ -227,58 +281,48 @@ namespace TNode.Editor.BaseViews{
             _isInspectorOn = true;
         }
 
-        public void CreateMiniMap(Rect rect){
+        public virtual void CreateMiniMap(Rect rect){
             var miniMap = new MiniMap();
             this.Add(miniMap);
             miniMap.SetPosition(rect);
         }
 
-        public void CreateBlackboard(){
-            var blackboard = new Blackboard();
+        public virtual void CreateBlackboard(){
+            _blackboard = new Blackboard();
             //Blackboard add "Add Node" button
             // blackboard.Add(new BlackboardSection(){
             //     title = "Hello World",
             // });
             // blackboard.addItemRequested = (item) => {
             //     //Create a sub window for the blackboard to show the selection
-            //     var subWindow = ScriptableObject.CreateInstance<NodeSearchWindowProvider>();
+            //     var subWindow = ScriptableObject.CreateNodeComponentFromGenericType<NodeSearchWindowProvider>();
             // };
             //
             //Set black board to left side of the view
-            blackboard.SetPosition(new Rect(0,0,200,600));
-            Add(blackboard);
+            _blackboard.SetPosition(new Rect(0,0,200,600));
+            Add(_blackboard);
             //Check the type of the blackboard
             
-            OnDataChanged+= (sender, e) => {
-              
-                if (_data.blackboardData==null||_data.blackboardData.GetType()==typeof(BlackboardData)){
-                    _data.blackboardData = NodeEditorExtensions.GetAppropriateBlackboardData(_data.GetType());
-          
-                    if(_data.blackboardData==null) return;
-
-                }  
-                Debug.Log(_data.blackboardData);
-                //Iterate field of the blackboard and add a button for each field
-                foreach (var field in _data.blackboardData.GetType()
-                             .GetFields(BindingFlags.Public|BindingFlags.NonPublic | BindingFlags.Instance)){
-                    Debug.Log(field);
-                    //if the field is MonoBehaviour,add a property field for blackboard
-                    if(typeof(UnityEngine.Object).IsAssignableFrom(field.FieldType)){
-                        var propertyField = new BlackboardField(null,field.Name,null){
-                            
-                        };
-                        blackboard.Add(propertyField);
-                    }
-                    if(typeof(string).IsAssignableFrom(field.FieldType)){
-                        var propertyField = new BlackboardField(null,field.Name,null){
-                            
-                        };
-                        blackboard.Add(propertyField);
-                    }
-                }
-            };
+            OnDataChanged+= (sender, e) => { BlackboardUpdate(); };
 
         }
+
+        private void BlackboardUpdate(){
+            if (_data.blackboardData == null || _data.blackboardData.GetType() == typeof(BlackboardData)){
+                _data.blackboardData = NodeEditorExtensions.GetAppropriateBlackboardData(_data.GetType());
+
+                if (_data.blackboardData == null) return;
+            }
+
+            //Iterate field of the blackboard and add a button for each field
+            foreach (var field in _data.blackboardData.GetType()
+                         .GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)){
+                //if the field is MonoBehaviour,add a property field for blackboard
+                var propertyField = new BlackboardPropertyField(new BlackboardProperty(field.Name,field.FieldType));
+                _blackboard.Add(propertyField);
+            }
+        }
+
         public virtual void DestroyInspector(){
             if(_nodeInspector!=null){
                 this.Remove(_nodeInspector);
@@ -329,11 +373,10 @@ namespace TNode.Editor.BaseViews{
             }
         }
         private void SaveEdge(){
+            var links = new List<NodeLink>();
             foreach (var edge in edges){
                 var inputNode = edge.input.node as INodeView;
                 var outputNode = edge.output.node as INodeView;
-                var links = new List<NodeLink>();
-                Debug.Log($"Edge{inputNode},{outputNode}");
                 if (inputNode != null && outputNode != null){
                     var inputNodeData = inputNode.GetNodeData();
                     var outputNodeData = outputNode.GetNodeData();
@@ -347,17 +390,16 @@ namespace TNode.Editor.BaseViews{
                     });
                     links.Add(newNodeLink);
                 }
-
-                _data.nodeLinks = links;
                 
             }
+            
+            _data.nodeLinks = links;
         }
         private void SaveGraphData(){
             _data.NodeDictionary.Clear();
-  
+            _data.nodeLinks.Clear();
             SaveNode();
             SaveEdge();
-   
             EditorUtility.SetDirty(_data);
         }
 
@@ -377,13 +419,16 @@ namespace TNode.Editor.BaseViews{
             OnGraphViewDestroy();
         }
 
+        public bool IsDroppable(){
+            return true;
+        }
+
         public void AddTNode(NodeData nodeData, Rect rect){
             if (NodeEditorExtensions.CreateNodeViewFromNodeType(nodeData.GetType()) is Node nodeView){
                 nodeView.SetPosition(rect);
                 AddElement(nodeView);
                 //Add a select callback to the nodeView
                 nodeView.RegisterCallback<MouseDownEvent>(evt => {
-                    Debug.Log("NodeView Selected");
                     if (evt.clickCount == 1){
                         if (_isInspectorOn){
                             _nodeInspector.Data = nodeData;
@@ -391,7 +436,6 @@ namespace TNode.Editor.BaseViews{
                         }
                     }
                 });
-                
                 if(nodeView is INodeView nodeViewInterface){
                     nodeViewInterface.SetNodeData(nodeData);
                 }
@@ -403,30 +447,27 @@ namespace TNode.Editor.BaseViews{
                     menu.AddItem(new GUIContent("Delete"), false, () => {
                         RemoveElement(nodeView);
                         if (nodeView is INodeView tNodeView){
-                            var nodeData1 = tNodeView.GetNodeData();
-                            _data.NodeDictionary.Remove(nodeData1.id);
-                            _nodeDict.Remove(nodeData1.id);
-                            //Break all edges connected to this node
-                            foreach (var edge in edges){
-                                if (edge.input.node == nodeView || edge.output.node == nodeView){
-                                    RemoveElement(edge);
-                                }
-                            }
-                            Owner.graphEditorData.graphElementsData.RemoveAll(x => x.guid == nodeData1.id);
+                            RemoveTNode(tNodeView.GetNodeData());
                         }
                     });
                     menu.ShowAsContext();
                 });
                 
-                
-                
-   
-                
             }
         }
 
         public void RemoveTNode(NodeData nodeData){
-            throw new NotImplementedException();
+            
+            _data.NodeDictionary.Remove(nodeData.id);
+            var nodeView = _nodeDict[nodeData.id];
+            _nodeDict.Remove(nodeData.id);
+            //Break all edges connected to this node
+            foreach (var edge in edges){
+                if (edge.input.node == nodeView || edge.output.node == nodeView){
+                    RemoveElement(edge);
+                }
+            }
+            Owner.graphEditorData.graphElementsData.RemoveAll(x => x.guid == nodeData.id);
         }
     }
 

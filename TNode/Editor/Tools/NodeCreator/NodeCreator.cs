@@ -2,7 +2,7 @@
 using TNode.Models;
 
 namespace TNode.Editor.Tools.NodeCreator{
-    public static class NodeHelper{
+    public static class NodeCreator{
         
         /// <summary>
         /// always use this to create a new node.
