@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Reflection;
 using TNode.Attribute;
 using TNode.Attribute.Ports;
 using TNode.Editor.Inspector;
@@ -63,25 +65,46 @@ namespace TNode.Editor.BaseViews{
             this.RefreshExpandedState();
         }
 
-        private void BuildInputAndOutputPort(){
+        protected virtual string BuildPortName(PortAttribute portAttribute,PropertyInfo propertyInfo,params object[] args){
+            switch (portAttribute.NameHandling){
+                case PortNameHandling.Auto:
+                    return portAttribute.Name.Trim(' ').Length>0?portAttribute.Name:propertyInfo.Name;
+                    break;
+                case PortNameHandling.Manual:
+                    return portAttribute.Name;
+                    break;
+                case PortNameHandling.MemberName:
+                    return propertyInfo.Name;
+                case PortNameHandling.Format:
+                    return String.Format(propertyInfo.Name, args);
+                case PortNameHandling.MemberType:
+                    return propertyInfo.PropertyType.Name;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+        /// <summary>
+        /// of course you can override this method to build your own port builder
+        /// </summary>
+        protected virtual void BuildInputAndOutputPort(){
             var propertyInfos = _data.GetType().GetProperties();
    
             foreach (var propertyInfo in propertyInfos){
-                var attribute = propertyInfo.GetCustomAttributes(typeof(OutputAttribute),true);
-                if (attribute.Length > 0){
+                if (propertyInfo.GetCustomAttributes(typeof(OutputAttribute),true).FirstOrDefault() is OutputAttribute attribute){
                     Port port = InstantiatePort(Orientation.Horizontal, Direction.Output,Port.Capacity.Multi,propertyInfo.PropertyType);
                     this.outputContainer.Add(port);
-                    port.portName = propertyInfo.Name;
-                    port.name = propertyInfo.Name;
+                    var portName = BuildPortName(attribute,propertyInfo);
+                    port.portName = portName;
+                    port.name = portName;
                 }
             }
             foreach (var propertyInfo in propertyInfos){
-                var attribute = propertyInfo.GetCustomAttributes(typeof(InputAttribute),true);
-                if (attribute.Length > 0){
-                    Port port = InstantiatePort(Orientation.Horizontal, Direction.Input,Port.Capacity.Multi,propertyInfo.PropertyType);
+                if(propertyInfo.GetCustomAttributes(typeof(InputAttribute),true).FirstOrDefault() is InputAttribute attribute){
+                    Port port = InstantiatePort(Orientation.Horizontal, Direction.Input,Port.Capacity.Single,propertyInfo.PropertyType);
                     this.inputContainer.Add(port);
-                    port.portName = propertyInfo.Name;
-                    port.name = propertyInfo.Name;
+                    var portName = BuildPortName(attribute,propertyInfo);
+                    port.portName = portName;
+                    port.name = portName;
                 }
             }
         }

@@ -9,14 +9,37 @@ using TNode.Editor.Inspector;
 using TNode.Models;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.TestTools.Utils;
 
 namespace TNode.Cache{
     /// <summary>
     /// Internal singleton class for caching TNode reflection Data.
     /// </summary>
+    internal class NodeEditorTypeDictionary:Dictionary<Type, Type>{
+        //Custom camparator for sorting the dictionary by key.
+
+
+
+        private class NodeEditorTypeDictionaryComparer : IEqualityComparer<Type>
+        {
+            public bool Equals(Type x, Type y){
+                return x?.ToString() == y?.ToString();
+            }
+
+            public int GetHashCode(Type obj){
+                return obj.ToString().GetHashCode();
+            }
+        }
+
+        public NodeEditorTypeDictionary():base(new NodeEditorTypeDictionaryComparer()){
+            
+        }
+
+    }
+    
     internal class NodeEditorSingleton{
         private static NodeEditorSingleton _instance;
-        public readonly Dictionary<Type,Type> FromGenericToSpecific = new Dictionary<Type, Type>();
+        public readonly Dictionary<Type,Type> FromGenericToSpecific = new NodeEditorTypeDictionary();
         public readonly Dictionary<Type, List<Type>> GraphDataUsage = new Dictionary<Type, List<Type>>();
         public Dictionary<Type, Type> GraphBlackboard = new();
         public static NodeEditorSingleton Instance{
@@ -75,15 +98,22 @@ namespace TNode.Cache{
                 }
             }
         }
-        private readonly Type[] _acceptedTypesForGenericToSpecific = new Type[]{typeof(NodeView<>),typeof(DataGraphView<>),typeof(InspectorItem<>)};
+        private readonly Type[] _acceptedTypesForGenericToSpecific = new Type[]{typeof(NodeView<>),typeof(DataGraphView<>),typeof(InspectorItem<>),typeof(NodeView<>)};
         private void SetNodeComponentAttribute(Type type){
             foreach (var attribute in type.GetCustomAttributes(typeof(NodeComponentAttribute), false)){
                 //fetch this type 's parent class
                 var parent = type.BaseType;
-                //Check if this type is a generic type and is a generic type of NodeView or DataGraphView
-                if (parent is{IsGenericType: true} && _acceptedTypesForGenericToSpecific.Contains(parent.GetGenericTypeDefinition())){
+                //Check if this type is a generic type and is a generic type of NodeView or DataGraphView,
+                //Two level generic definition is now supported by TNode
+                //Deeper nested generic definition is not supported by TNode
+                if (parent is{IsGenericType: true} && 
+                    (_acceptedTypesForGenericToSpecific.Contains(parent.GetGenericTypeDefinition()) ||
+                     (parent.GetGenericTypeDefinition().IsGenericType && _acceptedTypesForGenericToSpecific.Contains(parent.GetGenericTypeDefinition().GetGenericTypeDefinition()))
+                     )
+                    ){
                     //Get the generic type of this type
                     //Add this type to the dictionary
+                    Debug.Log($"type {type} is a registered as node component for {parent}");
                     FromGenericToSpecific.Add(parent, type);
                 }
                 //TODO Note that a node component only applied to a specific type of editor,so ,same GraphView could behave differently in different editor.it's a todo feature.
@@ -103,7 +133,6 @@ namespace TNode.Cache{
                 var instance = Activator.CreateInstance(implementedType);
                 return instance;
             }
-            Debug.Log($"No given type found {t}");
             //check if t is a generic type node view
             if (t is{IsGenericType: true} && t.GetGenericTypeDefinition() == typeof(NodeView<>)){
                 var instance = Activator.CreateInstance(typeof(NodeView<NodeData>));
@@ -146,13 +175,46 @@ namespace TNode.Cache{
         }
         public static object CreateNodeViewFromNodeType(Type t){
             //Check the generic type of NodeView by t
+           
+            if (t.IsGenericType){
+                Debug.Log($"A generic type {t} is detected");
+                //AKA if BlackboardDragNodeData<Camera> is pulled 
+                //Get BlackboardDragNodeData<T> as generic type 
+                
+          
+                var genericTypeDefinition = t.GetGenericTypeDefinition();
+                
+                //What you want is a NodeView<BlackboardDragNodeData<T>> to be created
+                var genericViewType = typeof(NodeView<>).MakeGenericType(genericTypeDefinition);
+                Debug.Log($"The generic view type  is  {genericViewType}");
+             
+                //search for the specific type of genericViewType in the dictionary
+                if (NodeEditorSingleton.Instance.FromGenericToSpecific.ContainsKey(genericViewType)){
+            
+                    var implementedType = NodeEditorSingleton.Instance.FromGenericToSpecific[genericViewType];
+                    //The implementedType is still a generic type ,so we make it a specific type by using MakeGenericType
+                    Debug.Log($"{implementedType}");
+                    //Get argument type of t
+                    var argumentType = t.GetGenericArguments()[0];
+                    var instance = Activator.CreateInstance(implementedType.MakeGenericType(argumentType));
+                 
+                    return instance;
+
+                }
+                else{
+                    return new DefaultNodeView();
+                }
+
+            }
             var type = typeof(NodeView<>).MakeGenericType(t);
             if (NodeEditorSingleton.Instance.FromGenericToSpecific.ContainsKey(type)){
+            
                 var implementedType = NodeEditorSingleton.Instance.FromGenericToSpecific[type];
                 var instance = Activator.CreateInstance(implementedType);
                 return instance;
             }
             else{
+                
                 return new DefaultNodeView();
             }
             

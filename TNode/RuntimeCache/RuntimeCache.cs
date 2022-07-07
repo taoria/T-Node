@@ -62,6 +62,11 @@ namespace TNode.RuntimeCache{
             var method = RuntimeCache.Instance.CachedDelegatesForGettingValue[blackboardData.GetType()][path];
             return (T) method.Invoke(blackboardData);
         }
+
+        public static object GetValue(this BlackboardData blackboardData, string path){
+            var method = RuntimeCache.Instance.CachedDelegatesForGettingValue[blackboardData.GetType()][path];
+            return method.Invoke(blackboardData);
+        }
         public static RuntimeCache.GetValueDelegate GetValueDelegate(this BlackboardData blackboardData,string path){
             var method = RuntimeCache.Instance.CachedDelegatesForGettingValue[blackboardData.GetType()][path];
             return method;

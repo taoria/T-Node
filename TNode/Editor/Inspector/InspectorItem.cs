@@ -88,7 +88,6 @@ namespace TNode.Editor.Inspector{
                 Bindable.value = Value;
                 Bindable.label = BindingPath;
             }
-            Debug.Log(Value.GetType());
         }
 
         private  void OnNodeDataValueChanged(NodeDataWrapper wrapper){
