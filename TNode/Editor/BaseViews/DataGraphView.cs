@@ -261,8 +261,7 @@ namespace TNode.Editor.BaseViews{
                     input = inputNodeView.inputContainer.Q<Port>(edge.inPort.portName),
                     output = outputNodeView.outputContainer.Q<Port>(edge.outPort.portName)
                 };
-                Debug.Log(edge.inPort.portName);
-                Debug.Log(edge.outPort.portName);
+
                 newEdge.input?.Connect(newEdge);
                 newEdge.output?.Connect(newEdge);
                 AddElement(newEdge);
@@ -296,7 +295,7 @@ namespace TNode.Editor.BaseViews{
             // });
             // blackboard.addItemRequested = (item) => {
             //     //Create a sub window for the blackboard to show the selection
-            //     var subWindow = ScriptableObject.CreateInstance<NodeSearchWindowProvider>();
+            //     var subWindow = ScriptableObject.CreateNodeComponentFromGenericType<NodeSearchWindowProvider>();
             // };
             //
             //Set black board to left side of the view
@@ -315,11 +314,9 @@ namespace TNode.Editor.BaseViews{
                 if (_data.blackboardData == null) return;
             }
 
-            Debug.Log(_data.blackboardData);
             //Iterate field of the blackboard and add a button for each field
             foreach (var field in _data.blackboardData.GetType()
                          .GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)){
-                Debug.Log(field);
                 //if the field is MonoBehaviour,add a property field for blackboard
                 var propertyField = new BlackboardPropertyField(new BlackboardProperty(field.Name,field.FieldType));
                 _blackboard.Add(propertyField);
@@ -432,7 +429,6 @@ namespace TNode.Editor.BaseViews{
                 AddElement(nodeView);
                 //Add a select callback to the nodeView
                 nodeView.RegisterCallback<MouseDownEvent>(evt => {
-                    Debug.Log("NodeView Selected");
                     if (evt.clickCount == 1){
                         if (_isInspectorOn){
                             _nodeInspector.Data = nodeData;

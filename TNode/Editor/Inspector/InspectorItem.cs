@@ -6,8 +6,8 @@ using UnityEngine.UIElements;
 
 namespace TNode.Editor.Inspector{
     public abstract class InspectorItem<T>:VisualElement,INodeDataBinding<T> {
-        private NodeData _bindingNodeData;
-        private string _bindingFieldName;
+        protected NodeData _bindingNodeData;
+        protected string _bindingFieldName;
         protected BaseField<T> Bindable;
         protected event System.Action OnDataChanged;
 
@@ -38,15 +38,19 @@ namespace TNode.Editor.Inspector{
         }
 
         private T GetValue(){
-        
+           
             var fieldInfo = _bindingNodeData.GetType().GetField(BindingPath, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
-            //check field type
-            if (fieldInfo != null && fieldInfo.FieldType == typeof(T)){
+            if (fieldInfo == null){
+                throw new Exception("Null field info");
+            }
+            if (fieldInfo.FieldType == typeof(T)){
                 return (T)fieldInfo.GetValue(BindingNodeData);
             }
-            else{
-                Debug.LogError("Wrong Type for current node data");
+
+            if (fieldInfo.FieldType.IsEnum){
+                return (T)fieldInfo.GetValue(BindingNodeData);
             }
+            Debug.LogError("Wrong Type for current node data");
             return default;
         }
 
@@ -75,7 +79,7 @@ namespace TNode.Editor.Inspector{
                 Bindable.UnregisterValueChangedCallback(OnInspectorItemValueChanged);
             }
             Bindable = bindable;
-            this.Add(Bindable);
+            Add(Bindable);
             Bindable?.RegisterValueChangedCallback(OnInspectorItemValueChanged);
         }
         private void OnDataChangedHandler(){
@@ -84,6 +88,7 @@ namespace TNode.Editor.Inspector{
                 Bindable.value = Value;
                 Bindable.label = BindingPath;
             }
+            Debug.Log(Value.GetType());
         }
 
         private  void OnNodeDataValueChanged(NodeDataWrapper wrapper){

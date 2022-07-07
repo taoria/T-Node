@@ -33,7 +33,6 @@ namespace TNode.Models{
             var deserializedBlackboard = JsonConvert.DeserializeObject<BlackboardData>(jsonBlackboard,JsonSerializeTool.JsonSerializerSettings);
             blackboardData = deserializedBlackboard;
             
-            Debug.Log("hi");
         }
     }
 }

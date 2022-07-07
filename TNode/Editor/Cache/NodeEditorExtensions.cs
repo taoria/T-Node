@@ -92,31 +92,32 @@ namespace TNode.Cache{
     }
     //Outer wrapper for the singleton class
     public static class NodeEditorExtensions{
-        public static T CreateInstance<T>(){
+        public static T CreateNodeComponentFromGenericType<T>(){
             var implementedType = NodeEditorSingleton.Instance.FromGenericToSpecific[typeof(T)];
             var instance = (T)Activator.CreateInstance(implementedType);
             return instance;
         }
-        public static object CreateInstance(Type t){
+        public static object CreateNodeComponentFromGenericType(Type t){
             if (NodeEditorSingleton.Instance.FromGenericToSpecific.ContainsKey(t)){
                 var implementedType = NodeEditorSingleton.Instance.FromGenericToSpecific[t];
                 var instance = Activator.CreateInstance(implementedType);
                 return instance;
             }
-            else{
-                Debug.Log($"No given type found {t}");
-                //check if t is a generic type node view
-                if (t is{IsGenericType: true} && t.GetGenericTypeDefinition() == typeof(NodeView<>)){
-                    var instance = Activator.CreateInstance(typeof(NodeView<NodeData>));
-                    return instance;
-                }
-           
-                return null;
+            Debug.Log($"No given type found {t}");
+            //check if t is a generic type node view
+            if (t is{IsGenericType: true} && t.GetGenericTypeDefinition() == typeof(NodeView<>)){
+                var instance = Activator.CreateInstance(typeof(NodeView<NodeData>));
+                return instance;
             }
+            return null;
         }
-        public static bool HasSpecificType<T>() where T : class{
+        public static bool HasSpecificTypeComponent<T>() where T : class{
 
             return NodeEditorSingleton.Instance.FromGenericToSpecific.ContainsKey(typeof(T));
+        }
+        public static bool HasSpecificTypeComponent(Type t) {
+
+            return NodeEditorSingleton.Instance.FromGenericToSpecific.ContainsKey(t);
         }
         public static List<Type> GetGraphDataUsage(Type t){
             if (NodeEditorSingleton.Instance.GraphDataUsage.ContainsKey(t)){
@@ -145,9 +146,6 @@ namespace TNode.Cache{
         }
         public static object CreateNodeViewFromNodeType(Type t){
             //Check the generic type of NodeView by t
-            Debug.Log(t);
-            Debug.Log(t.ToString());
-            Debug.Log(typeof(NodeData).IsAssignableFrom(t));
             var type = typeof(NodeView<>).MakeGenericType(t);
             if (NodeEditorSingleton.Instance.FromGenericToSpecific.ContainsKey(type)){
                 var implementedType = NodeEditorSingleton.Instance.FromGenericToSpecific[type];
