@@ -76,7 +76,6 @@ namespace TNode.Editor.BaseViews{
                 }
             }
             foreach (var propertyInfo in propertyInfos){
-                Debug.Log(propertyInfos);
                 var attribute = propertyInfo.GetCustomAttributes(typeof(InputAttribute),true);
                 if (attribute.Length > 0){
                     Port port = InstantiatePort(Orientation.Horizontal, Direction.Input,Port.Capacity.Multi,propertyInfo.PropertyType);
