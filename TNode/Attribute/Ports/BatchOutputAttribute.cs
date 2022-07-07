@@ -7,6 +7,7 @@ namespace TNode.Attribute.Ports{
     /// </summary>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
     public class BatchOutputAttribute:PortAttribute{
-
+        public BatchOutputAttribute(string name="") : base(name){
+        }
     }
 }
