@@ -32,22 +32,13 @@ namespace TNode.Editor.Inspector{
                 var showInNodeViewAttribute = field.GetCustomAttribute<ShowInNodeViewAttribute>()!=null;
                 if(!showInNodeViewAttribute)
                     continue;
-                //Invoke generic function Create<> of default inspector item factory to create an inspector item of appropriate type by reflection
                 var createdItem = inspectorItemFactory.Create(type);
                 if (createdItem is { } castedItem){
                     castedItem.BindingNodeData = _data;
                     castedItem.BindingPath = bindingPath;
                 }
                 Add((VisualElement)createdItem);
-                // MethodInfo methodInfo = inspectorItemFactory.GetType().GetMethod("Create", BindingFlags.Instance | BindingFlags.Public);
-                // if (methodInfo != null){
-                //     var genericMethod = methodInfo.MakeGenericMethod(type);
-                //     Debug.Log(genericMethod);
-                //     var createdItem  = genericMethod.Invoke(inspectorItemFactory,null) as VisualElement;
-                //     Add(createdItem);
-                //     Debug.Log(createdItem?.GetType());
-                //
-                // }
+
             }
         }
     }
