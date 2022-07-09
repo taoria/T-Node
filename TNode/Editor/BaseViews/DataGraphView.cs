@@ -112,20 +112,13 @@ namespace TNode.Editor.BaseViews{
      */
     public  abstract  class DataGraphView<T>:GraphView,IDataGraphView where T:GraphData{
         #region variables and properties
-
-        
-
-   
         private T _data;
         private bool _isInspectorOn;
-        
         private NodeSearchWindowProvider _nodeSearchWindowProvider;
         private NodeInspector _nodeInspector;
         public GraphEditor<T> Owner;
         private Dictionary<string,Node> _nodeDict = new();
         private Blackboard _blackboard;
-        
-
         public T Data{
             get{ return _data; }
             set{
@@ -469,11 +462,17 @@ namespace TNode.Editor.BaseViews{
             }
             Owner.graphEditorData.graphElementsData.RemoveAll(x => x.guid == nodeData.id);
         }
+
+        public BlackboardData GetBlackboardData(){
+            return this._data.blackboardData;
+        }
     }
 
     public interface IDataGraphView{
         public void AddTNode(NodeData nodeData, Rect rect);
         public void RemoveTNode(NodeData nodeData);
+        
+        public BlackboardData GetBlackboardData();
     }
 
     public class DataChangedEventArgs<T>{

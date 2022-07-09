@@ -51,21 +51,12 @@ namespace TNode.Editor.Inspector{
                 var type = field.FieldType;
                 InspectorItemFactory inspectorItemFactory = new InspectorItemFactory();
                 //Invoke generic function Create<> of default inspector item factory to create an inspector item of appropriate type by reflection
-                MethodInfo methodInfo = inspectorItemFactory.GetType().GetMethod("Create", BindingFlags.Instance | BindingFlags.Public);
-                if (methodInfo != null){
-                    var genericMethod = methodInfo.MakeGenericMethod(type);
-                    var createdItem  = genericMethod.Invoke(inspectorItemFactory,null) as VisualElement;
-                    body.Add(createdItem);
-                    if (createdItem is INodeDataBindingBase castedItem){
-                        castedItem.BindingNodeData = _data;
-                        castedItem.BindingPath = bindingPath;
-                    }
-                    
-                    //Check if field has DisableOnInspector attribute and if so,disable it
-                    if (field.GetCustomAttribute<DisableOnInspectorAttribute>() != null){
-                        createdItem?.SetEnabled(false);
-                    }
+                var createdItem = inspectorItemFactory.Create(type);
+                if (createdItem is { } castedItem){
+                    castedItem.BindingNodeData = _data;
+                    castedItem.BindingPath = bindingPath;
                 }
+                Add((VisualElement)createdItem);
             }
         }
     }
