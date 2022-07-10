@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
 using Newtonsoft.Json;
 using TNode.Attribute;
 using TNode.Attribute.Ports;
@@ -9,7 +10,7 @@ namespace TNode.Models{
         private string _blackDragData;
         [JsonIgnore]
         private BlackboardData _blackboardData;
-
+        
         [Output("",PortNameHandling.MemberType)] 
         public T Value => _blackboardData.GetValue<T>(_blackDragData);
  

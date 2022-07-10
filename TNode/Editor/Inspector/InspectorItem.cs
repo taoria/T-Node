@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace TNode.Editor.Inspector{
+    [Obsolete]
     public abstract class InspectorItem<T>:VisualElement,INodeDataBinding<T> {
         protected NodeData _bindingNodeData;
         protected string _bindingFieldName;

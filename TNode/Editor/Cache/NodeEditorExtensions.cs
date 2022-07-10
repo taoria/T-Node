@@ -113,7 +113,6 @@ namespace TNode.Cache{
                     ){
                     //Get the generic type of this type
                     //Add this type to the dictionary
-                    Debug.Log($"type {type} is a registered as node component for {parent}");
                     FromGenericToSpecific.Add(parent, type);
                 }
                 //TODO Note that a node component only applied to a specific type of editor,so ,same GraphView could behave differently in different editor.it's a todo feature.

@@ -1,6 +1,8 @@
 ﻿using System.Reflection;
 using TNode.Attribute;
 using TNode.Models;
+using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -14,8 +16,11 @@ namespace TNode.Editor.Inspector{
                 UpdateData();
                 
             }
+            
         }
 
+        public NodeInspectorInNode():base(){
+        }
         private void UpdateData(){
             if (_data != null){
                 RefreshInspector();
@@ -23,22 +28,52 @@ namespace TNode.Editor.Inspector{
         }
 
         private void RefreshInspector(){
+            //Set size
+           
             Clear();
+            //RefreshItems();
+            RefreshPropertyDrawer();
+        }
+
+        private void RefreshPropertyDrawer(){
+            //Check if the data's type is a generic type of  BlackboardDragNodeData<>
+            if (_data.GetType().IsSubclassOf(typeof(BlackboardDragNodeData<>))){
+                return;
+            }
+
+ 
+            
+            var serializedObject = new SerializedObject((NodeDataWrapper)_data);
+            foreach (var field in _data.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public|BindingFlags.NonPublic)){
+                //Create corresponding property field
+                //check if the field has ShowInNodeView attribute
+                var showInNodeViewAttribute = field.GetCustomAttribute<ShowInNodeViewAttribute>() != null;
+                if (!showInNodeViewAttribute)
+                    continue;
+                var drawer = new PropertyField(serializedObject.FindProperty("Data").FindPropertyRelative(field.Name),field.Name);
+                Debug.Log(serializedObject.FindProperty("Data"));
+                drawer.Bind(serializedObject);
+               
+                Add(drawer);
+            }
+        }
+
+        private void RefreshItems(){
             InspectorItemFactory inspectorItemFactory = new InspectorItemFactory();
             foreach (var field in _data.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public)){
                 var bindingPath = field.Name;
                 var type = field.FieldType;
                 //check if the field has ShowInNodeView attribute
-                var showInNodeViewAttribute = field.GetCustomAttribute<ShowInNodeViewAttribute>()!=null;
-                if(!showInNodeViewAttribute)
+                var showInNodeViewAttribute = field.GetCustomAttribute<ShowInNodeViewAttribute>() != null;
+                if (!showInNodeViewAttribute)
                     continue;
                 var createdItem = inspectorItemFactory.Create(type);
-                if (createdItem is { } castedItem){
+                if (createdItem is{ } castedItem){
                     castedItem.BindingNodeData = _data;
                     castedItem.BindingPath = bindingPath;
                 }
-                Add((VisualElement)createdItem);
 
+                Add((VisualElement) createdItem);
             }
         }
     }

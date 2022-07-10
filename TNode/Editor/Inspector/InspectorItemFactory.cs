@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace TNode.Editor.Inspector{
+    [Obsolete]
     public class InspectorItemFactory{
       
         public InspectorItem<T> Create<T>(){
