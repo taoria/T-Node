@@ -5,6 +5,7 @@ using UnityEngine.UIElements;
 
 namespace TNode.Editor.Inspector.InspectorImplementation{
     [NodeComponent]
+    [Obsolete]
     public class EnumFieldItem:InspectorItem<Enum>{
         public EnumFieldItem() : base(){
             var field = new EnumField();
