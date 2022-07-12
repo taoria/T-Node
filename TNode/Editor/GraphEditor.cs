@@ -36,7 +36,7 @@ namespace TNode.Editor{
         }
         
         private void BuildGraphView(){
-            _graphView = NodeEditorExtensions.CreateNodeComponentFromGenericType<DataGraphView<T>>();
+            _graphView = NodeEditorExtensions.CreateViewComponentFromBaseType<DataGraphView<T>>();
             rootVisualElement.Add(_graphView);
             _graphView.StretchToParentSize();
         }

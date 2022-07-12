@@ -15,12 +15,12 @@ namespace TNode.Editor.Inspector{
             var hasSpecificType = NodeEditorExtensions.HasSpecificTypeComponent<InspectorItem<T>>();
            
             if (hasSpecificType){
-                return NodeEditorExtensions.CreateNodeComponentFromGenericType<InspectorItem<T>>();
+                return NodeEditorExtensions.CreateViewComponentFromBaseType<InspectorItem<T>>();
             }
 
             if (typeof(T).IsEnum){
               
-                return NodeEditorExtensions.CreateNodeComponentFromGenericType(typeof(InspectorItem<Enum>)) as InspectorItem<T>;
+                return NodeEditorExtensions.CreateViewComponentFromBaseType(typeof(InspectorItem<Enum>)) as InspectorItem<T>;
             }
             return null;
         }
@@ -30,12 +30,12 @@ namespace TNode.Editor.Inspector{
             var hasSpecificType = NodeEditorExtensions.HasSpecificTypeComponent(genericType);
            
             if (hasSpecificType){
-                return NodeEditorExtensions.CreateNodeComponentFromGenericType(genericType) as INodeDataBindingBase;
+                return NodeEditorExtensions.CreateViewComponentFromBaseType(genericType) as INodeDataBindingBase;
             }
 
             if (t.IsEnum){
               
-                return NodeEditorExtensions.CreateNodeComponentFromGenericType(typeof(InspectorItem<Enum>)) as INodeDataBindingBase;
+                return NodeEditorExtensions.CreateViewComponentFromBaseType(typeof(InspectorItem<Enum>)) as INodeDataBindingBase;
             }
             return null;
         }

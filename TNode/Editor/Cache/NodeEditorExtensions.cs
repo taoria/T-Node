@@ -5,6 +5,7 @@ using TNode.Attribute;
 using TNode.BaseViews;
 using TNode.Editor;
 using TNode.Editor.BaseViews;
+using TNode.Editor.GraphBlackboard;
 using TNode.Editor.Inspector;
 using TNode.Models;
 using UnityEditor.Experimental.GraphView;
@@ -58,7 +59,7 @@ namespace TNode.Cache{
                 foreach(var type in assembly.GetTypes()){
                     if(type.IsClass && !type.IsAbstract){
                         //Register Node View And Graph View via its parent class
-                        SetNodeComponentAttribute(type);
+                        SetViewComponentAttribute(type);
                         //Register Node Data by GraphUsageAttribute.
                         SetGraphUsageAttribute(type);
                     }
@@ -98,9 +99,10 @@ namespace TNode.Cache{
                 }
             }
         }
-        private readonly Type[] _acceptedTypesForGenericToSpecific = new Type[]{typeof(NodeView<>),typeof(DataGraphView<>),typeof(InspectorItem<>),typeof(NodeView<>)};
-        private void SetNodeComponentAttribute(Type type){
-            foreach (var attribute in type.GetCustomAttributes(typeof(NodeComponentAttribute), false)){
+        private readonly Type[] _acceptedTypesForGenericToSpecific = new Type[]{typeof(NodeView<>),typeof(DataGraphView<>),typeof(GraphBlackboardView<>)};
+        private readonly Type[] _defaultTypes = new []{typeof(DefaultNodeView),typeof(DefaultGraphBlackboardView)};
+        private void SetViewComponentAttribute(Type type){
+            foreach (var attribute in type.GetCustomAttributes(typeof(ViewComponentAttribute), false)){
                 //fetch this type 's parent class
                 var parent = type.BaseType;
                 //Check if this type is a generic type and is a generic type of NodeView or DataGraphView,
@@ -121,21 +123,57 @@ namespace TNode.Cache{
     }
     //Outer wrapper for the singleton class
     public static class NodeEditorExtensions{
-        public static T CreateNodeComponentFromGenericType<T>(){
+        /// <summary>
+        ///  by given a generic type T,return the implementation instance  of the generic type
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static T CreateViewComponentFromBaseType<T>(){
             var implementedType = NodeEditorSingleton.Instance.FromGenericToSpecific[typeof(T)];
             var instance = (T)Activator.CreateInstance(implementedType);
             return instance;
         }
-        public static object CreateNodeComponentFromGenericType(Type t){
+        
+        /// <summary>
+        /// by given a generic type t,return the implementation instance  of the generic type
+        /// </summary>
+        /// <returns></returns>
+        public static object CreateViewComponentFromBaseType(Type t){
             if (NodeEditorSingleton.Instance.FromGenericToSpecific.ContainsKey(t)){
                 var implementedType = NodeEditorSingleton.Instance.FromGenericToSpecific[t];
                 var instance = Activator.CreateInstance(implementedType);
                 return instance;
             }
+            
             //check if t is a generic type node view
             if (t is{IsGenericType: true} && t.GetGenericTypeDefinition() == typeof(NodeView<>)){
                 var instance = Activator.CreateInstance(typeof(NodeView<NodeData>));
                 return instance;
+            }
+            return null;
+        }
+        
+        public static Blackboard CreateBlackboardDataFromBlackboardDataType(Type t){
+            var type = typeof(GraphBlackboardView<>).MakeGenericType(t);
+            var res = CreateViewComponentFromBaseType(type) as Blackboard;
+            return res ?? new DefaultGraphBlackboardView();
+
+        }
+
+        public static Blackboard CreateBlackboardWithGraphData(GraphData graphData){
+            var graphType = graphData.GetType();
+            if (NodeEditorSingleton.Instance.GraphBlackboard.ContainsKey(graphType)){
+                var type = NodeEditorSingleton.Instance.GraphBlackboard[graphType];
+                return CreateBlackboardDataFromBlackboardDataType(type);
+
+            }
+            return null;
+        }
+        public static Blackboard CreateBlackboardWithGraphData(Type graphType){
+            if (NodeEditorSingleton.Instance.GraphBlackboard.ContainsKey(graphType)){
+                var type = NodeEditorSingleton.Instance.GraphBlackboard[graphType];
+                return CreateBlackboardDataFromBlackboardDataType(type);
+
             }
             return null;
         }
@@ -158,19 +196,6 @@ namespace TNode.Cache{
                 return (BlackboardData)Activator.CreateInstance(NodeEditorSingleton.Instance.GraphBlackboard[t]);
             }
             return null;
-        }
-        public static object CreateNodeViewFromNodeType<T>() where  T:NodeData,new(){
-            //Check specific derived type exists or not.
-            var type = typeof(NodeView<T>);
-            if (NodeEditorSingleton.Instance.FromGenericToSpecific.ContainsKey(type)){
-                var implementedType = NodeEditorSingleton.Instance.FromGenericToSpecific[type];
-                var instance = (NodeView<T>)Activator.CreateInstance(implementedType);
-                return instance;
-            }
-            else{
-                return new DefaultNodeView();
-            }
-            
         }
         public static object CreateNodeViewFromNodeType(Type t){
             //Check the generic type of NodeView by t
