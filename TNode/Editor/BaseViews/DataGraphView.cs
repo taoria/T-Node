@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -7,6 +8,7 @@ using TNode.Cache;
 using TNode.Editor.GraphBlackboard;
 using TNode.Editor.Inspector;
 using TNode.Editor.Model;
+using TNode.Editor.Search;
 using TNode.Editor.Tools.NodeCreator;
 using TNode.Models;
 using Unity.VisualScripting;
@@ -281,20 +283,11 @@ namespace TNode.Editor.BaseViews{
         }
 
         public virtual void CreateBlackboard(){
-            _blackboard = new Blackboard();
-            //Blackboard add "Add Node" button
-            // blackboard.Add(new BlackboardSection(){
-            //     title = "Hello World",
-            // });
-            // blackboard.addItemRequested = (item) => {
-            //     //Create a sub window for the blackboard to show the selection
-            //     var subWindow = ScriptableObject.CreateNodeComponentFromGenericType<NodeSearchWindowProvider>();
-            // };
-            //
-            //Set black board to left side of the view
+
+            _blackboard = NodeEditorExtensions.CreateBlackboardWithGraphData(typeof(T));
+
             _blackboard.SetPosition(new Rect(0,0,200,600));
             Add(_blackboard);
-            //Check the type of the blackboard
             
             OnDataChanged+= (sender, e) => { BlackboardUpdate(); };
 
@@ -306,14 +299,30 @@ namespace TNode.Editor.BaseViews{
 
                 if (_data.blackboardData == null) return;
             }
-
+           
             //Iterate field of the blackboard and add a button for each field
             foreach (var field in _data.blackboardData.GetType()
                          .GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)){
-                //if the field is MonoBehaviour,add a property field for blackboard
-                var propertyField = new BlackboardPropertyField(new BlackboardProperty(field.Name,field.FieldType));
-                _blackboard.Add(propertyField);
+                //if the field is MonoBehaviour,add a property field for blackboard 
+                //skip if the field is a list or Ilist
+                if (!typeof(IList).IsAssignableFrom(field.FieldType)){
+                    var propertyField = new BlackboardPropertyField(new BlackboardProperty(field.Name,field.FieldType));
+                    _blackboard.Add(propertyField);
+                }
+
             }
+            _blackboard.addItemRequested = (sender) => {
+                var res = ScriptableObject.CreateInstance<BlackboardSearchWindowProvider>();
+                
+                //Get right top corner of the blackboard
+                var blackboardPos = _blackboard.GetPosition().position;
+                var searchWindowContext = new SearchWindowContext(blackboardPos,200,200);
+                //Call search window 
+                res.Setup(typeof(T),this,Owner);
+                
+                SearchWindow.Open(searchWindowContext, res);
+            };
+                
         }
 
         public virtual void DestroyInspector(){

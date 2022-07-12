@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace TNode.Editor.Inspector.InspectorImplementation{
-    [NodeComponent]
+    [ViewComponent]
     [Obsolete]
     public class EnumFieldItem:InspectorItem<Enum>{
         public EnumFieldItem() : base(){

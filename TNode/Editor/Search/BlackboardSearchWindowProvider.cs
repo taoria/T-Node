@@ -6,8 +6,8 @@ using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
-namespace TNode.Editor{
-    public class BlackboardSearchWindowProvider:ISearchWindowProvider{
+namespace TNode.Editor.Search{
+    public class BlackboardSearchWindowProvider:ScriptableObject,ISearchWindowProvider{
         private Type _graphType;
         private IDataGraphView _graphView;
         private EditorWindow _editor;
@@ -20,15 +20,19 @@ namespace TNode.Editor{
         public List<SearchTreeEntry> CreateSearchTree(SearchWindowContext context){
             var blackboardData = _graphView.GetBlackboardData();
             var type = blackboardData.GetType();
-            var entries = new List<SearchTreeEntry>();
-            if (entries == null) throw new ArgumentNullException(nameof(entries));
+            var list = new List<SearchTreeEntry>(){
+                new SearchTreeGroupEntry(new GUIContent("Add New Blackboard Data"), 0),
+            };
+                
+            if (list == null) throw new ArgumentNullException(nameof(list));
             //search fields with List type
             Texture2D icon = new Texture2D(2,2);
+  
             foreach (var field in type.GetFields()){
                 if (field.FieldType.IsGenericType){
                     var genericType = field.FieldType.GetGenericTypeDefinition();
                     if (genericType == typeof(List<>)){
-                        entries.Add(new SearchTreeEntry(new GUIContent(field.Name,icon)){
+                        list.Add(new SearchTreeEntry(new GUIContent(field.Name,icon)){
                             level = 1,
                             userData = new InternalSearchTreeUserData(){
                                 List = field.GetValue(blackboardData) as IList,
@@ -39,24 +43,20 @@ namespace TNode.Editor{
                     }
                 }
             }
-
-            return entries;
+            Debug.Log($"{list.Count}");
+            return list;
 
         }
 
         public bool OnSelectEntry(SearchTreeEntry SearchTreeEntry, SearchWindowContext context){
             var userData = SearchTreeEntry.userData;
-            var relativePos = context.screenMousePosition - _editor.position.position;
-            var blackboardData  = _graphView.GetBlackboardData();
-            
             if (userData is InternalSearchTreeUserData){
                 var list = ((InternalSearchTreeUserData) userData).List;
                 var type = ((InternalSearchTreeUserData) userData).Type;
                 var newItem = Activator.CreateInstance(type);
-                list.Add(newItem);
+                list?.Add(newItem);
                 return true;
             }
-
             return false;
         }
 

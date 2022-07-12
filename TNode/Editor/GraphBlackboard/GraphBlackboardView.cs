@@ -5,8 +5,11 @@ namespace TNode.Editor.GraphBlackboard{
     /// <summary>
     /// Implement this class to create graph black board for specified graph
     /// </summary>
-    public class GraphBlackboard<T>:Blackboard where T:BlackboardData{
+    public class GraphBlackboardView<T>:Blackboard where T:BlackboardData{
         public T BlackboardData;
-        
+
+        public GraphBlackboardView() : base(){
+            
+        }
     }
 }

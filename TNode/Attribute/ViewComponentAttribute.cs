@@ -11,7 +11,7 @@ namespace TNode.Attribute{
    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
    [MeansImplicitUse]
     
-    public class NodeComponentAttribute:System.Attribute{
+    public class ViewComponentAttribute:System.Attribute{
 
 
         public Type GenericType{ get; set; }

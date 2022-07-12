@@ -3,7 +3,7 @@ using TNode.Editor.BaseViews;
 using TNode.Models;
 
 namespace TNode.Editor.NodeViews{
-    [NodeComponent]
+    [ViewComponent]
     public class DragNodeView<T>:NodeView<BlackboardDragNodeData<T>>{
         public DragNodeView() : base(){
            //Make capsule like style

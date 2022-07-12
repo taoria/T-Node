@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using TNode.BaseViews;
 using TNode.Cache;
 using TNode.Editor.BaseViews;
 using TNode.Editor.Tools.NodeCreator;
@@ -11,7 +9,7 @@ using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace TNode.Editor{
+namespace TNode.Editor.Search{
     public class NodeSearchWindowProvider:ScriptableObject,ISearchWindowProvider{
         private Type _graphType;
         private GraphView _graphView;
