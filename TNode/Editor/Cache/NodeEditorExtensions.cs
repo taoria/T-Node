@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using TNode.Attribute;
-using TNode.BaseViews;
 using TNode.Editor;
-using TNode.Editor.BaseViews;
-using TNode.Editor.GraphBlackboard;
 using TNode.Editor.Inspector;
+using TNode.Editor.NodeViews;
 using TNode.Models;
+using TNodeGraphViewImpl.Editor.GraphBlackboard;
+using TNodeGraphViewImpl.Editor.NodeGraphView;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.TestTools.Utils;
@@ -99,13 +99,13 @@ namespace TNode.Cache{
                 }
             }
         }
-        private readonly Type[] _acceptedTypesForGenericToSpecific = new Type[]{typeof(NodeView<>),typeof(DataGraphView<>),typeof(GraphBlackboardView<>)};
-        private readonly Type[] _defaultTypes = new []{typeof(DefaultNodeView),typeof(DefaultGraphBlackboardView)};
+        private readonly Type[] _acceptedTypesForGenericToSpecific = new Type[]{typeof(BaseNodeView<>),typeof(BaseDataGraphView<>),typeof(GraphBlackboardView<>)};
+        private readonly Type[] _defaultTypes = new []{typeof(DefaultBaseNodeView),typeof(DefaultGraphBlackboardView)};
         private void SetViewComponentAttribute(Type type){
             foreach (var attribute in type.GetCustomAttributes(typeof(ViewComponentAttribute), false)){
                 //fetch this type 's parent class
                 var parent = type.BaseType;
-                //Check if this type is a generic type and is a generic type of NodeView or DataGraphView,
+                //Check if this type is a generic type and is a generic type of BaseNodeView or BaseDataGraphView,
                 //Two level generic definition is now supported by TNode
                 //Deeper nested generic definition is not supported by TNode
                 if (parent is{IsGenericType: true} && 
@@ -146,8 +146,8 @@ namespace TNode.Cache{
             }
             
             //check if t is a generic type node view
-            if (t is{IsGenericType: true} && t.GetGenericTypeDefinition() == typeof(NodeView<>)){
-                var instance = Activator.CreateInstance(typeof(NodeView<NodeData>));
+            if (t is{IsGenericType: true} && t.GetGenericTypeDefinition() == typeof(BaseNodeView<>)){
+                var instance = Activator.CreateInstance(typeof(BaseNodeView<NodeData>));
                 return instance;
             }
             return null;
@@ -198,7 +198,7 @@ namespace TNode.Cache{
             return null;
         }
         public static object CreateNodeViewFromNodeType(Type t){
-            //Check the generic type of NodeView by t
+            //Check the generic type of BaseNodeView by t
            
             if (t.IsGenericType){
                 Debug.Log($"A generic type {t} is detected");
@@ -208,8 +208,8 @@ namespace TNode.Cache{
           
                 var genericTypeDefinition = t.GetGenericTypeDefinition();
                 
-                //What you want is a NodeView<BlackboardDragNodeData<T>> to be created
-                var genericViewType = typeof(NodeView<>).MakeGenericType(genericTypeDefinition);
+                //What you want is a BaseNodeView<BlackboardDragNodeData<T>> to be created
+                var genericViewType = typeof(BaseNodeView<>).MakeGenericType(genericTypeDefinition);
                 Debug.Log($"The generic view type  is  {genericViewType}");
              
                 //search for the specific type of genericViewType in the dictionary
@@ -226,11 +226,11 @@ namespace TNode.Cache{
 
                 }
                 else{
-                    return new DefaultNodeView();
+                    return new DefaultBaseNodeView();
                 }
 
             }
-            var type = typeof(NodeView<>).MakeGenericType(t);
+            var type = typeof(BaseNodeView<>).MakeGenericType(t);
             if (NodeEditorSingleton.Instance.FromGenericToSpecific.ContainsKey(type)){
             
                 var implementedType = NodeEditorSingleton.Instance.FromGenericToSpecific[type];
@@ -239,7 +239,7 @@ namespace TNode.Cache{
             }
             else{
                 
-                return new DefaultNodeView();
+                return new DefaultBaseNodeView();
             }
             
         }
