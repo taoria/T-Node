@@ -1,10 +1,7 @@
 ﻿using System.Collections.Generic;
-using TNode.Editor.EditorPersistence;
-using TNode.Editor.Model;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-namespace TNode.Editor{
+namespace TNode.Editor.EditorPersistence{
     
     [CreateAssetMenu(fileName = "Graph Editor Data", menuName = "TNode/Graph Editor Data")]
     public class GraphEditorData:ScriptableObject{
