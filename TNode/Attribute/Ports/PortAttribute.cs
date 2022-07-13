@@ -1,8 +1,7 @@
 ﻿using System;
 using JetBrains.Annotations;
-using UnityEditor.Experimental.GraphView;
 
-namespace TNode.Attribute{
+namespace TNode.Attribute.Ports{
 
     public enum PortNameHandling{
         Auto,

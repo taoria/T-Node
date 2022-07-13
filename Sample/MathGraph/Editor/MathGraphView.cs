@@ -1,8 +1,9 @@
 using TNode.Models;
 using TNode.Attribute;
-using TNode.Editor.BaseViews;
-[NodeComponent]
-public class MathGraphView : DataGraphView<MathGraph>{
+using TNodeGraphViewImpl.Editor.NodeGraphView;
+
+[ViewComponent]
+public class MathGraphView : BaseDataGraphView<MathGraph>{
 
 
 
