@@ -14,6 +14,11 @@ using UnityEngine.UIElements;
 namespace TNodeGraphViewImpl.Editor.GraphBlackboard{
     [ViewComponent]
     public class DefaultGraphBlackboardView:GraphBlackboardView<BlackboardData>{
+        public DefaultGraphBlackboardView():base(){
+            //the label and the field gap smaller
+            styleSheets.Add( Resources.Load<StyleSheet>("GraphViewPropertyField"));
+       
+        }
         protected override void UpdateBlackboard(BlackboardData data){
             var serializedObject = new SerializedObject((BlackboardDataWrapper)data);
             foreach (var field in data.GetType()

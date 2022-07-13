@@ -38,7 +38,7 @@ namespace TNode.Editor.Inspector{
 
         private void RefreshPropertyDrawer(){
             //Check if the data's type is a generic type of  BlackboardDragNodeData<>
-            if (_data.GetType().IsSubclassOf(typeof(BlackboardDragNodeData<>))){
+            if (_data.GetType().IsSubclassOf(typeof(BlackboardDragNodeData))){
                 return;
             }
             var serializedObject = new SerializedObject((NodeDataWrapper)_data);

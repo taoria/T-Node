@@ -4,15 +4,18 @@ using Newtonsoft.Json;
 using TNode.Attribute;
 using TNode.Attribute.Ports;
 using TNode.RuntimeCache;
+using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace TNode.Models{
-    public class BlackboardDragNodeData<T>:NodeData{
-        private string _blackDragData;
-        [JsonIgnore]
-        private BlackboardData _blackboardData;
+    [Serializable]
+    public class BlackboardDragNodeData:NodeData{
+        public string blackDragData;
+        [SerializeReference]
+        public BlackboardData blackboardData;
         
-        [Output("",PortNameHandling.MemberType)] 
-        public T Value => _blackboardData.GetValue<T>(_blackDragData);
+        [Output("",PortNameHandling.MemberType,TypeHandling.Implemented)] 
+        public object Value => blackboardData.GetValue(blackDragData);
  
         public BlackboardDragNodeData(){
             

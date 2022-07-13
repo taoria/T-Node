@@ -1,0 +1,5 @@
+﻿.unity-property-field__label {
+    width: 75px;
+    min-width: 100px;
+    max-width: 150px;
+}

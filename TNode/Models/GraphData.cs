@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
 using Newtonsoft.Json;
-using TNode.JsonSerialize;
+using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace TNode.Models{
@@ -10,18 +9,12 @@ namespace TNode.Models{
     public class GraphData:ScriptableObject,ISerializationCallbackReceiver{
         public Dictionary<string,NodeData> NodeDictionary = new Dictionary<string,NodeData>();
         
+        [SerializeReference]
+        public List<NodeData> nodeList = new List<NodeData>();
         
         [SerializeField]
         protected List<NodeLink> nodeLinks;
-        [TextArea(1,10)]
-        [SerializeField]
-        //[HideInInspector]
-        private string jsonNodeData;
-        [TextArea(1,10)]
-        [SerializeField]
-        private string jsonBlackboard;
-        
-        
+        [SerializeReference]
         public BlackboardData blackboardData;
 
         public List<NodeLink> NodeLinks{
@@ -34,32 +27,19 @@ namespace TNode.Models{
     
   
         public void OnBeforeSerialize(){
-            if (nodeLinks != null){
-                jsonNodeData = JsonConvert.SerializeObject(NodeDictionary,JsonSerializeTool.JsonSerializerSettings);
-
-            }
-
-            if (jsonBlackboard != null){
-                jsonBlackboard = JsonConvert.SerializeObject(blackboardData,typeof(object),JsonSerializeTool.JsonSerializerSettings);
-
+     
+   
+            nodeList.Clear();
+            foreach(var node in NodeDictionary.Values){
+                nodeList.Add(node);
             }
         }
         public void OnAfterDeserialize(){
-            //Deserialize node dictionary
-            var deserializedData = JsonConvert.DeserializeObject<Dictionary<string,NodeData>>(jsonNodeData,JsonSerializeTool.JsonSerializerSettings);
-            NodeDictionary = deserializedData;
-            //Deserialize blackboard data
-            // var deserializedBlackboard =
-            //     JsonConvert.DeserializeObject(jsonBlackboard,JsonSerializeTool.JsonSerializerSettings);
-            // blackboardData = deserializedBlackboard as BlackboardData;
-            // Debug.Log(deserializedBlackboard);
+            NodeDictionary.Clear();
+            foreach(var node in nodeList){
+                NodeDictionary.Add(node.id,node);
+            }
         }
-
-        public void OnEnable(){
-            var deserializedBlackboard =
-                JsonConvert.DeserializeObject(jsonBlackboard,JsonSerializeTool.JsonSerializerSettings);
-            blackboardData = deserializedBlackboard as BlackboardData;
-            Debug.Log(deserializedBlackboard);
-        }
+        
     }
 }
