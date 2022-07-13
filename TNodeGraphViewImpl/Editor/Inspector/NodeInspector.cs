@@ -5,6 +5,7 @@ using TNode.Attribute;
 using TNode.Editor.NodeViews;
 using TNode.Models;
 using TNodeGraphViewImpl.Editor.NodeGraphView;
+using TNodeGraphViewImpl.Editor.NodeViews;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
