@@ -76,6 +76,18 @@ namespace TNodeGraphViewImpl.Editor.NodeViews{
                     throw new ArgumentOutOfRangeException();
             }
         }
+        protected virtual Type BuildPortType(PortAttribute portAttribute,PropertyInfo propertyInfo){
+            switch (portAttribute.TypeHandling){
+                case TypeHandling.Declared :
+                    return propertyInfo.PropertyType;
+                case TypeHandling.Implemented:
+                    return propertyInfo.GetValue(_data)?.GetType();
+                case TypeHandling.Specified:
+                    return portAttribute.HandledType??typeof(object);
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
         /// <summary>
         /// of course you can override this method to build your own port builder
         /// </summary>
@@ -84,7 +96,7 @@ namespace TNodeGraphViewImpl.Editor.NodeViews{
    
             foreach (var propertyInfo in propertyInfos){
                 if (propertyInfo.GetCustomAttributes(typeof(OutputAttribute),true).FirstOrDefault() is OutputAttribute attribute){
-                    Port port = InstantiatePort(Orientation.Horizontal, Direction.Output,Port.Capacity.Multi,propertyInfo.PropertyType);
+                    Port port = InstantiatePort(Orientation.Horizontal, Direction.Output,Port.Capacity.Multi,BuildPortType(attribute,propertyInfo));
                     this.outputContainer.Add(port);
                     var portName = BuildPortName(attribute,propertyInfo);
                     port.portName = portName;
@@ -93,7 +105,7 @@ namespace TNodeGraphViewImpl.Editor.NodeViews{
             }
             foreach (var propertyInfo in propertyInfos){
                 if(propertyInfo.GetCustomAttributes(typeof(InputAttribute),true).FirstOrDefault() is InputAttribute attribute){
-                    Port port = InstantiatePort(Orientation.Horizontal, Direction.Input,Port.Capacity.Single,propertyInfo.PropertyType);
+                    Port port = InstantiatePort(Orientation.Horizontal, Direction.Input,Port.Capacity.Single,BuildPortType(attribute,propertyInfo));
                     this.inputContainer.Add(port);
                     var portName = BuildPortName(attribute,propertyInfo);
                     port.portName = portName;

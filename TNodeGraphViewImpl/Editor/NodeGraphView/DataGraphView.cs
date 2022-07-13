@@ -105,11 +105,10 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
                 foreach (var selectable in blackboardFields){
                     if(selectable is { } field) {
                         //Make a constructor of  BlackboardDragNodeData<field.PropertyType > by reflection
-                        var specifiedType =
-                            typeof(BlackboardDragNodeData<>).MakeGenericType(field.BlackboardProperty.PropertyType);
-                        //Create a new instance of specified type
-                        var dragNodeData = NodeCreator.InstantiateNodeData(specifiedType);
-                        this.AddTNode(dragNodeData,new Rect(evt.mousePosition,new Vector2(200,200)));
+                        var dragNodeData = NodeCreator.InstantiateNodeData<BlackboardDragNodeData>();
+                        dragNodeData.blackboardData = _data.blackboardData;
+                        dragNodeData.blackDragData = field.BlackboardProperty.PropertyName;
+                        AddTNode(dragNodeData,new Rect(evt.mousePosition,new Vector2(200,200)));
                     }
                 }
              
