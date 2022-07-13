@@ -14,7 +14,7 @@ public class MathEditor : GraphEditor<MathGraph>{
                 var wnd = GetWindow<MathEditor>();
                 wnd.titleContent = new GUIContent("MathGraph Editor");
                 wnd.CreateGUI();
-                wnd._graphView.Data = graph;
+                wnd.GraphView.Data = graph;
                 return true;
             }
             return false;
