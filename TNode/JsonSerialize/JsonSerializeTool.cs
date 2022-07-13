@@ -19,7 +19,7 @@ namespace TNode.JsonSerialize{
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
             NullValueHandling = NullValueHandling.Ignore,
             DateFormatString = "yyyy-MM-dd HH:mm:ss",
-            Converters = new List<JsonConverter> { new Vector3Converter() },
+            Converters = new List<JsonConverter> { new Vector3Converter(),new UnityObjectConverter() },
             TypeNameHandling = TypeNameHandling.Auto,
             ContractResolver = new WritablePropertiesOnlyResolver(),
             Formatting = Formatting.Indented

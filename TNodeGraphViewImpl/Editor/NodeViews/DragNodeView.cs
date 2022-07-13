@@ -1,5 +1,6 @@
 ﻿using TNode.Attribute;
 using TNode.Models;
+using TNodeGraphViewImpl.Editor.NodeViews;
 
 namespace TNode.Editor.NodeViews{
     [ViewComponent]

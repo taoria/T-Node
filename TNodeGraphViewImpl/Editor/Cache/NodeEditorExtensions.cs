@@ -8,6 +8,7 @@ using TNode.Editor.NodeViews;
 using TNode.Models;
 using TNodeGraphViewImpl.Editor.GraphBlackboard;
 using TNodeGraphViewImpl.Editor.NodeGraphView;
+using TNodeGraphViewImpl.Editor.NodeViews;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
@@ -200,7 +201,6 @@ namespace TNodeGraphViewImpl.Editor.Cache{
             //Check the generic type of BaseNodeView by t
            
             if (t.IsGenericType){
-                Debug.Log($"A generic type {t} is detected");
                 //AKA if BlackboardDragNodeData<Camera> is pulled 
                 //Get BlackboardDragNodeData<T> as generic type 
                 
@@ -209,14 +209,12 @@ namespace TNodeGraphViewImpl.Editor.Cache{
                 
                 //What you want is a BaseNodeView<BlackboardDragNodeData<T>> to be created
                 var genericViewType = typeof(BaseNodeView<>).MakeGenericType(genericTypeDefinition);
-                Debug.Log($"The generic view type  is  {genericViewType}");
              
                 //search for the specific type of genericViewType in the dictionary
                 if (NodeEditorSingleton.Instance.FromGenericToSpecific.ContainsKey(genericViewType)){
             
                     var implementedType = NodeEditorSingleton.Instance.FromGenericToSpecific[genericViewType];
                     //The implementedType is still a generic type ,so we make it a specific type by using MakeGenericType
-                    Debug.Log($"{implementedType}");
                     //Get argument type of t
                     var argumentType = t.GetGenericArguments()[0];
                     var instance = Activator.CreateInstance(implementedType.MakeGenericType(argumentType));

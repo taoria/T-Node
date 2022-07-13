@@ -15,6 +15,7 @@ using TNode.Models;
 using TNodeGraphViewImpl.Editor.Cache;
 using TNodeGraphViewImpl.Editor.GraphBlackboard;
 using TNodeGraphViewImpl.Editor.GraphBlackboard.BlackboardProperty;
+using TNodeGraphViewImpl.Editor.NodeViews;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
@@ -156,7 +157,7 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
                 AddTNode(dataNode,nodePos);
             }
 
-            foreach (var edge in _data.nodeLinks){
+            foreach (var edge in _data.NodeLinks){
                 var inputNode = _data.NodeDictionary[edge.inPort.nodeDataId];
                 var outputNode = _data.NodeDictionary[edge.outPort.nodeDataId];
                 var inputNodeView = _nodeDict[inputNode.id];
@@ -194,12 +195,13 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
 
 
         private void BlackboardUpdate(){
-            if (_data.blackboardData == null || _data.blackboardData.GetType() == typeof(BlackboardData)){
+            if (_data.blackboardData == null || _data.blackboardData.GetType()==(typeof(BlackboardData))){
                 _data.blackboardData = NodeEditorExtensions.GetAppropriateBlackboardData(_data.GetType());
 
                 if (_data.blackboardData == null) return;
-                _blackboard.SetBlackboardData(_data.blackboardData);
+                
             }
+            _blackboard.SetBlackboardData(_data.blackboardData);
         }
 
         public virtual void DestroyInspector(){
@@ -272,17 +274,23 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
                 
             }
             
-            _data.nodeLinks = links;
+            _data.NodeLinks = links;
         }
         private void SaveGraphData(){
             _data.NodeDictionary.Clear();
-            _data.nodeLinks.Clear();
+            _data.NodeLinks.Clear();
             SaveNode();
             SaveEdge();
+            SaveBlackboard();
             EditorUtility.SetDirty(_data);
         }
 
-   
+        private void SaveBlackboard(){
+            if (_data.blackboardData == null){
+                _data.blackboardData = NodeEditorExtensions.GetAppropriateBlackboardData(_data.GetType());
+            }
+        }
+
 
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter){
             return ports.Where(x => x.portType == startPort.portType).ToList();
@@ -354,7 +362,7 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
             
             Add(castedBlackboard);
 
-            Rect blackboardPos = new Rect(0,0,200,700);
+            Rect blackboardPos = new Rect(0,0,300,700);
             castedBlackboard?.SetPosition(blackboardPos);
             
             

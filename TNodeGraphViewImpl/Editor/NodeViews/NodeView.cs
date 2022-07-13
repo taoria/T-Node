@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using TNode.Attribute;
 using TNode.Attribute.Ports;
 using TNode.Editor.Inspector;
+using TNode.Editor.Serialization;
 using TNode.Models;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace TNode.Editor.NodeViews{
+namespace TNodeGraphViewImpl.Editor.NodeViews{
     
     public abstract class BaseNodeView<T> : Node,INodeView<T> where T:NodeData,new(){
         protected T _data;
@@ -28,10 +28,9 @@ namespace TNode.Editor.NodeViews{
             }
         }
 
-        private void OnDataValueChanged(NodeDataWrapper obj){
+        private void OnDataValueChanged(DataWrapper<NodeDataWrapper, NodeData> obj){
             Refresh();
         }
-
         public sealed override string title{
             get => base.title;
             set => base.title = value;

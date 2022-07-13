@@ -3,27 +3,45 @@ using System.Reflection;
 using TNode.Attribute;
 using TNode.Editor.NodeGraphView;
 using TNode.Editor.Search;
+using TNode.Editor.Serialization;
 using TNode.Models;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
+using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace TNodeGraphViewImpl.Editor.GraphBlackboard{
     [ViewComponent]
     public class DefaultGraphBlackboardView:GraphBlackboardView<BlackboardData>{
         protected override void UpdateBlackboard(BlackboardData data){
-            
-          
+            var serializedObject = new SerializedObject((BlackboardDataWrapper)data);
             foreach (var field in data.GetType()
                          .GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)){
                 //if the field is MonoBehaviour,add a property field for blackboard 
                 //skip if the field is a list or Ilist
                 if (!typeof(IList).IsAssignableFrom(field.FieldType)){
+                    VisualElement visualElement = new VisualElement();
                     var propertyField = new BlackboardPropertyField(new BlackboardProperty.BlackboardProperty(field.Name,field.FieldType));
-                    this.Add(propertyField);
+                    var foldoutData = new Foldout{
+                        text = field.Name
+                    };
+                    var drawer = new PropertyField(serializedObject.FindProperty("data").FindPropertyRelative(field.Name),field.Name);
+                    drawer.Bind(serializedObject);
+                    foldoutData.Add(drawer);
+                    visualElement.Add(propertyField);
+                    visualElement.Add(foldoutData);
+                    this.Add(visualElement);
+                    
+                }
+                else{
+                    var blackboardList = new BlackboardSection{
+                        title = field.Name
+                    };
+                    this.Add(blackboardList);
                 }
             }
-            this.addItemRequested = (sender) => {
+            addItemRequested = (sender) => {
                 var res = ScriptableObject.CreateInstance<BlackboardSearchWindowProvider>();
                 
                 //Get right top corner of the blackboard
