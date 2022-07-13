@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TNode.Attribute;
 using TNode.Editor;
+using TNode.Editor.Blackboard;
 using TNode.Editor.NodeViews;
 using TNode.Models;
 using TNodeGraphViewImpl.Editor.GraphBlackboard;
@@ -151,14 +152,14 @@ namespace TNodeGraphViewImpl.Editor.Cache{
             return null;
         }
         
-        public static Blackboard CreateBlackboardDataFromBlackboardDataType(Type t){
+        public static IBlackboardView CreateBlackboardDataFromBlackboardDataType(Type t){
             var type = typeof(GraphBlackboardView<>).MakeGenericType(t);
-            var res = CreateViewComponentFromBaseType(type) as Blackboard;
+            var res = CreateViewComponentFromBaseType(type) as IBlackboardView;
             return res ?? new DefaultGraphBlackboardView();
 
         }
 
-        public static Blackboard CreateBlackboardWithGraphData(GraphData graphData){
+        public static IBlackboardView CreateBlackboardWithGraphData(GraphData graphData){
             var graphType = graphData.GetType();
             if (NodeEditorSingleton.Instance.GraphBlackboard.ContainsKey(graphType)){
                 var type = NodeEditorSingleton.Instance.GraphBlackboard[graphType];
@@ -167,7 +168,7 @@ namespace TNodeGraphViewImpl.Editor.Cache{
             }
             return null;
         }
-        public static Blackboard CreateBlackboardWithGraphData(Type graphType){
+        public static IBlackboardView CreateBlackboardWithGraphData(Type graphType){
             if (NodeEditorSingleton.Instance.GraphBlackboard.ContainsKey(graphType)){
                 var type = NodeEditorSingleton.Instance.GraphBlackboard[graphType];
                 return CreateBlackboardDataFromBlackboardDataType(type);

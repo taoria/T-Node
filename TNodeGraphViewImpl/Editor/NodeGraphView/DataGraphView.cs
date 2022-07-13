@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using TNode.Editor;
+using TNode.Editor.Blackboard;
+using TNode.Editor.EditorPersistence;
 using TNode.Editor.Inspector;
-using TNode.Editor.Model;
 using TNode.Editor.NodeGraphView;
 using TNode.Editor.NodeViews;
 using TNode.Editor.Search;
@@ -29,7 +30,7 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
         private NodeInspector _nodeInspector;
         public GraphEditor<T> Owner;
         private Dictionary<string,Node> _nodeDict = new();
-        private Blackboard _blackboard;
+        private IBlackboardView _blackboard;
         public T Data{
             get{ return _data; }
             set{
@@ -191,47 +192,14 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
             miniMap.SetPosition(rect);
         }
 
-        public virtual void CreateBlackboard(){
-
-            _blackboard = NodeEditorExtensions.CreateBlackboardWithGraphData(typeof(T));
-
-            _blackboard.SetPosition(new Rect(0,0,200,600));
-            Add(_blackboard);
-            
-            OnDataChanged+= (sender, e) => { BlackboardUpdate(); };
-
-        }
 
         private void BlackboardUpdate(){
             if (_data.blackboardData == null || _data.blackboardData.GetType() == typeof(BlackboardData)){
                 _data.blackboardData = NodeEditorExtensions.GetAppropriateBlackboardData(_data.GetType());
 
                 if (_data.blackboardData == null) return;
+                _blackboard.SetBlackboardData(_data.blackboardData);
             }
-           
-            //Iterate field of the blackboard and add a button for each field
-            foreach (var field in _data.blackboardData.GetType()
-                         .GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)){
-                //if the field is MonoBehaviour,add a property field for blackboard 
-                //skip if the field is a list or Ilist
-                if (!typeof(IList).IsAssignableFrom(field.FieldType)){
-                    var propertyField = new BlackboardPropertyField(new BlackboardProperty(field.Name,field.FieldType));
-                    _blackboard.Add(propertyField);
-                }
-
-            }
-            _blackboard.addItemRequested = (sender) => {
-                var res = ScriptableObject.CreateInstance<BlackboardSearchWindowProvider>();
-                
-                //Get right top corner of the blackboard
-                var blackboardPos = _blackboard.GetPosition().position;
-                var searchWindowContext = new SearchWindowContext(blackboardPos,200,200);
-                //Call search window 
-                res.Setup(typeof(T),this,Owner);
-                
-                SearchWindow.Open(searchWindowContext, res);
-            };
-                
         }
 
         public virtual void DestroyInspector(){
@@ -330,10 +298,7 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
             OnGraphViewDestroy();
         }
 
-        public bool IsDroppable(){
-            return true;
-        }
-
+        #region implement interfaces
         public void AddTNode(NodeData nodeData, Rect rect){
             if (NodeEditorExtensions.CreateNodeViewFromNodeType(nodeData.GetType()) is Node nodeView){
                 nodeView.SetPosition(rect);
@@ -381,9 +346,30 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
             Owner.graphEditorData.graphElementsData.RemoveAll(x => x.guid == nodeData.id);
         }
 
+        public void CreateBlackboard(){
+            _blackboard = NodeEditorExtensions.CreateBlackboardWithGraphData(typeof(T));
+            _blackboard.Setup(this,Owner);
+      
+            var castedBlackboard = _blackboard as Blackboard;
+            
+            Add(castedBlackboard);
+
+            Rect blackboardPos = new Rect(0,0,200,700);
+            castedBlackboard?.SetPosition(blackboardPos);
+            
+            
+            OnDataChanged+= (sender, e) => { BlackboardUpdate(); };
+        }
+
+        public GraphData GetGraphData(){
+            return _data;
+        }
+
+
         public BlackboardData GetBlackboardData(){
             return this._data.blackboardData;
         }
+        #endregion
     }
 
 
