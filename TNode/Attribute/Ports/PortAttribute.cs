@@ -9,17 +9,26 @@ namespace TNode.Attribute.Ports{
         Manual,
         Format,
         MemberType
+    }
 
+    public enum TypeHandling{
+        Declared,
+        Implemented,
+        Specified
     }
     [MeansImplicitUse]
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
     public class PortAttribute:System.Attribute{
         public readonly string Name;
         public readonly PortNameHandling NameHandling;
- 
-        public PortAttribute(string name,PortNameHandling nameHandling=PortNameHandling.Auto){
+        public Type HandledType;
+        public TypeHandling TypeHandling{ get; set; }
+        public PortAttribute(string name,PortNameHandling nameHandling=PortNameHandling.Auto,TypeHandling typeHandling=TypeHandling.Declared){
             this.Name = name;
             this.NameHandling = nameHandling;
+            this.TypeHandling = typeHandling;
         }
+
+       
     }
 }

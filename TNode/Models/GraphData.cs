@@ -1,38 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
 using Newtonsoft.Json;
-using TNode.Editor;
-using TNode.JsonSerialize;
-using UnityEditor.Experimental.GraphView;
+using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace TNode.Models{
     [Serializable]
     public class GraphData:ScriptableObject,ISerializationCallbackReceiver{
-        [SerializeField]
         public Dictionary<string,NodeData> NodeDictionary = new Dictionary<string,NodeData>();
-        public List<NodeLink> nodeLinks = new();
-        public BlackboardData blackboardData = new();
-        [TextArea(1,10)]
+        
+        [SerializeReference]
+        public List<NodeData> nodeList = new List<NodeData>();
+        
         [SerializeField]
-        //[HideInInspector]
-        private string jsonObject;
-        [TextArea(1,10)]
-        [SerializeField]
-        private string jsonBlackboard;
+        protected List<NodeLink> nodeLinks;
+        [SerializeReference]
+        public BlackboardData blackboardData;
+
+        public List<NodeLink> NodeLinks{
+            get{
+                return nodeLinks ??= new List<NodeLink>();
+                
+            }
+            set => nodeLinks = value;
+        }
+    
+  
         public void OnBeforeSerialize(){
-            jsonObject = JsonConvert.SerializeObject(NodeDictionary,JsonSerializeTool.JsonSerializerSettings);
-            jsonBlackboard = JsonConvert.SerializeObject(blackboardData,JsonSerializeTool.JsonSerializerSettings);
+     
+   
+            nodeList.Clear();
+            foreach(var node in NodeDictionary.Values){
+                nodeList.Add(node);
+            }
         }
         public void OnAfterDeserialize(){
-            //Deserialize node dictionary
-            var deserializedData = JsonConvert.DeserializeObject<Dictionary<string,NodeData>>(jsonObject,JsonSerializeTool.JsonSerializerSettings);
-            NodeDictionary = deserializedData;
-            //Deserialize blackboard data
-            var deserializedBlackboard = JsonConvert.DeserializeObject<BlackboardData>(jsonBlackboard,JsonSerializeTool.JsonSerializerSettings);
-            blackboardData = deserializedBlackboard;
-            
+            NodeDictionary.Clear();
+            foreach(var node in nodeList){
+                NodeDictionary.Add(node.id,node);
+            }
         }
+        
     }
 }

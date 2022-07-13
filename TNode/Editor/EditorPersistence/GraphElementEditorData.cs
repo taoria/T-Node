@@ -1,9 +1,7 @@
 ﻿using System;
-using TNode.Models;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-namespace TNode.Editor.Model{
+namespace TNode.Editor.EditorPersistence{
     [Serializable]
     
     public class GraphElementEditorData{

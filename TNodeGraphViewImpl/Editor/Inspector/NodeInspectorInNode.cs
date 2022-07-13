@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using TNode.Attribute;
+using TNode.Editor.Serialization;
 using TNode.Models;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -37,7 +38,7 @@ namespace TNode.Editor.Inspector{
 
         private void RefreshPropertyDrawer(){
             //Check if the data's type is a generic type of  BlackboardDragNodeData<>
-            if (_data.GetType().IsSubclassOf(typeof(BlackboardDragNodeData<>))){
+            if (_data.GetType().IsSubclassOf(typeof(BlackboardDragNodeData))){
                 return;
             }
             var serializedObject = new SerializedObject((NodeDataWrapper)_data);
@@ -47,11 +48,11 @@ namespace TNode.Editor.Inspector{
                 var showInNodeViewAttribute = field.GetCustomAttribute<ShowInNodeViewAttribute>() != null;
                 if (!showInNodeViewAttribute)
                     continue;
-                var drawer = new PropertyField(serializedObject.FindProperty("Data").FindPropertyRelative(field.Name),field.Name);
-                Debug.Log(serializedObject.FindProperty("Data"));
+                var drawer = new PropertyField(serializedObject.FindProperty("data").FindPropertyRelative(field.Name),field.Name);
                 drawer.Bind(serializedObject);
                 Add(drawer);
             }
         }
+        
     }
 }

@@ -3,17 +3,19 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using TNode.Cache;
 using TNode.Editor;
+using TNode.Editor.Blackboard;
+using TNode.Editor.EditorPersistence;
 using TNode.Editor.Inspector;
-using TNode.Editor.Model;
 using TNode.Editor.NodeGraphView;
 using TNode.Editor.NodeViews;
 using TNode.Editor.Search;
 using TNode.Editor.Tools.NodeCreator;
 using TNode.Models;
+using TNodeGraphViewImpl.Editor.Cache;
 using TNodeGraphViewImpl.Editor.GraphBlackboard;
 using TNodeGraphViewImpl.Editor.GraphBlackboard.BlackboardProperty;
+using TNodeGraphViewImpl.Editor.NodeViews;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
@@ -21,7 +23,7 @@ using UnityEngine.UIElements;
 using Edge = UnityEditor.Experimental.GraphView.Edge;
 
 namespace TNodeGraphViewImpl.Editor.NodeGraphView{
-    public  abstract  class BaseDataGraphView<T>:GraphView,IBaseDataGraphView where T:GraphData{
+    public  abstract  class BaseDataGraphView<T>:GraphView,IDataGraphView<T> where T:GraphData{
         #region variables and properties
         private T _data;
         private bool _isInspectorOn;
@@ -29,7 +31,7 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
         private NodeInspector _nodeInspector;
         public GraphEditor<T> Owner;
         private Dictionary<string,Node> _nodeDict = new();
-        private Blackboard _blackboard;
+        private IBlackboardView _blackboard;
         public T Data{
             get{ return _data; }
             set{
@@ -103,11 +105,10 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
                 foreach (var selectable in blackboardFields){
                     if(selectable is { } field) {
                         //Make a constructor of  BlackboardDragNodeData<field.PropertyType > by reflection
-                        var specifiedType =
-                            typeof(BlackboardDragNodeData<>).MakeGenericType(field.BlackboardProperty.PropertyType);
-                        //Create a new instance of specified type
-                        var dragNodeData = NodeCreator.InstantiateNodeData(specifiedType);
-                        this.AddTNode(dragNodeData,new Rect(evt.mousePosition,new Vector2(200,200)));
+                        var dragNodeData = NodeCreator.InstantiateNodeData<BlackboardDragNodeData>();
+                        dragNodeData.blackboardData = _data.blackboardData;
+                        dragNodeData.blackDragData = field.BlackboardProperty.PropertyName;
+                        AddTNode(dragNodeData,new Rect(evt.mousePosition,new Vector2(200,200)));
                     }
                 }
              
@@ -155,7 +156,7 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
                 AddTNode(dataNode,nodePos);
             }
 
-            foreach (var edge in _data.nodeLinks){
+            foreach (var edge in _data.NodeLinks){
                 var inputNode = _data.NodeDictionary[edge.inPort.nodeDataId];
                 var outputNode = _data.NodeDictionary[edge.outPort.nodeDataId];
                 var inputNodeView = _nodeDict[inputNode.id];
@@ -191,47 +192,15 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
             miniMap.SetPosition(rect);
         }
 
-        public virtual void CreateBlackboard(){
-
-            _blackboard = NodeEditorExtensions.CreateBlackboardWithGraphData(typeof(T));
-
-            _blackboard.SetPosition(new Rect(0,0,200,600));
-            Add(_blackboard);
-            
-            OnDataChanged+= (sender, e) => { BlackboardUpdate(); };
-
-        }
 
         private void BlackboardUpdate(){
-            if (_data.blackboardData == null || _data.blackboardData.GetType() == typeof(BlackboardData)){
+            if (_data.blackboardData == null || _data.blackboardData.GetType()==(typeof(BlackboardData))){
                 _data.blackboardData = NodeEditorExtensions.GetAppropriateBlackboardData(_data.GetType());
 
                 if (_data.blackboardData == null) return;
+                
             }
-           
-            //Iterate field of the blackboard and add a button for each field
-            foreach (var field in _data.blackboardData.GetType()
-                         .GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)){
-                //if the field is MonoBehaviour,add a property field for blackboard 
-                //skip if the field is a list or Ilist
-                if (!typeof(IList).IsAssignableFrom(field.FieldType)){
-                    var propertyField = new BlackboardPropertyField(new BlackboardProperty(field.Name,field.FieldType));
-                    _blackboard.Add(propertyField);
-                }
-
-            }
-            _blackboard.addItemRequested = (sender) => {
-                var res = ScriptableObject.CreateInstance<BlackboardSearchWindowProvider>();
-                
-                //Get right top corner of the blackboard
-                var blackboardPos = _blackboard.GetPosition().position;
-                var searchWindowContext = new SearchWindowContext(blackboardPos,200,200);
-                //Call search window 
-                res.Setup(typeof(T),this,Owner);
-                
-                SearchWindow.Open(searchWindowContext, res);
-            };
-                
+            _blackboard.SetBlackboardData(_data.blackboardData);
         }
 
         public virtual void DestroyInspector(){
@@ -304,17 +273,23 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
                 
             }
             
-            _data.nodeLinks = links;
+            _data.NodeLinks = links;
         }
         private void SaveGraphData(){
             _data.NodeDictionary.Clear();
-            _data.nodeLinks.Clear();
+            _data.NodeLinks.Clear();
             SaveNode();
             SaveEdge();
+            SaveBlackboard();
             EditorUtility.SetDirty(_data);
         }
 
-   
+        private void SaveBlackboard(){
+            if (_data.blackboardData == null){
+                _data.blackboardData = NodeEditorExtensions.GetAppropriateBlackboardData(_data.GetType());
+            }
+        }
+
 
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter){
             return ports.Where(x => x.portType == startPort.portType).ToList();
@@ -330,10 +305,7 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
             OnGraphViewDestroy();
         }
 
-        public bool IsDroppable(){
-            return true;
-        }
-
+        #region implement interfaces
         public void AddTNode(NodeData nodeData, Rect rect){
             if (NodeEditorExtensions.CreateNodeViewFromNodeType(nodeData.GetType()) is Node nodeView){
                 nodeView.SetPosition(rect);
@@ -381,9 +353,30 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
             Owner.graphEditorData.graphElementsData.RemoveAll(x => x.guid == nodeData.id);
         }
 
+        public void CreateBlackboard(){
+            _blackboard = NodeEditorExtensions.CreateBlackboardWithGraphData(typeof(T));
+            _blackboard.Setup(this,Owner);
+      
+            var castedBlackboard = _blackboard as Blackboard;
+            
+            Add(castedBlackboard);
+
+            Rect blackboardPos = new Rect(0,0,300,700);
+            castedBlackboard?.SetPosition(blackboardPos);
+            
+            
+            OnDataChanged+= (sender, e) => { BlackboardUpdate(); };
+        }
+
+        public GraphData GetGraphData(){
+            return _data;
+        }
+
+
         public BlackboardData GetBlackboardData(){
             return this._data.blackboardData;
         }
+        #endregion
     }
 
 

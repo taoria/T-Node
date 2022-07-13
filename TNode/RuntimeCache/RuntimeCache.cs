@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using EasyRandomGenerator.Blackboard;
 using JetBrains.Annotations;
 using TNode.Models;
 using Unity.VisualScripting;
@@ -21,6 +22,10 @@ namespace TNode.RuntimeCache{
             new ();
         
         private static readonly string[] ExcludedAssemblies = new string[]{"Microsoft", "UnityEngine","UnityEditor","mscorlib","System"};
+
+        public RuntimeCache(){
+            RegisterRuntimeBlackboard(typeof(EasyBlackboardData));
+        }
         public void RegisterRuntimeBlackboard(Type type){
             if(!CachedDelegatesForGettingValue.ContainsKey(type)){
                 CachedDelegatesForGettingValue.Add(type, new Dictionary<string, GetValueDelegate>());

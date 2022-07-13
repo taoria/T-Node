@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Text.RegularExpressions;
-using Microsoft.CodeAnalysis;
+﻿using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace TNode.Editor.Tools.GraphEditorCreator{
