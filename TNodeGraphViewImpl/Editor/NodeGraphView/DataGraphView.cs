@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using TNode.Cache;
 using TNode.Editor;
 using TNode.Editor.Inspector;
 using TNode.Editor.Model;
@@ -12,6 +11,7 @@ using TNode.Editor.NodeViews;
 using TNode.Editor.Search;
 using TNode.Editor.Tools.NodeCreator;
 using TNode.Models;
+using TNodeGraphViewImpl.Editor.Cache;
 using TNodeGraphViewImpl.Editor.GraphBlackboard;
 using TNodeGraphViewImpl.Editor.GraphBlackboard.BlackboardProperty;
 using UnityEditor;
@@ -21,7 +21,7 @@ using UnityEngine.UIElements;
 using Edge = UnityEditor.Experimental.GraphView.Edge;
 
 namespace TNodeGraphViewImpl.Editor.NodeGraphView{
-    public  abstract  class BaseDataGraphView<T>:GraphView,IBaseDataGraphView where T:GraphData{
+    public  abstract  class BaseDataGraphView<T>:GraphView,IDataGraphView<T> where T:GraphData{
         #region variables and properties
         private T _data;
         private bool _isInspectorOn;

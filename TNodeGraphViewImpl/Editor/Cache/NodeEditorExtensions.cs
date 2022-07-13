@@ -3,16 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using TNode.Attribute;
 using TNode.Editor;
-using TNode.Editor.Inspector;
 using TNode.Editor.NodeViews;
 using TNode.Models;
 using TNodeGraphViewImpl.Editor.GraphBlackboard;
 using TNodeGraphViewImpl.Editor.NodeGraphView;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-using UnityEngine.TestTools.Utils;
 
-namespace TNode.Cache{
+namespace TNodeGraphViewImpl.Editor.Cache{
     /// <summary>
     /// Internal singleton class for caching TNode reflection Data.
     /// </summary>
