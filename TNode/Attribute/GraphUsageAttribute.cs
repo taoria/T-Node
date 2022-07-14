@@ -13,6 +13,7 @@ namespace TNode.Attribute{
     /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
     [BaseTypeRequired(typeof(IModel))]
+    [UsedImplicitly]
     public class GraphUsageAttribute:System.Attribute{
         public readonly Type GraphDataType;
         public string Category;
