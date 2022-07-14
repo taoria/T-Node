@@ -17,6 +17,9 @@ namespace TNode.Models{
         [SerializeReference]
         public BlackboardData blackboardData;
 
+        [HideInInspector] 
+        public string sceneReference;
+
         public List<NodeLink> NodeLinks{
             get{
                 return nodeLinks ??= new List<NodeLink>();

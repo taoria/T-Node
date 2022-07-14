@@ -5,10 +5,10 @@ using UnityEngine;
 
 namespace TNode.Editor.Serialization{
     [Serializable]
-    public class DataWrapper<TWrapper,TData>:ScriptableObject where TWrapper:DataWrapper<TWrapper,TData> where TData:IModel,new(){
+    public class DataWrapper<TWrapper,TData>:ScriptableObject where TWrapper:DataWrapper<TWrapper,TData>,new(){
         [SerializeReference]
         public TData data;
-        private static readonly Dictionary<TData,TWrapper> Cache = new ();
+        protected static readonly Dictionary<TData,TWrapper> Cache = new ();
         public static TWrapper Get(TData data){
             if (data.GetType().IsGenericType){
                 return CreateInstance<TWrapper>();
@@ -33,10 +33,13 @@ namespace TNode.Editor.Serialization{
             var fieldInfo = data.GetType().GetField(path);
             return fieldInfo.GetValue(data);
         }
+        public virtual TData GetData(){
+            return data;
+        }
         public static implicit operator TData(DataWrapper<TWrapper,TData> wrapper){
             if (wrapper == null)
                 return default(TData);
-            return wrapper.data;
+            return wrapper.GetData();
      
         }
         /// <summary>

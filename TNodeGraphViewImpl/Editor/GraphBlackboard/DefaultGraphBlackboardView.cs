@@ -20,6 +20,7 @@ namespace TNodeGraphViewImpl.Editor.GraphBlackboard{
        
         }
         protected override void UpdateBlackboard(BlackboardData data){
+            if (data == null) return;
             var serializedObject = new SerializedObject((BlackboardDataWrapper)data);
             foreach (var field in data.GetType()
                          .GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)){
