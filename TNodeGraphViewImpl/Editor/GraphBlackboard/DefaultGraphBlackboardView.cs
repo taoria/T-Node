@@ -32,12 +32,13 @@ namespace TNodeGraphViewImpl.Editor.GraphBlackboard{
                     var foldoutData = new Foldout{
                         text = field.Name
                     };
-                    var drawer = new PropertyField(serializedObject.FindProperty("data").FindPropertyRelative(field.Name),field.Name);
+                    var drawer = new GraphBlackboardPropertyField(serializedObject.FindProperty("data").FindPropertyRelative(field.Name),field.Name);
                     drawer.Bind(serializedObject);
                     foldoutData.Add(drawer);
                     visualElement.Add(propertyField);
                     visualElement.Add(foldoutData);
-                    this.Add(visualElement);
+                    
+                    Add(visualElement);
                     
                 }
                 else{

@@ -60,7 +60,7 @@ namespace TNode.Editor.Serialization{
     //     private static readonly Dictionary<NodeData,NodeDataWrapper> Cache = new ();
     //     public event Action<NodeDataWrapper> OnValueChanged;
     //     /// <summary>
-    //     /// Create a new wrapper or get a cached wrapper for the given data
+    //     /// Create a new wrapper or get a infoCached wrapper for the given data
     //     /// </summary>
     //     /// <param name="data">node data,an implemented type is acceptable</param>
     //     /// <returns></returns>

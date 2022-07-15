@@ -21,6 +21,8 @@ namespace TNode.Editor.Serialization{
             Cache.Add(data,wrapper);
             return wrapper;
         }
+
+
         public event Action<DataWrapper<TWrapper,TData>> OnValueChanged;
 
         public void SetValue(string path, object value){
