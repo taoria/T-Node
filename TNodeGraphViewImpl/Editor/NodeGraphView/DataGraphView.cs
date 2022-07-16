@@ -376,7 +376,7 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
 
 
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter){
-            return ports.Where(x => x.portType == startPort.portType).ToList();
+            return ports.Where(x => x.portType == startPort.portType || x.portType.IsAssignableFrom(startPort.portType)).ToList();
         }
 
         public virtual void OnGraphViewCreate(){

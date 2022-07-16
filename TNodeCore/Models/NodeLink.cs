@@ -7,9 +7,11 @@ namespace TNodeCore.Models{
        // public DialogueNodePortData From{ get; }
        public PortInfo inPort;
        public PortInfo outPort;
+       
          public NodeLink(PortInfo inPort, PortInfo outPort){
              this.inPort = inPort;
               this.outPort = outPort;
          }
+        
     }
 }

@@ -36,6 +36,9 @@ namespace TNode.Editor.Inspector{
             RefreshPropertyDrawer();
         }
 
+        private void CreateTestButton(){
+            
+        }
         private void RefreshPropertyDrawer(){
             //Check if the data's type is a generic type of  BlackboardDragNodeData<>
             if (_data.GetType().IsSubclassOf(typeof(BlackboardDragNodeData))){
@@ -51,6 +54,17 @@ namespace TNode.Editor.Inspector{
                 var drawer = new PropertyField(serializedObject.FindProperty("data").FindPropertyRelative(field.Name),field.Name);
                 drawer.Bind(serializedObject);
                 Add(drawer);
+
+     
+            }
+            if (_data.isTest){
+                //Add a test button for the node
+                var testButton = new Button(()=>{
+                    Debug.Log("Test button clicked");
+                });
+                testButton.text = "Test";
+                _data.OnTest();
+                Add(testButton);
             }
         }
         
