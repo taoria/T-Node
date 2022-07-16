@@ -1,31 +1,32 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using TNode.Editor;
 using TNode.Editor.Inspector;
-using TNode.Editor.NodeViews;
 using TNode.Editor.Search;
 using TNodeCore.Editor.Blackboard;
 using TNodeCore.Editor.EditorPersistence;
 using TNodeCore.Editor.NodeGraphView;
 using TNodeCore.Editor.Tools.NodeCreator;
 using TNodeCore.Models;
+using TNodeCore.Runtime;
 using TNodeGraphViewImpl.Editor.Cache;
 using TNodeGraphViewImpl.Editor.GraphBlackboard;
-using TNodeGraphViewImpl.Editor.GraphBlackboard.BlackboardProperty;
 using TNodeGraphViewImpl.Editor.NodeViews;
+
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
+using UnityEditor.VersionControl;
 using UnityEngine;
 using UnityEngine.UIElements;
+
 using Edge = UnityEditor.Experimental.GraphView.Edge;
 
 namespace TNodeGraphViewImpl.Editor.NodeGraphView{
     public  abstract  class BaseDataGraphView<T>:GraphView,IDataGraphView<T> where T:GraphData{
         #region variables and properties
         private T _data;
+        private RuntimeGraph _runtimeGraph;
+
         private bool _isInspectorOn;
         private NodeSearchWindowProvider _nodeSearchWindowProvider;
         private NodeInspector _nodeInspector;
@@ -64,7 +65,91 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
             SetupZoom(ContentZoomer.DefaultMinScale, ContentZoomer.DefaultMaxScale);
             RegisterDragEvent();
             OnInit();
+            CheckAfterInit();
         }
+        /// <summary>
+        /// Probably reusable in later GTFs version
+        /// </summary>
+        private void WaitingForAGraph(){
+            Debug.Log("hello");
+            VisualElement visualElement = new VisualElement();
+            //Set background color to white
+            visualElement.style.backgroundColor = new StyleColor(new Color(0.1f, 0.1f, 0.1f, 1));
+            
+            Debug.Log("hello2");
+            visualElement.StretchToParentSize();
+            visualElement.name = "WaitingForAGraph";
+            Add(visualElement);
+            visualElement.BringToFront();
+        
+    
+            //Add a label at the center of the created element
+            Label label = new Label("drag a graph item here"){
+                style ={
+                    position = Position.Absolute
+                },
+                name = "HintLabel"
+            };
+            
+            visualElement.RegisterCallback<DragPerformEvent>((evt) => {
+                //check if the dragged object is a graph data or a Game Object contains a runtime graph
+                var res = DragAndDrop.objectReferences;
+                foreach (var obj in res){
+                    if (obj is T graphData){
+                        Data = graphData;
+                        IsRuntimeGraph = false;
+                    }
+                    else{
+                        if (obj is GameObject gameObject){
+                            
+                            if (gameObject.GetComponent<RuntimeGraph>() != null){
+                                if (gameObject.GetComponent<RuntimeGraph>().graphData != null){
+                                   
+                                    _runtimeGraph = gameObject.GetComponent<RuntimeGraph>();
+                                    IsRuntimeGraph = true;
+                                    
+                                    
+                                    Data = gameObject.GetComponent<RuntimeGraph>().graphData as T;
+                                    if(Data==null){
+                                        Debug.LogError($"Dragged a wrong graph data to editor,expected {typeof(T)} but got {gameObject.GetComponent<RuntimeGraph>().graphData.GetType()}");
+                                    }
+                                    
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            visualElement.RegisterCallback<DragUpdatedEvent>((evt) => {
+                //check if the dragged object is a graph data or a Game Object contains a runtime graph
+                var res = DragAndDrop.objectReferences;
+                foreach (var obj in res){
+                    if (obj is GraphData graphData){
+                        DragAndDrop.visualMode = DragAndDropVisualMode.Link;
+                    }
+                    else{
+                        if (obj is GameObject gameObject){
+                            if (gameObject.GetComponent<RuntimeGraph>() != null){
+                                DragAndDrop.visualMode = DragAndDropVisualMode.Link;
+                            }
+                        }
+                    }
+                }
+
+            });
+            visualElement.Add(label);
+            OnDataChanged += (sender, e) => {
+                if (Data != null){
+                    visualElement.RemoveFromHierarchy();
+                }
+            };
+        }
+        private void CheckAfterInit(){
+            if(Data == null){
+                WaitingForAGraph();
+            }
+        }
+
         private void ConstructDefaultBehaviour(){
             //Register a right click context menu
             ConstructViewContextualMenu();
@@ -106,7 +191,7 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
                     if(selectable is { } field) {
                         //Make a constructor of  BlackboardDragNodeData<field.PropertyType > by reflection
                         var dragNodeData = NodeCreator.InstantiateNodeData<BlackboardDragNodeData>();
-                        dragNodeData.blackboardData = _data.blackboardData;
+                        dragNodeData.blackboardData = GetBlackboardData();
                         dragNodeData.blackDragData = field.BlackboardProperty.PropertyName;
                         AddTNode(dragNodeData,new Rect(evt.mousePosition,new Vector2(200,200)));
                     }
@@ -116,7 +201,6 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
         }
 
         private void OnDragUpdated(DragUpdatedEvent evt){
-            Debug.Log(evt);
             
             //check if the drag data is BlackboardField
 
@@ -188,7 +272,7 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
 
         public virtual void CreateMiniMap(Rect rect){
             var miniMap = new MiniMap();
-            this.Add(miniMap);
+            Add(miniMap);
             miniMap.SetPosition(rect);
         }
 
@@ -200,7 +284,7 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
                 if (_data.blackboardData == null) return;
                 
             }
-            _blackboard.SetBlackboardData(_data.blackboardData);
+            _blackboard.SetBlackboardData(GetBlackboardData());
         }
 
         public virtual void DestroyInspector(){
@@ -292,7 +376,7 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
 
 
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter){
-            return ports.Where(x => x.portType == startPort.portType).ToList();
+            return ports.Where(x => x.portType == startPort.portType || x.portType.IsAssignableFrom(startPort.portType)).ToList();
         }
 
         public virtual void OnGraphViewCreate(){
@@ -358,12 +442,9 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
             _blackboard.Setup(this,Owner);
       
             var castedBlackboard = _blackboard as Blackboard;
-            
             Add(castedBlackboard);
-
             Rect blackboardPos = new Rect(0,0,300,700);
             castedBlackboard?.SetPosition(blackboardPos);
-            
             
             OnDataChanged+= (sender, e) => { BlackboardUpdate(); };
         }
@@ -374,8 +455,18 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
 
 
         public BlackboardData GetBlackboardData(){
-            return this._data.blackboardData;
+            if (IsRuntimeGraph){
+                return _runtimeGraph.runtimeBlackboardData;
+            }
+            return _data.blackboardData;
         }
+
+        public bool IsRuntimeGraph{ get; set; }
+
+        public void SetGraphData(GraphData graph){
+            Data = graph as T;
+        }
+
         #endregion
     }
 

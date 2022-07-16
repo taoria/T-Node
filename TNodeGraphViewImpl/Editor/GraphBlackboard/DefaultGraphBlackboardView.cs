@@ -2,6 +2,7 @@
 using System.Reflection;
 using TNode.Editor.Search;
 using TNodeCore.Attribute;
+using TNodeCore.Editor.NodeGraphView;
 using TNodeCore.Editor.Serialization;
 using TNodeCore.Models;
 using UnityEditor;
@@ -21,6 +22,8 @@ namespace TNodeGraphViewImpl.Editor.GraphBlackboard{
         protected override void UpdateBlackboard(BlackboardData data){
             if (data == null) return;
             var serializedObject = new SerializedObject((BlackboardDataWrapper)data);
+            var currentGraphView = graphView as IBaseDataGraphView;
+            var isRuntimeGraph = currentGraphView?.IsRuntimeGraph ?? false;
             foreach (var field in data.GetType()
                          .GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)){
                 //if the field is MonoBehaviour,add a property field for blackboard 
@@ -31,14 +34,12 @@ namespace TNodeGraphViewImpl.Editor.GraphBlackboard{
                     var foldoutData = new Foldout{
                         text = field.Name
                     };
-                    var drawer = new GraphBlackboardPropertyField(serializedObject.FindProperty("data").FindPropertyRelative(field.Name),field.Name);
+                    var drawer = new GraphBlackboardPropertyField(serializedObject.FindProperty("data").FindPropertyRelative(field.Name),field.Name,isRuntimeGraph);
                     drawer.Bind(serializedObject);
                     foldoutData.Add(drawer);
                     visualElement.Add(propertyField);
                     visualElement.Add(foldoutData);
-                    
                     Add(visualElement);
-                    
                 }
                 else{
                     var blackboardList = new BlackboardSection{

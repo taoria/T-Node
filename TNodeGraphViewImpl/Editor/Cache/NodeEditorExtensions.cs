@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using TNode.Editor;
 using TNode.Editor.NodeViews;
 using TNodeCore.Attribute;
@@ -58,10 +59,12 @@ namespace TNodeGraphViewImpl.Editor.Cache{
                         SetViewComponentAttribute(type);
                         //Register Node Data by GraphUsageAttribute.
                         SetGraphUsageAttribute(type);
+                     
                     }
                 }
             }
         }
+        
 
         private void SetGraphUsageAttribute(Type type){
             foreach (var attribute in type.GetCustomAttributes(typeof(GraphUsageAttribute), true)){
