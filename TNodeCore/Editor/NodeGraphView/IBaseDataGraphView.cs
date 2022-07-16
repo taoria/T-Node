@@ -9,7 +9,8 @@ namespace TNodeCore.Editor.NodeGraphView{
         public void CreateBlackboard();
         public GraphData GetGraphData();
         public BlackboardData GetBlackboardData();
-        
-        
+
+
+        void SetGraphData(GraphData graph);
     }
 }

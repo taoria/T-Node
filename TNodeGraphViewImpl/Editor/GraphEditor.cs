@@ -1,25 +1,60 @@
-using Codice.CM.Common;
-using TNode.Editor.Inspector;
+using System;
+using TNodeCore.Editor;
 using TNodeCore.Editor.EditorPersistence;
+using TNodeCore.Editor.NodeGraphView;
 using TNodeCore.Models;
 using TNodeGraphViewImpl.Editor.Cache;
 using TNodeGraphViewImpl.Editor.NodeGraphView;
 using UnityEditor;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 
-namespace TNode.Editor{
+namespace TNodeGraphViewImpl.Editor{
     
-    
-    public abstract class GraphEditor<T> : EditorWindow where T:GraphData{ 
+    // public class SelectGraphWindow : EditorWindow{
+    //     public EditorWindow parent;
+    //     public Type graphType;
+    //     public static void ShowWindow<T> (GraphEditor<T> parent) where T:GraphData{
+    //         var window = GetWindow<SelectGraphWindow>();
+    //         window.graphType = typeof(T);
+    //         window.Show();
+    //         window.parent = parent;
+    //     }
+    //     private void OnGUI(){
+    //             
+    //         if(GUILayout.Button("Create An Graph")){
+    //             //Add a save file dialog to save the graph
+    //             //Create the graph
+    //             var graphAsset = ScriptableObject.CreateInstance(graphType);
+    //             var path = EditorUtility.SaveFilePanel("Save Graph", "", "", "asset");
+    //             //Save the graph
+    //             AssetDatabase.CreateAsset(graphAsset, path); 
+    //             AssetDatabase.SaveAssets();
+    //             AssetDatabase.Refresh();
+    //             //Load the graph
+    //             var graph = AssetDatabase.LoadAssetAtPath<ScriptableObject>(path) as GraphData;
+    //             var graphEditor = parent as IGraphEditor;
+    //             if (graphEditor.GetGraphView() != null){
+    //                 graphEditor.GetGraphView().SetGraphData(graph);
+    //                 Debug.Log(graph);
+    //             }
+    //         }
+    //         //Drag and drop a graph asset to load it
+    //         if(Event.current.type == EventType.DragUpdated){
+    //             DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
+    //             Event.current.Use();
+    //         }
+    //     }
+    // }
+    public abstract class GraphEditor<T> : EditorWindow,IGraphEditor where T:GraphData{ 
         protected BaseDataGraphView<T> GraphView;
         [SerializeField]
         private VisualTreeAsset mVisualTreeAsset = default;
         //Persist editor data ,such as node position,node size ,etc ,in this script object
         [FormerlySerializedAs("nodeEditorData")] public GraphEditorData graphEditorData;
-    
+        private bool _windowShowed=false;
+
         public void CreateGUI(){
             
             // Each editor window contains a root VisualElement object
@@ -28,12 +63,25 @@ namespace TNode.Editor{
             // Instantiate UXML
             VisualElement labelFromUXML = mVisualTreeAsset.Instantiate();
             root.Add(labelFromUXML);
-       
+            
             BuildGraphView();
             DefineGraphEditorActions();
             OnCreate();
         }
-        
+  
+        public void Update(){
+            if (GraphView == null) return;
+            if (GraphView.Data != null) return;
+            if (_windowShowed==false){
+                _windowShowed = true;
+            }
+        }
+
+
+        public void Setup(T graphData){
+            GraphView.Owner = this;
+            GraphView.Data = graphData;
+        }
         private void BuildGraphView(){
             GraphView = NodeEditorExtensions.CreateViewComponentFromBaseType<BaseDataGraphView<T>>();
             rootVisualElement.Add(GraphView);
@@ -75,6 +123,13 @@ namespace TNode.Editor{
         protected virtual void OnCreate(){
             
         }
-  
+
+        public void SetGraphView(IBaseDataGraphView graphView){
+            GraphView = graphView as BaseDataGraphView<T>;
+        }
+
+        public IBaseDataGraphView GetGraphView(){
+            return GraphView;
+        }
     }
 }
