@@ -1,5 +1,6 @@
 ﻿using System;
 using TNodeCore.Attribute;
+using UnityEngine;
 
 namespace TNodeCore.Models{
     /// <summary>
@@ -22,12 +23,15 @@ namespace TNodeCore.Models{
         public bool entryPoint;
 
 
-        public virtual void OnProcess(){
+        public virtual void Process(){
             
         }
         
-// #if UNITY_EDITOR
-//         public Rect rect;
-// #endif
+#if UNITY_EDITOR
+        [HideInInspector] public bool isTest;
+        public virtual void OnTest(){
+            
+        }
+ #endif
     }
 }

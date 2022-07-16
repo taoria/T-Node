@@ -50,6 +50,11 @@ namespace TNodeCore.RuntimeCache{
                 AddBlackboardDataTypeToCache(type,attribute);
                 RegisterRuntimeBlackboard(type);
             }
+            //Check if the type is a node data type
+            if(typeof(NodeData).IsAssignableFrom(type)){
+                //if it is, add it to the cache
+                RegisterRuntimeNodeData(type);
+            }
             
         }
         
@@ -101,6 +106,41 @@ namespace TNodeCore.RuntimeCache{
             }
         }
 
+        public void RegisterRuntimeNodeData(Type type){
+            if (type == null) return;
+            if(!CachedDelegatesForGettingValue.ContainsKey(type)){
+                CachedDelegatesForGettingValue.Add(type, new Dictionary<string, GetValueDelegate>());
+                CachedDelegatesForSettingValue.Add(type,new Dictionary<string, SetValueDelegate>());
+                var properties = type.GetProperties();
+                foreach(var property in properties){
+                    //if the property only has a setter ,skip 
+                  
+                    if(property.SetMethod != null){
+                        var setValueDelegate = SetValueDelegateForProperty(property);
+                        CachedDelegatesForSettingValue[type].Add(property.Name,setValueDelegate);
+                    }
+                    if(property.GetMethod != null){
+                        var getValueDelegate = GetValueDelegateForProperty(property);
+                        CachedDelegatesForGettingValue[type].Add(property.Name,getValueDelegate);
+                    }
+        
+                    
+                 
+                }
+                //register the fields
+                var fields = type.GetFields();
+                foreach(var field in fields){
+                    
+                    var getValueDelegate = GetValueDelegateForField(field);
+                    CachedDelegatesForGettingValue[type].Add(field.Name,getValueDelegate);
+                    if (field.IsPublic){
+                        var setValueDelegate = SetValueDelegateForField(field);
+                        CachedDelegatesForSettingValue[type].Add(field.Name,setValueDelegate);
+                    }
+    
+                }
+            }
+        }
         private GetValueDelegate GetValueDelegateForField(FieldInfo field){
             return field.GetValue;
         }
@@ -120,26 +160,29 @@ namespace TNodeCore.RuntimeCache{
     public static class RuntimeExtension{
      
         //todo  latter on i will try some way caching reflection more efficiently
-        public static T GetValue<T>(this BlackboardData blackboardData,string path){
-            var method = RuntimeCache.Instance.CachedDelegatesForGettingValue[blackboardData.GetType()][path];
-            return (T) method.Invoke(blackboardData);
+        public static T GetValue<T>(this IModel data,string path,Type type=null){
+            var method = RuntimeCache.Instance.CachedDelegatesForGettingValue[type??data.GetType()][path];
+            return (T) method.Invoke(data);
         }
-        public static object GetValue(this BlackboardData blackboardData, string path){
-            var method = RuntimeCache.Instance.CachedDelegatesForGettingValue[blackboardData.GetType()][path];
-            return method.Invoke(blackboardData);
+        public static object GetValue(this  IModel data, string path,Type type=null){
+            var method = RuntimeCache.Instance.CachedDelegatesForGettingValue[type??data.GetType()][path];
+            return method.Invoke(data);
         }
-        public static void SetValue<T>(this BlackboardData blackboardData,string path,T value){
-            var method = RuntimeCache.Instance.CachedDelegatesForSettingValue[blackboardData.GetType()][path];
-            method.Invoke(blackboardData,value);
+    
+        public static void SetValue<T>(this IModel data,string path,T value,Type type=null){
+            var method = RuntimeCache.Instance.CachedDelegatesForSettingValue[type??data.GetType()][path];
+            method.Invoke(data,value);
         }
-        public static void SetValue(this BlackboardData blackboardData,string path,object value){
-            var method = RuntimeCache.Instance.CachedDelegatesForSettingValue[blackboardData.GetType()][path];
-            method.Invoke(blackboardData,value);
+        public static void SetValue(this IModel data,string path,object value,Type type=null){
+            var method = RuntimeCache.Instance.CachedDelegatesForSettingValue[type??data.GetType()][path];
+            method.Invoke(data,value);
         }
-        public static RuntimeCache.GetValueDelegate GetValueDelegate(this BlackboardData blackboardData,string path){
+        public static RuntimeCache.GetValueDelegate GetValueDelegate(this  IModel blackboardData,string path){
             var method = RuntimeCache.Instance.CachedDelegatesForGettingValue[blackboardData.GetType()][path];
             return method;
         }
+
+        
         
     }
 }

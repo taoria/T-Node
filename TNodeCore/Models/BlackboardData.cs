@@ -6,6 +6,9 @@ namespace TNodeCore.Models{
     /// </summary>
     [Serializable]
     
-    public class BlackboardData:IModel{
+    public class BlackboardData:IModel,ICloneable{
+        public object Clone(){
+            return this.MemberwiseClone();
+        }
     }
 }
