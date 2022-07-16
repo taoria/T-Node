@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using TNode.Attribute;
 using TNode.Editor.NodeViews;
-using TNode.Models;
+using TNodeCore.Models;
 using TNodeGraphViewImpl.Editor.NodeGraphView;
 using TNodeGraphViewImpl.Editor.NodeViews;
 using Unity.VisualScripting;

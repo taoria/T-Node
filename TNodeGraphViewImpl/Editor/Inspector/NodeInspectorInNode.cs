@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
-using TNode.Attribute;
-using TNode.Editor.Serialization;
-using TNode.Models;
+using TNodeCore.Attribute;
+using TNodeCore.Editor.Serialization;
+using TNodeCore.Models;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;

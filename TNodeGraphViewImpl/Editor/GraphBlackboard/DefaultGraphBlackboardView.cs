@@ -1,10 +1,9 @@
 ﻿using System.Collections;
 using System.Reflection;
-using TNode.Attribute;
-using TNode.Editor.NodeGraphView;
 using TNode.Editor.Search;
-using TNode.Editor.Serialization;
-using TNode.Models;
+using TNodeCore.Attribute;
+using TNodeCore.Editor.Serialization;
+using TNodeCore.Models;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;

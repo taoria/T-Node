@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using TNode.Attribute.Ports;
 using TNode.Editor.Inspector;
-using TNode.Editor.Serialization;
-using TNode.Models;
+using TNodeCore;
+using TNodeCore.Attribute.Ports;
+using TNodeCore.Editor.Serialization;
+using TNodeCore.Models;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;

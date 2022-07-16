@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using TNode.Editor.NodeGraphView;
+using TNodeCore.Editor.NodeGraphView;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
