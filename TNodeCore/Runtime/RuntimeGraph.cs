@@ -11,7 +11,8 @@ namespace TNodeCore.Runtime{
         
         public void OnValidate(){
             if(runtimeBlackboardData==null||runtimeBlackboardData.GetType()==typeof(BlackboardData)){
-                runtimeBlackboardData = graphData?.blackboardData;
+                if(graphData!=null)
+                    runtimeBlackboardData = RuntimeCache.RuntimeCache.Instance.GetBlackboardData(graphData);
             }
         }
     }

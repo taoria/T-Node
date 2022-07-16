@@ -66,6 +66,7 @@ namespace TNodeGraphViewImpl.Editor{
             
             BuildGraphView();
             DefineGraphEditorActions();
+            GraphView.Owner = this;
             OnCreate();
         }
   
@@ -78,9 +79,9 @@ namespace TNodeGraphViewImpl.Editor{
         }
 
 
-        public void Setup(T graphData){
-            GraphView.Owner = this;
+        public void SetupNonRuntime(T graphData){
             GraphView.Data = graphData;
+            GraphView.IsRuntimeGraph = false;
         }
         private void BuildGraphView(){
             GraphView = NodeEditorExtensions.CreateViewComponentFromBaseType<BaseDataGraphView<T>>();
