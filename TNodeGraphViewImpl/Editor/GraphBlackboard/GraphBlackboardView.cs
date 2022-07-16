@@ -1,7 +1,7 @@
-﻿using TNode.Editor.Blackboard;
-using TNode.Editor.NodeGraphView;
-using TNode.Editor.Search;
-using TNode.Models;
+﻿using TNode.Editor.Search;
+using TNodeCore.Editor.Blackboard;
+using TNodeCore.Editor.NodeGraphView;
+using TNodeCore.Models;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;

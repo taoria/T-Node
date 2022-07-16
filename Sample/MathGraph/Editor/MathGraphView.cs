@@ -1,5 +1,4 @@
-using TNode.Models;
-using TNode.Attribute;
+using TNodeCore.Attribute;
 using TNodeGraphViewImpl.Editor.NodeGraphView;
 
 [ViewComponent]

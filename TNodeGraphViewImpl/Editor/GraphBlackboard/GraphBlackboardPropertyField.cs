@@ -13,6 +13,7 @@ namespace TNodeGraphViewImpl.Editor.GraphBlackboard{
             base.ExecuteDefaultActionAtTarget(evt);
             if (this.Q<ObjectField>() != null){
                 this.Q<ObjectField>().allowSceneObjects = false;
+
             }
         }
      
