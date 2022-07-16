@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using TNode.Editor;
 using TNode.Editor.Inspector;
-using TNode.Editor.NodeViews;
 using TNode.Editor.Search;
 using TNodeCore.Editor.Blackboard;
 using TNodeCore.Editor.EditorPersistence;
@@ -14,7 +10,6 @@ using TNodeCore.Editor.Tools.NodeCreator;
 using TNodeCore.Models;
 using TNodeGraphViewImpl.Editor.Cache;
 using TNodeGraphViewImpl.Editor.GraphBlackboard;
-using TNodeGraphViewImpl.Editor.GraphBlackboard.BlackboardProperty;
 using TNodeGraphViewImpl.Editor.NodeViews;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
@@ -116,7 +111,6 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
         }
 
         private void OnDragUpdated(DragUpdatedEvent evt){
-            Debug.Log(evt);
             
             //check if the drag data is BlackboardField
 
@@ -376,6 +370,11 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
         public BlackboardData GetBlackboardData(){
             return this._data.blackboardData;
         }
+
+        public void SetGraphData(GraphData graph){
+            Data = graph as T;
+        }
+
         #endregion
     }
 
