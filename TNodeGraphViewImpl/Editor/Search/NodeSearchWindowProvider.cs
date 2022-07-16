@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using TNode.Editor.NodeGraphView;
-using TNode.Editor.Tools.NodeCreator;
-using TNode.Models;
+using TNodeCore.Editor.NodeGraphView;
+using TNodeCore.Editor.Tools.NodeCreator;
+using TNodeCore.Models;
 using TNodeGraphViewImpl.Editor.Cache;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;

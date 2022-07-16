@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using TNode.Attribute;
 using TNode.Editor;
-using TNode.Editor.Blackboard;
 using TNode.Editor.NodeViews;
-using TNode.Models;
+using TNodeCore.Attribute;
+using TNodeCore.Editor.Blackboard;
+using TNodeCore.Models;
 using TNodeGraphViewImpl.Editor.GraphBlackboard;
 using TNodeGraphViewImpl.Editor.NodeGraphView;
 using TNodeGraphViewImpl.Editor.NodeViews;
@@ -17,10 +17,6 @@ namespace TNodeGraphViewImpl.Editor.Cache{
     /// Internal singleton class for caching TNode reflection Data.
     /// </summary>
     internal class NodeEditorTypeDictionary:Dictionary<Type, Type>{
-        //Custom camparator for sorting the dictionary by key.
-
-
-
         private class NodeEditorTypeDictionaryComparer : IEqualityComparer<Type>
         {
             public bool Equals(Type x, Type y){
