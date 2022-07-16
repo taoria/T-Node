@@ -45,7 +45,6 @@ namespace TNode.Editor.Search{
             }
             Debug.Log($"{list.Count}");
             return list;
-
         }
 
         public bool OnSelectEntry(SearchTreeEntry SearchTreeEntry, SearchWindowContext context){
