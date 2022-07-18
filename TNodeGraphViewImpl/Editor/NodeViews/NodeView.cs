@@ -4,6 +4,7 @@ using System.Reflection;
 using TNode.Editor.Inspector;
 using TNodeCore;
 using TNodeCore.Attribute.Ports;
+using TNodeCore.Editor.NodeGraphView;
 using TNodeCore.Editor.Serialization;
 using TNodeCore.Models;
 using UnityEditor.Experimental.GraphView;
@@ -15,7 +16,13 @@ namespace TNodeGraphViewImpl.Editor.NodeViews{
     public abstract class BaseNodeView<T> : Node,INodeView<T> where T:NodeData,new(){
         protected T _data;
         private readonly NodeInspectorInNode _nodeInspectorInNode;
-        
+
+        public IBaseDataGraphView BaseDataGraphView{
+            get{
+                var visualElement = this.GetFirstAncestorOfType<IBaseDataGraphView>() as IBaseDataGraphView;
+                return visualElement;
+            }
+        }
         public T Data{
             get => _data;
             set{
@@ -180,6 +187,7 @@ namespace TNodeGraphViewImpl.Editor.NodeViews{
         public NodeData GetNodeData();
         public void OnDataModified();
 
+        IBaseDataGraphView BaseDataGraphView{ get; }
     }
 
     public interface INodeView<T>:IBaseNodeView where T:NodeData,new(){

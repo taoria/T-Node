@@ -108,16 +108,11 @@ namespace TNodeCore.Runtime{
             return null;
         }
         //DFS search for resolving dependency
-        public void StartDependencyTraversal(NodeData startNode,NodeData currentNode,int level=0){
-            if (!_build)
-                Build();
-            if(_graphTool==null)
-                return;
+        public bool ResolveDependency(NodeData startNode){
+            if (_graphTool == null)
+                return false;
             _graphTool.DependencyTraversal(Get(startNode));
-            var inputNodesId = Get(currentNode).GetInputNodesId();
-            foreach (var s in inputNodesId){
-                var runtimeNode = Get(s);
-            }
+            return true;
         }
         private void ModifyOrCreateInNode(NodeLink linkData){
             var inNodeId = linkData.inPort.nodeDataId;

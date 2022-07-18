@@ -12,12 +12,12 @@ using TNodeCore.Runtime;
 using TNodeGraphViewImpl.Editor.Cache;
 using TNodeGraphViewImpl.Editor.GraphBlackboard;
 using TNodeGraphViewImpl.Editor.NodeViews;
-
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
-using UnityEditor.VersionControl;
 using UnityEngine;
 using UnityEngine.UIElements;
+
+
 
 using Edge = UnityEditor.Experimental.GraphView.Edge;
 
@@ -65,7 +65,7 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
             SetupZoom(ContentZoomer.DefaultMinScale, ContentZoomer.DefaultMaxScale);
             RegisterDragEvent();
             OnInit();
-            CheckAfterInit();
+            
         }
         /// <summary>
         /// Probably reusable in later GTFs version
@@ -144,7 +144,7 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
                 }
             };
         }
-        private void CheckAfterInit(){
+        private void CheckDataAfterInit(){
             if(Data == null){
                 WaitingForAGraph();
             }
@@ -173,7 +173,39 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
         private void OnInit(){
             ConstructDefaultBehaviour();
             OnGraphViewCreate();
+            CheckDataAfterInit();
         }
+
+        protected void CreateMenu(){
+            var visualElement = new VisualElement{
+                name = "TopMenu"
+            };
+            visualElement.style.position = Position.Absolute;
+            visualElement.style.top = 0;
+            visualElement.style.backgroundColor = new StyleColor(new Color(0.1f, 0.1f, 0.1f, 1));
+            Add(visualElement);
+            visualElement.style.flexDirection = FlexDirection.Row;
+            
+            
+            //Add a toggle button to toggle test mode
+            var testModeToggle = new Toggle{
+                name = "TestModeToggle",
+                label = "Test Mode",
+                value = false
+            };
+            testModeToggle.RegisterValueChangedCallback(evt => {
+                if (evt.newValue){
+                    TestMode = true;
+                }
+                else{
+                    TestMode = false;
+                }
+            });
+            visualElement.Add(testModeToggle);
+            
+
+        }
+        
         public void RegisterDragEvent(){
             RegisterCallback<DragUpdatedEvent>(OnDragUpdated);
             RegisterCallback<DragPerformEvent>(OnDragPerform);
@@ -437,6 +469,8 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
             Owner.graphEditorData.graphElementsData.RemoveAll(x => x.guid == nodeData.id);
         }
 
+        public bool TestMode{ get; set; }
+
         public void CreateBlackboard(){
             _blackboard = NodeEditorExtensions.CreateBlackboardWithGraphData(typeof(T));
             _blackboard.Setup(this,Owner);
@@ -462,6 +496,10 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
         }
 
         public bool IsRuntimeGraph{ get; set; }
+
+        public RuntimeGraph GetRuntimeGraph(){
+            return _runtimeGraph;
+        }
 
         public void SetGraphData(GraphData graph){
             Data = graph as T;
