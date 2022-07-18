@@ -71,12 +71,10 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
         /// Probably reusable in later GTFs version
         /// </summary>
         private void WaitingForAGraph(){
-            Debug.Log("hello");
             VisualElement visualElement = new VisualElement();
             //Set background color to white
             visualElement.style.backgroundColor = new StyleColor(new Color(0.1f, 0.1f, 0.1f, 1));
             
-            Debug.Log("hello2");
             visualElement.StretchToParentSize();
             visualElement.name = "WaitingForAGraph";
             Add(visualElement);
@@ -279,8 +277,8 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
                 var outputNodeView = _nodeDict[outputNode.id];
                 Edge newEdge = new Edge(){
                  
-                    input = inputNodeView.inputContainer.Q<Port>(edge.inPort.portName),
-                    output = outputNodeView.outputContainer.Q<Port>(edge.outPort.portName)
+                    input = inputNodeView.inputContainer.Q<Port>(edge.inPort.portEntryName),
+                    output = outputNodeView.outputContainer.Q<Port>(edge.outPort.portEntryName)
                 };
 
                 newEdge.input?.Connect(newEdge);
@@ -378,11 +376,11 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
                     var outputNodeData = outputNode.GetNodeData();
                     var newNodeLink = new NodeLink(new PortInfo(){
                         nodeDataId = inputNodeData.id,
-                        portName = edge.input.portName,
+                        portEntryName = edge.input.name,
 
                     }, new PortInfo(){
                         nodeDataId = outputNodeData.id,
-                        portName = edge.output.portName
+                        portEntryName = edge.output.name
                     });
                     links.Add(newNodeLink);
                 }

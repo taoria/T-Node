@@ -33,8 +33,8 @@ namespace TNodeCore.Runtime{
                 
                 //out node is node output data
                 //in node is node receive data
-                var outValue = outNode.GetOutput(nodeLink.outPort.portName);
-                inNode.SetInput(nodeLink.inPort.portName, outValue);
+                var outValue = outNode.GetOutput(nodeLink.outPort.portEntryName);
+                inNode.SetInput(nodeLink.inPort.portEntryName, outValue);
             }
             public GraphTool(List<RuntimeNode> list, Dictionary<string, RuntimeNode> graphNodes){
                 RuntimeNodes = graphNodes;
@@ -66,7 +66,7 @@ namespace TNodeCore.Runtime{
                 if(TopologicalOrder.Count!= list.Count){
                     throw new Exception("Topological sort failed,circular dependency detected");
                 }
-                RuntimeNodes.Clear();
+             
                 inDegreeCounterForTopologicalSort.Clear();
                 queue.Clear();
             }
@@ -75,7 +75,7 @@ namespace TNodeCore.Runtime{
         }
         [SerializeReference]
         public BlackboardData runtimeBlackboardData;
-
+        [NonSerialized]
         private bool _build = false;
         public void Build(){
             
@@ -85,6 +85,7 @@ namespace TNodeCore.Runtime{
                 ModifyOrCreateInNode(linkData);
                 ModifyOrCreateOutNode(linkData);
             }
+            Debug.Log("hi");
             var nodeList = RuntimeNodes.Values;
             _graphTool = new GraphTool(nodeList.ToList(),RuntimeNodes);
             _build = true;
@@ -93,7 +94,6 @@ namespace TNodeCore.Runtime{
         public RuntimeNode Get(NodeData nodeData){
             if(!_build)
                 Build();
-            
             if(RuntimeNodes.ContainsKey(nodeData.id)){
                 return RuntimeNodes[nodeData.id];
             }
@@ -104,11 +104,12 @@ namespace TNodeCore.Runtime{
             if (RuntimeNodes.ContainsKey(id)){
                 return RuntimeNodes[id];
             }
-
             return null;
         }
         //DFS search for resolving dependency
         public bool ResolveDependency(NodeData startNode){
+            if(!_build)
+                Build();
             if (_graphTool == null)
                 return false;
             _graphTool.DependencyTraversal(Get(startNode));
@@ -140,8 +141,17 @@ namespace TNodeCore.Runtime{
                     runtimeBlackboardData = graphData.blackboardData.Clone() as BlackboardData;
             }
         }
-        
-        
+
+        public void OnDisable(){
+            RuntimeNodes.Clear();
+            _build = false;
+        }
+
+        public void OnDestroy(){
+            RuntimeNodes.Clear();
+            _build = false;
+        }
+       
     }
 
     public enum ProcessingStrategy{

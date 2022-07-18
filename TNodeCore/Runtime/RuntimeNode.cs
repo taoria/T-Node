@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Codice.Client.Common.TreeGrouper;
 using TNodeCore.Attribute.Ports;
 using TNodeCore.Models;
@@ -9,49 +10,33 @@ namespace TNodeCore.Runtime{
     public class RuntimeNode{
         public NodeData NodeData { get; set; }
         //the link connect to node's in port
-        public List<NodeLink> InputLink;
+        public List<NodeLink> InputLink = new List<NodeLink>();
         //the link connect to node's out port
-        public List<NodeLink> OutputLink;
+        public List<NodeLink> OutputLink = new List<NodeLink>();
         //Cache node data type for fast access
         private readonly Type _type;
 
 
         public void SetInput(string portName,object value){
-            NodeData.SetValue(portName, value);
+            _portAccessors[portName].SetValue(this.NodeData,value);
+           
         }
         public object GetOutput(string portName){
-            return NodeData.GetValue(portName);
+            
+            return _portAccessors[portName].GetValue(this.NodeData);
         }
 
 
+        private readonly Dictionary<string, IModelPropertyAccessor> _portAccessors;
 
-        private Dictionary<string,RuntimeCache.RuntimeCache.SetPropertyValueDelegate> _inputPorts = new();
-        private Dictionary<string,RuntimeCache.RuntimeCache.GetPropertyValueDelegate> _outputPorts = new();
-
-
-        private void CachingPorts(){
-            var properties = _type.GetProperties();
-            foreach (var propertyInfo in properties){
-                //Check if the property is a port
-                var attribute = propertyInfo.GetCustomAttributes(typeof(InputAttribute),true);
-                if (attribute.Length > 0){
-                  
-                    _inputPorts.Add(propertyInfo.Name,NodeData.CacheSetProperty(propertyInfo.Name));
-                }
-                
-                attribute = propertyInfo.GetCustomAttributes(typeof(OutputAttribute),true);
-                if (attribute.Length > 0){
-                    _outputPorts.Add(propertyInfo.Name,NodeData.CacheGetProperty(propertyInfo.Name));
-                }
-            }
-        }
+   
         public RuntimeNode(NodeData nodeData){
             NodeData = nodeData;
             //Caching the type of the node
             _type = nodeData.GetType();
             var info = nodeData.GetType().GetProperties();
-            
-            CachingPorts();
+
+            _portAccessors = RuntimeCache.RuntimeCache.Instance.CachedPropertyAccessors[_type];
         }
         public List<string> GetInputNodesId(){
             List<string> dependencies = new List<string>();
