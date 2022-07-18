@@ -108,7 +108,8 @@ namespace TNodeGraphViewImpl.Editor.NodeViews{
                     this.outputContainer.Add(port);
                     var portName = BuildPortName(attribute,propertyInfo);
                     port.portName = portName;
-                    port.name = portName;
+                    port.name = propertyInfo.Name;
+                    
                 }
             }
             foreach (var propertyInfo in propertyInfos){
@@ -117,7 +118,7 @@ namespace TNodeGraphViewImpl.Editor.NodeViews{
                     this.inputContainer.Add(port);
                     var portName = BuildPortName(attribute,propertyInfo);
                     port.portName = portName;
-                    port.name = portName;
+                    port.name = propertyInfo.Name;
                 }
             }
         }

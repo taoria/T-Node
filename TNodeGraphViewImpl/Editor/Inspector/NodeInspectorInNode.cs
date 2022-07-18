@@ -57,7 +57,8 @@ namespace TNode.Editor.Inspector{
 
      
             }
-            var globalTest = GetFirstAncestorOfType<IBaseNodeView>()?.BaseDataGraphView?.TestMode;
+
+            var globalTest = GetFirstAncestorOfType<IBaseDataGraphView>()?.TestMode;
             if(globalTest??false){
                 CreateTestButton();
             }
@@ -74,7 +75,7 @@ namespace TNode.Editor.Inspector{
                     if(!test.IsRuntimeGraph) return;
                     var runtimeGraph = test.GetRuntimeGraph();
                     if (runtimeGraph != null){
-                        runtimeGraph.ResolveDependency(_data);
+                       var res = runtimeGraph.ResolveDependency(_data);
                     }
                     _data.OnTest();
                 }

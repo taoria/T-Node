@@ -1,5 +1,7 @@
-﻿namespace TNodeCore.Models{
+﻿using System;
+
+namespace TNodeCore.Models{
     public interface IModel{
-        
+
     }
 }

@@ -22,7 +22,6 @@ namespace TNodeCore.Models{
         public string nodeName;
         public bool entryPoint;
 
-
         public virtual void Process(){
             
         }
