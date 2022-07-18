@@ -13,3 +13,11 @@ GridBackground{
     font-size: 14;
     
 }
+#TopMenu{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 24px;
+    background-color: #171717;
+}

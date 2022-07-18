@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using PlasticPipe.PlasticProtocol.Messages;
 using TNodeCore.Attribute;
 using TNodeCore.Models;
+using UnityEngine;
 
 namespace TNodeCore.RuntimeCache{
     public class RuntimeCache{
@@ -14,11 +16,18 @@ namespace TNodeCore.RuntimeCache{
         }
         //delegate return a value from a nodedata
         public delegate object GetValueDelegate(IModel nodeData);
-        public delegate void SetValueDelegate(object nodeData,object value);
+        public delegate void SetValueDelegate(IModel nodeData,object value);
+
+        public delegate object GetPropertyValueDelegate();
+        public delegate void SetPropertyValueDelegate(object value);
 
         public readonly Dictionary<Type, Dictionary<string,GetValueDelegate>> CachedDelegatesForGettingValue =
             new ();
         public readonly Dictionary<Type,Dictionary<string,SetValueDelegate>> CachedDelegatesForSettingValue =
+            new ();
+        public readonly Dictionary<Type,Dictionary<string,GetPropertyValueDelegate>> CachedDelegatesForGettingPropertyValue =
+            new ();
+        public readonly Dictionary<Type,Dictionary<string,SetPropertyValueDelegate>> CachedDelegatesForSettingPropertyValue =
             new ();
 
         private readonly Dictionary<Type, Type> _graphBlackboardDictionary = new Dictionary<Type, Type>();
@@ -84,16 +93,16 @@ namespace TNodeCore.RuntimeCache{
                 CachedDelegatesForGettingValue.Add(type, new Dictionary<string, GetValueDelegate>());
                 CachedDelegatesForSettingValue.Add(type,new Dictionary<string, SetValueDelegate>());
               
-                var properties = type.GetProperties();
-                foreach(var property in properties){
-                    //if the property only has a setter ,skip 
-          
-                    var getValueDelegate = GetValueDelegateForProperty(property);
-                    CachedDelegatesForGettingValue[type].Add(property.Name,getValueDelegate);
-                    
-                    var setValueDelegate = SetValueDelegateForProperty(property);
-                    CachedDelegatesForSettingValue[type].Add(property.Name,setValueDelegate);
-                }
+                // var properties = type.GetProperties();
+                // foreach(var property in properties){
+                //     //if the property only has a setter ,skip 
+                //
+                //     var getValueDelegate = GetValueDelegateForProperty(property);
+                //     CachedDelegatesForGettingValue[type].Add(property.Name,getValueDelegate);
+                //     
+                //     var setValueDelegate = SetValueDelegateForProperty(property);
+                //     CachedDelegatesForSettingValue[type].Add(property.Name,setValueDelegate);
+                // }
                 //register the fields
                 var fields = type.GetFields();
                 foreach(var field in fields){
@@ -111,19 +120,21 @@ namespace TNodeCore.RuntimeCache{
             if(!CachedDelegatesForGettingValue.ContainsKey(type)){
                 CachedDelegatesForGettingValue.Add(type, new Dictionary<string, GetValueDelegate>());
                 CachedDelegatesForSettingValue.Add(type,new Dictionary<string, SetValueDelegate>());
+      
+                
                 var properties = type.GetProperties();
                 foreach(var property in properties){
                     //if the property only has a setter ,skip 
                   
-                    if(property.SetMethod != null){
-                        var setValueDelegate = SetValueDelegateForProperty(property);
-                        CachedDelegatesForSettingValue[type].Add(property.Name,setValueDelegate);
-                    }
-                    if(property.GetMethod != null){
-                        var getValueDelegate = GetValueDelegateForProperty(property);
-                        CachedDelegatesForGettingValue[type].Add(property.Name,getValueDelegate);
-                    }
-        
+                    // if(property.GetSetMethod(false) != null){
+                    //     var setValueDelegate = SetValueDelegateForProperty(property);
+                    //     CachedDelegatesForSettingPropertyValue[type].Add(property.Name,setValueDelegate);
+                    // }
+                    // if(property.GetMethod != null){
+                    //     var getValueDelegate = GetValueDelegateForProperty(property);
+                    //     CachedDelegatesForGettingPropertyValue[type].Add(property.Name,getValueDelegate);
+                    // }
+                
                     
                  
                 }
@@ -142,17 +153,21 @@ namespace TNodeCore.RuntimeCache{
             }
         }
         private GetValueDelegate GetValueDelegateForField(FieldInfo field){
+       
             return field.GetValue;
         }
         private SetValueDelegate SetValueDelegateForField(FieldInfo field){
+            
             return field.SetValue;
         }
-        private GetValueDelegate GetValueDelegateForProperty(PropertyInfo property){
-            var getValueDelegate = (GetValueDelegate)Delegate.CreateDelegate(typeof(GetValueDelegate), property.GetGetMethod());
+        private GetPropertyValueDelegate GetValueDelegateForProperty(PropertyInfo property){
+            var getValueDelegate = (GetPropertyValueDelegate)Delegate.CreateDelegate(typeof(GetPropertyValueDelegate), property.GetGetMethod());
             return getValueDelegate;
         }
-        private SetValueDelegate SetValueDelegateForProperty(PropertyInfo property){
-            var setValueDelegate = (SetValueDelegate)Delegate.CreateDelegate(typeof(SetValueDelegate), property.GetSetMethod());
+        private SetPropertyValueDelegate SetValueDelegateForProperty(PropertyInfo property){
+            Debug.Log(property.GetSetMethod());
+      
+            var setValueDelegate = (SetPropertyValueDelegate)Delegate.CreateDelegate(typeof(SetPropertyValueDelegate), property.GetSetMethod());
             return setValueDelegate;
         }
         
@@ -177,12 +192,46 @@ namespace TNodeCore.RuntimeCache{
             var method = RuntimeCache.Instance.CachedDelegatesForSettingValue[type??data.GetType()][path];
             method.Invoke(data,value);
         }
+
         public static RuntimeCache.GetValueDelegate GetValueDelegate(this  IModel blackboardData,string path){
             var method = RuntimeCache.Instance.CachedDelegatesForGettingValue[blackboardData.GetType()][path];
             return method;
         }
+        /// <summary>
+        /// it generate a delegate that can get the value fast,but it won't cache in runtime cache system,you should put it in somewhere you need
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        /// <exception cref="PropertyNotFoundException"></exception>
+        public static RuntimeCache.GetPropertyValueDelegate CacheGetProperty(this IModel data,string path){
+            var type = data.GetType();
+            var property = type.GetProperty(path);
+            if (property == null) throw new PropertyNotFoundException(path);
+            var instance = Delegate.CreateDelegate(typeof(RuntimeCache.GetPropertyValueDelegate), data,
+                property.GetGetMethod());
+            return instance as RuntimeCache.GetPropertyValueDelegate;
+        }
+        /// <summary>
+        /// it generate a delegate that can get the value fast,but it won't cache in runtime cache system,you should put it in somewhere you need
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        /// <exception cref="PropertyNotFoundException"></exception>
+        public static RuntimeCache.SetPropertyValueDelegate CacheSetProperty(this IModel data,string path){
+            var type = data.GetType();
+            var property = type.GetProperty(path);
+            if (property == null) throw new PropertyNotFoundException(path);
+            var instance = Delegate.CreateDelegate(typeof(RuntimeCache.SetPropertyValueDelegate), data,
+                property.GetSetMethod());
+            return instance as RuntimeCache.SetPropertyValueDelegate;
+        }
+    }
 
-        
-        
+    public class PropertyNotFoundException : Exception{
+        public PropertyNotFoundException(string path):base("Property not found :"+path){
+            
+        }
     }
 }

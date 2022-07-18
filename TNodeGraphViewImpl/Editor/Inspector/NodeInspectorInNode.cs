@@ -1,7 +1,9 @@
 ﻿using System.Reflection;
 using TNodeCore.Attribute;
+using TNodeCore.Editor.NodeGraphView;
 using TNodeCore.Editor.Serialization;
 using TNodeCore.Models;
+using TNodeGraphViewImpl.Editor.NodeViews;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -36,9 +38,7 @@ namespace TNode.Editor.Inspector{
             RefreshPropertyDrawer();
         }
 
-        private void CreateTestButton(){
-            
-        }
+  
         private void RefreshPropertyDrawer(){
             //Check if the data's type is a generic type of  BlackboardDragNodeData<>
             if (_data.GetType().IsSubclassOf(typeof(BlackboardDragNodeData))){
@@ -57,16 +57,33 @@ namespace TNode.Editor.Inspector{
 
      
             }
-            if (_data.isTest){
+            var globalTest = GetFirstAncestorOfType<IBaseNodeView>()?.BaseDataGraphView?.TestMode;
+            if(globalTest??false){
+                CreateTestButton();
+            }
+            else if (_data.isTest){
                 //Add a test button for the node
-                var testButton = new Button(()=>{
-                    Debug.Log("Test button clicked");
-                });
-                testButton.text = "Test";
-                _data.OnTest();
-                Add(testButton);
+                CreateTestButton();
             }
         }
-        
+
+        private void CreateTestButton(){
+            var testButton = new Button(() => {
+                var test = GetFirstAncestorOfType<IBaseDataGraphView>();
+                if (test != null){
+                    if(!test.IsRuntimeGraph) return;
+                    var runtimeGraph = test.GetRuntimeGraph();
+                    if (runtimeGraph != null){
+                        runtimeGraph.ResolveDependency(_data);
+                    }
+                    _data.OnTest();
+                }
+            }){
+                text = "Test"
+            };
+
+            Add(testButton);
+     
+        }
     }
 }
