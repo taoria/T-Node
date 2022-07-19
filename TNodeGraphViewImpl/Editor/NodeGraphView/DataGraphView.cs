@@ -16,9 +16,7 @@ using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
-
-
-
+using BlackboardField = TNodeGraphViewImpl.Editor.GraphBlackboard.BlackboardField;
 using Edge = UnityEditor.Experimental.GraphView.Edge;
 
 namespace TNodeGraphViewImpl.Editor.NodeGraphView{
@@ -216,12 +214,12 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
         private void OnDragPerform(DragPerformEvent evt){
         
             if (DragAndDrop.GetGenericData("DragSelection") is List<ISelectable>{Count: > 0} data){
-                var blackboardFields = data.OfType<BlackboardPropertyField >();
+                var blackboardFields = data.OfType<BlackboardField >();
                 foreach (var selectable in blackboardFields){
                     if(selectable is { } field) {
                         //Make a constructor of  BlackboardDragNodeData<field.PropertyType > by reflection
                         var dragNodeData = NodeCreator.InstantiateNodeData<BlackboardDragNodeData>();
-                        dragNodeData.blackboardData = GetBlackboardData();
+                        dragNodeData.BlackboardData = GetBlackboardData();
                         dragNodeData.blackDragData = field.BlackboardProperty.PropertyName;
                         AddTNode(dragNodeData,new Rect(evt.mousePosition,new Vector2(200,200)));
                     }
@@ -231,17 +229,11 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
         }
 
         private void OnDragUpdated(DragUpdatedEvent evt){
-            
             //check if the drag data is BlackboardField
-
             if (DragAndDrop.GetGenericData("DragSelection") is List<ISelectable>{Count: > 0} data){
                 DragAndDrop.visualMode = DragAndDropVisualMode.Move;
-     
             }
-            
-
         }
-
         #endregion
 
 
@@ -263,10 +255,12 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
                 //Get the node type
                 var nodeType = dataNode.GetType();
                 //Get the derived type of NodeAttribute View from the node type
-           
+                if (dataNode is RuntimeNodeData runtimeNodeData){
+                    runtimeNodeData.BlackboardData = GetBlackboardData();
+                }
                 var nodePos = Owner.graphEditorData.graphElementsData.
                     FirstOrDefault(x => x.guid == dataNode.id)?.pos??new Rect(0,0,200,200);
-                
+      
                 AddTNode(dataNode,nodePos);
             }
 

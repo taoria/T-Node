@@ -15,7 +15,7 @@ namespace TNodeCore.Runtime{
         public List<NodeLink> OutputLink = new List<NodeLink>();
         //Cache node data type for fast access
         private readonly Type _type;
-
+        public Type NodeType => _type;
 
         public void SetInput(string portName,object value){
             _portAccessors[portName].SetValue(this.NodeData,value);

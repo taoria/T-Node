@@ -1,9 +1,9 @@
 ﻿using UnityEditor.Experimental.GraphView;
 
 namespace TNodeGraphViewImpl.Editor.GraphBlackboard{
-    public class BlackboardPropertyField:BlackboardField{
+    public class BlackboardField:UnityEditor.Experimental.GraphView.BlackboardField{
          public BlackboardProperty.BlackboardProperty BlackboardProperty;
-         public BlackboardPropertyField(BlackboardProperty.BlackboardProperty blackboardProperty):base(null,blackboardProperty.PropertyName,null){
+         public BlackboardField(BlackboardProperty.BlackboardProperty blackboardProperty):base(null,blackboardProperty.PropertyName,null){
                 BlackboardProperty = blackboardProperty;
          }
          

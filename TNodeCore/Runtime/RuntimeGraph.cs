@@ -16,6 +16,9 @@ namespace TNodeCore.Runtime{
             [NonSerialized]
             public readonly List<RuntimeNode> TopologicalOrder = new List<RuntimeNode>();
             public readonly List<RuntimeNode> EntryNodes = new List<RuntimeNode>();
+            /// <summary>
+            /// elements are read only ,do not modify them
+            /// </summary>
             public readonly Dictionary<string, RuntimeNode> RuntimeNodes;
             public void DependencyTraversal(RuntimeNode runtimeNode){
                 var links = runtimeNode.InputLink;
@@ -26,7 +29,7 @@ namespace TNodeCore.Runtime{
                 }
                 runtimeNode.NodeData.Process();
             }
-
+            
             public void HandlingLink(NodeLink nodeLink){
                 var inNode = RuntimeNodes[nodeLink.inPort.nodeDataId];
                 var outNode = RuntimeNodes[nodeLink.outPort.nodeDataId];
@@ -124,6 +127,12 @@ namespace TNodeCore.Runtime{
             }
             RuntimeNodes[inNode.id].InputLink.Add(linkData);
             
+        }
+        public List<RuntimeNode> GetRuntimeNodesOfType<T>(){
+            return RuntimeNodes.Values.Where(x => x.NodeType == typeof(T)).ToList();
+        }
+        public  List<RuntimeNode> GetRuntimeNodesOfType(Type type){
+            return RuntimeNodes.Values.Where(x => x.NodeType == type).ToList();
         }
         private void ModifyOrCreateOutNode(NodeLink linkData){
             var outNodeId = linkData.outPort.nodeDataId;

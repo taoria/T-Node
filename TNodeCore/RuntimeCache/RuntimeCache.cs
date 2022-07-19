@@ -80,10 +80,7 @@ namespace TNodeCore.RuntimeCache{
                     }
                 }
             }
-            
-            
         }
-
         private void AddTypeToCache(Type type,System.Attribute attribute){
             //Check if the type is a blackboard data type
             if(typeof(BlackboardData).IsAssignableFrom(type)){
