@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using TNode.Editor.Inspector;
 using TNode.Editor.Search;
 using TNodeCore.Editor.Blackboard;
@@ -12,6 +13,7 @@ using TNodeCore.Runtime;
 using TNodeGraphViewImpl.Editor.Cache;
 using TNodeGraphViewImpl.Editor.GraphBlackboard;
 using TNodeGraphViewImpl.Editor.NodeViews;
+using TNodeGraphViewImpl.Editor.Search;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
@@ -397,10 +399,20 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
                 _data.blackboardData = NodeEditorExtensions.GetAppropriateBlackboardData(_data.GetType());
             }
         }
-
-
+        //TODO:Handling implicit conversion when two port types are different but compatible
+        private static bool HasImplicitConversion(Type baseType, Type targetType)
+        {
+            return baseType.GetMethods(BindingFlags.Public | BindingFlags.Static)
+                .Where(mi => mi.Name == "op_Implicit" && mi.ReturnType == targetType)
+                .Any(mi => {
+                    ParameterInfo pi = mi.GetParameters().FirstOrDefault();
+                    return pi != null && pi.ParameterType == baseType;
+                });
+        }
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter){
-            return ports.Where(x => x.portType == startPort.portType || x.portType.IsAssignableFrom(startPort.portType)).ToList();
+            
+            return  ports.Where(x => startPort!=x &&  (x.portType == startPort.portType || x.portType.IsAssignableFrom(startPort.portType))).ToList();
+        
         }
 
         public virtual void OnGraphViewCreate(){
