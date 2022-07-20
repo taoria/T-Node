@@ -5,6 +5,7 @@ using System.Reflection;
 using PlasticPipe.PlasticProtocol.Messages;
 using TNodeCore.Attribute;
 using TNodeCore.Models;
+using TNodeCore.Runtime.Interfaces;
 using UnityEngine;
 
 namespace TNodeCore.RuntimeCache{
@@ -32,6 +33,22 @@ namespace TNodeCore.RuntimeCache{
             Set((T1)model,(T2)value);
         }
     }
+
+    internal class PortConverterHelper<T1,T2> : IPortConverterHelper{
+        private readonly IPortTypeConversion<T1, T2> _converter;
+        public PortConverterHelper(Type type){
+            _converter = Activator.CreateInstance(type) as IPortTypeConversion<T1, T2>;
+        }
+        public object Convert(object value){
+            return _converter.Convert((T1)value);
+        }
+        
+    }
+
+    internal interface IPortConverterHelper{
+        public object Convert(object value);
+    }
+
     public class PropertyNotFoundException : Exception{
         public PropertyNotFoundException(string path):base("Property not found :"+path){
             
@@ -55,7 +72,12 @@ namespace TNodeCore.RuntimeCache{
             new ();
         public readonly Dictionary<Type,Dictionary<string,IModelPropertyAccessor>> CachedPropertyAccessors =
             new ();
-
+        /// <summary>
+        /// TODO: Converters now work globally, but it should be possible to specify a converter for a specific graph.but it will be too nested.so in current implementation, we will use a global converter.
+        /// </summary>
+        private readonly Dictionary<Type,Dictionary<Type,IPortConverterHelper>> CachedPortConverters =
+            new ();
+        
 
         private readonly Dictionary<Type, Type> _graphBlackboardDictionary = new Dictionary<Type, Type>();
 
@@ -75,8 +97,8 @@ namespace TNodeCore.RuntimeCache{
                         AddTypeToCache(type,attribute as GraphUsageAttribute);
                     }
 
-                    if (attribute is InternalModel){
-                        AddTypeToCache(type,attribute as InternalModel);
+                    if (attribute is InternalUsageAttribute usageAttribute){
+                        AddTypeToCache(type,usageAttribute);
                     }
                 }
             }
@@ -93,9 +115,53 @@ namespace TNodeCore.RuntimeCache{
                 //if it is, add it to the cache
                 CacheRuntimeNodeData(type);
             }
-            
+            //Check if the type is implementing IPortTypeConversion<T1,T2>
+            if(typeof(IPortTypeConversion<,>).IsAssignableFrom(type)){
+                //if it is, add it to the cache
+                CacheRuntimePortTypeConversion(type);
+            }
+        }
+
+        private void CacheRuntimePortTypeConversion(Type type){
+            if (type.IsGenericType == false){
+                return;
+            }
+            var genericType = type.GetGenericTypeDefinition();
+            if (genericType != typeof(IPortTypeConversion<,>)){
+                return;
+            }
+            var type1 = type.GetGenericArguments()[0];
+            var type2 = type.GetGenericArguments()[1];
+
+            var specificType = typeof(PortConverterHelper<,>).MakeGenericType(type1, type2);
+            var instance = Activator.CreateInstance(specificType, type) as IPortConverterHelper;
+            if (instance == null){
+                return;
+            }
+            if (!CachedPortConverters.ContainsKey(type1)){
+                CachedPortConverters.Add(type1,new Dictionary<Type,IPortConverterHelper>());
+            }
+            CachedPortConverters[type1].Add(type2,instance);
         }
         
+        public object GetConvertedValue(Type from,Type to,object value){
+            if(!CachedPortConverters.ContainsKey(from)){
+                throw new ConversionFailedException("No converter found for type "+from);
+                return value;
+            }
+            if(!CachedPortConverters[from].ContainsKey(to)){
+                return value;
+            }
+            return CachedPortConverters[from][to].Convert(value);
+        }
+        public List<Type> GetSupportedTypes(Type type){
+            if(!CachedPortConverters.ContainsKey(type)){
+                return null;
+            }
+            return CachedPortConverters[type].Keys.ToList();
+        }
+
+
         private void AddBlackboardDataTypeToCache(Type type,GraphUsageAttribute attribute){
             var graphData = attribute.GraphDataType;
             _graphBlackboardDictionary.Add(graphData,type);
@@ -121,18 +187,6 @@ namespace TNodeCore.RuntimeCache{
             if(!CachedDelegatesForGettingValue.ContainsKey(type)){
                 CachedDelegatesForGettingValue.Add(type, new Dictionary<string, GetValueDelegate>());
                 CachedDelegatesForSettingValue.Add(type,new Dictionary<string, SetValueDelegate>());
-              
-                // var properties = type.GetProperties();
-                // foreach(var property in properties){
-                //     //if the property only has a setter ,skip 
-                //
-                //     var getValueDelegate = GetValueDelegateForProperty(property);
-                //     CachedDelegatesForGettingValue[type].Add(property.Name,getValueDelegate);
-                //     
-                //     var setValueDelegate = SetValueDelegateForProperty(property);
-                //     CachedDelegatesForSettingValue[type].Add(property.Name,setValueDelegate);
-                // }
-                //register the fields
                 var fields = type.GetFields();
                 foreach(var field in fields){
                     var getValueDelegate = GetValueDelegateForField(field);
@@ -184,7 +238,15 @@ namespace TNodeCore.RuntimeCache{
             
             return field.SetValue;
         }
+        
   
+    }
+
+    public class ConversionFailedException : Exception{
+        public ConversionFailedException(string noConverterFoundForType):base(noConverterFoundForType){
+            
+        
+        }
     }
 
     public static class RuntimeExtension{
@@ -208,4 +270,5 @@ namespace TNodeCore.RuntimeCache{
             method.Invoke(data,value);
         }
     }
+
 }

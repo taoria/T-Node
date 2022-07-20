@@ -10,6 +10,7 @@ using TNodeCore.Editor.NodeGraphView;
 using TNodeCore.Editor.Tools.NodeCreator;
 using TNodeCore.Models;
 using TNodeCore.Runtime;
+using TNodeCore.RuntimeCache;
 using TNodeGraphViewImpl.Editor.Cache;
 using TNodeGraphViewImpl.Editor.GraphBlackboard;
 using TNodeGraphViewImpl.Editor.NodeViews;
@@ -411,7 +412,10 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
         }
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter){
             
-            return  ports.Where(x => startPort!=x &&  (x.portType == startPort.portType || x.portType.IsAssignableFrom(startPort.portType))).ToList();
+            return  ports.Where(x => startPort!=x &&  
+                                     (x.portType == startPort.portType ||
+                                      x.portType.IsAssignableFrom(startPort.portType) || 
+                                      RuntimeCache.Instance.GetSupportedTypes(startPort.portType).Contains(x.portType))).ToList();
         
         }
 
