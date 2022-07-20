@@ -16,15 +16,14 @@ namespace TNodeCore.Attribute{
     public class GraphUsageAttribute:System.Attribute{
         public readonly Type GraphDataType;
         public string Category;
-        public GraphUsageAttribute(Type t,string category = null){
+        public GraphUsageAttribute(Type t,string category = "default"){
             //check if the type t is graph
             if(!typeof(GraphData).IsAssignableFrom(t)){
                 throw new Exception("The type used on Graph Usage must be a graph");
             }
             GraphDataType = t;
-            if (category != null){
-                Category = category;
-            }
+            Category = category;
+           
         }
     }
 

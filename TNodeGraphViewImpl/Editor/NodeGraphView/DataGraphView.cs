@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using TNode.Editor.Inspector;
 using TNode.Editor.Search;
 using TNodeCore.Editor.Blackboard;
@@ -12,13 +13,12 @@ using TNodeCore.Runtime;
 using TNodeGraphViewImpl.Editor.Cache;
 using TNodeGraphViewImpl.Editor.GraphBlackboard;
 using TNodeGraphViewImpl.Editor.NodeViews;
+using TNodeGraphViewImpl.Editor.Search;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
-
-
-
+using BlackboardField = TNodeGraphViewImpl.Editor.GraphBlackboard.BlackboardField;
 using Edge = UnityEditor.Experimental.GraphView.Edge;
 
 namespace TNodeGraphViewImpl.Editor.NodeGraphView{
@@ -216,12 +216,12 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
         private void OnDragPerform(DragPerformEvent evt){
         
             if (DragAndDrop.GetGenericData("DragSelection") is List<ISelectable>{Count: > 0} data){
-                var blackboardFields = data.OfType<BlackboardPropertyField >();
+                var blackboardFields = data.OfType<BlackboardField >();
                 foreach (var selectable in blackboardFields){
                     if(selectable is { } field) {
                         //Make a constructor of  BlackboardDragNodeData<field.PropertyType > by reflection
                         var dragNodeData = NodeCreator.InstantiateNodeData<BlackboardDragNodeData>();
-                        dragNodeData.blackboardData = GetBlackboardData();
+                        dragNodeData.BlackboardData = GetBlackboardData();
                         dragNodeData.blackDragData = field.BlackboardProperty.PropertyName;
                         AddTNode(dragNodeData,new Rect(evt.mousePosition,new Vector2(200,200)));
                     }
@@ -231,17 +231,11 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
         }
 
         private void OnDragUpdated(DragUpdatedEvent evt){
-            
             //check if the drag data is BlackboardField
-
             if (DragAndDrop.GetGenericData("DragSelection") is List<ISelectable>{Count: > 0} data){
                 DragAndDrop.visualMode = DragAndDropVisualMode.Move;
-     
             }
-            
-
         }
-
         #endregion
 
 
@@ -263,10 +257,12 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
                 //Get the node type
                 var nodeType = dataNode.GetType();
                 //Get the derived type of NodeAttribute View from the node type
-           
+                if (dataNode is RuntimeNodeData runtimeNodeData){
+                    runtimeNodeData.BlackboardData = GetBlackboardData();
+                }
                 var nodePos = Owner.graphEditorData.graphElementsData.
                     FirstOrDefault(x => x.guid == dataNode.id)?.pos??new Rect(0,0,200,200);
-                
+      
                 AddTNode(dataNode,nodePos);
             }
 
@@ -403,10 +399,20 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
                 _data.blackboardData = NodeEditorExtensions.GetAppropriateBlackboardData(_data.GetType());
             }
         }
-
-
+        //TODO:Handling implicit conversion when two port types are different but compatible
+        private static bool HasImplicitConversion(Type baseType, Type targetType)
+        {
+            return baseType.GetMethods(BindingFlags.Public | BindingFlags.Static)
+                .Where(mi => mi.Name == "op_Implicit" && mi.ReturnType == targetType)
+                .Any(mi => {
+                    ParameterInfo pi = mi.GetParameters().FirstOrDefault();
+                    return pi != null && pi.ParameterType == baseType;
+                });
+        }
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter){
-            return ports.Where(x => x.portType == startPort.portType || x.portType.IsAssignableFrom(startPort.portType)).ToList();
+            
+            return  ports.Where(x => startPort!=x &&  (x.portType == startPort.portType || x.portType.IsAssignableFrom(startPort.portType))).ToList();
+        
         }
 
         public virtual void OnGraphViewCreate(){

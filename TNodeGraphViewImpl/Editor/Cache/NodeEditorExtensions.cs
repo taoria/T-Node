@@ -18,8 +18,7 @@ namespace TNodeGraphViewImpl.Editor.Cache{
     /// Internal singleton class for caching TNode reflection Data.
     /// </summary>
     internal class NodeEditorTypeDictionary:Dictionary<Type, Type>{
-        private class NodeEditorTypeDictionaryComparer : IEqualityComparer<Type>
-        {
+        private class NodeEditorTypeDictionaryComparer : IEqualityComparer<Type>{
             public bool Equals(Type x, Type y){
                 return x?.ToString() == y?.ToString();
             }
@@ -28,11 +27,9 @@ namespace TNodeGraphViewImpl.Editor.Cache{
                 return obj.ToString().GetHashCode();
             }
         }
-
         public NodeEditorTypeDictionary():base(new NodeEditorTypeDictionaryComparer()){
             
         }
-
     }
     
     internal class NodeEditorSingleton{
@@ -132,6 +129,10 @@ namespace TNodeGraphViewImpl.Editor.Cache{
             var instance = (T)Activator.CreateInstance(implementedType);
             return instance;
         }
+        public static string GetTypeCategory(Type type){
+            var category = type.GetCustomAttribute<GraphUsageAttribute>();
+            return category?.Category ?? "";
+        }
         
         /// <summary>
         /// by given a generic type t,return the implementation instance  of the generic type
@@ -189,6 +190,13 @@ namespace TNodeGraphViewImpl.Editor.Cache{
                 return NodeEditorSingleton.Instance.GraphDataUsage[t];
             }
             return new List<Type>();
+        }
+
+        public static List<string> GetGraphCategories(Type t){
+            var list = NodeEditorSingleton.Instance.GraphDataUsage[t];
+            //Merge same category
+            var res = list.Select(x=>x.GetCustomAttribute<GraphUsageAttribute>().Category).Distinct().ToList();
+            return res;
         }
         public static BlackboardData GetAppropriateBlackboardData(Type t){
             if (NodeEditorSingleton.Instance.GraphBlackboard.ContainsKey(t)){

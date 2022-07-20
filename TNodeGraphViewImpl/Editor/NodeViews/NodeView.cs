@@ -59,10 +59,7 @@ namespace TNodeGraphViewImpl.Editor.NodeViews{
             this.title = _data.nodeName;
             if (_nodeInspectorInNode != null){
                 _nodeInspectorInNode.Data = obj;
-                
-                
             }
-
             BuildInputAndOutputPort();
             this.expanded = true;
             this.RefreshExpandedState();

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace TNodeCore{
@@ -34,6 +35,7 @@ namespace TNodeCore{
             var fieldInfo = data.GetType().GetField(path);
             return fieldInfo.GetValue(data);
         }
+        
         public virtual TData GetData(){
             return data;
         }
