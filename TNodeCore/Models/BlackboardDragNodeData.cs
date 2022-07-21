@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace TNodeCore.Models{
     [Serializable]
-    [InternalModel]
+    [InternalUsage]
     public class BlackboardDragNodeData:RuntimeNodeData{
         public string blackDragData;
       
