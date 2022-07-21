@@ -1,0 +1,10 @@
+﻿#node-border{
+    
+    /*border-radius: 16px;*/
+    /*border-color: #000;*/
+    /*border-width: 1px;*/
+}
+Image{
+    max-height: 16;
+    max-width: 16;
+}

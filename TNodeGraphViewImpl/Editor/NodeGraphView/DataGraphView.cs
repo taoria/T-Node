@@ -235,6 +235,7 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
             //check if the drag data is BlackboardField
             if (DragAndDrop.GetGenericData("DragSelection") is List<ISelectable>{Count: > 0} data){
                 DragAndDrop.visualMode = DragAndDropVisualMode.Move;
+                //high light the 
             }
         }
         #endregion
@@ -411,12 +412,19 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
                 });
         }
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter){
-            
-            return  ports.Where(x => startPort!=x &&  
-                                     (x.portType == startPort.portType ||
-                                      x.portType.IsAssignableFrom(startPort.portType) || 
-                                      RuntimeCache.Instance.GetSupportedTypes(startPort.portType).Contains(x.portType))).ToList();
-        
+            var supportedTypes = RuntimeCache.Instance.GetSupportedTypes(startPort.portType);
+
+            var compatiblePorts = ports.Where(x => startPort != x &&
+                                        (x.portType == startPort.portType ||
+                                         x.portType.IsAssignableFrom(startPort.portType)
+                                        )).ToList();
+            if (supportedTypes != null){
+                compatiblePorts.AddRange(ports.Where(x => supportedTypes.Contains(x.portType)).ToList());
+            }
+
+            return compatiblePorts;
+
+
         }
 
         public virtual void OnGraphViewCreate(){

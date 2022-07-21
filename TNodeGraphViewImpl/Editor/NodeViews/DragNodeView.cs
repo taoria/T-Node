@@ -25,16 +25,29 @@ namespace TNode.Editor.NodeViews{
             BlackboardDataWrapper blackboardWrapper = (BlackboardDataWrapper)blackboard;
             var serializedData = new SerializedObject(blackboardWrapper);
             var serializedProperty = serializedData.FindProperty("data").FindPropertyRelative(obj.blackDragData);
-            PropertyField field = new PropertyField(serializedProperty,"");
-            field.Bind(serializedData);
-            label.parent.parent.style.flexDirection = FlexDirection.RowReverse;
-            label.parent.parent.Add(field);
-            label.parent.parent.style.alignItems = Align.Center;
-            label.parent.parent.style.justifyContent = Justify.Center;
-            label.parent.parent.style.paddingTop = 0;
-            label.parent.parent.style.paddingBottom = 0;
-            label.RemoveFromHierarchy();
             
+            //
+            // field.Bind(serializedData);
+            // var p = label.parent.parent.parent;
+            // p.Add(field);
+            // field.SendToBack();
+            // field.SetEnabled(false);
+            // p.style.alignItems = Align.Center;
+            // p.style.justifyContent = Justify.Center;
+            // p.style.paddingTop = 0;
+            // p.style.paddingBottom = 0;
+            label.text = obj.blackDragData;
+            //Get serialized property's icon
+            var icon = AssetPreview.GetMiniThumbnail(serializedProperty.objectReferenceValue);
+         
+            label.parent.Add(new Image(){
+                image = icon
+            });
+            //more round style for entire element
+            style.borderBottomLeftRadius = style.borderBottomRightRadius =
+                style.borderTopLeftRadius = style.borderTopRightRadius = 25;
+            styleSheets.Add(Resources.Load<StyleSheet>("DragNodeStyle"));
+            this.name = "DragNodeView";
         }
     }
 }
