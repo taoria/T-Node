@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using TNode.Editor;
-using TNode.Editor.NodeViews;
 using TNodeCore.Attribute;
 using TNodeCore.Editor.Blackboard;
+using TNodeCore.Editor.EditorPersistence;
+using TNodeCore.Editor.NodeGraphView;
 using TNodeCore.Models;
 using TNodeGraphViewImpl.Editor.GraphBlackboard;
 using TNodeGraphViewImpl.Editor.NodeGraphView;
 using TNodeGraphViewImpl.Editor.NodeViews;
-using UnityEditor.Experimental.GraphView;
+using UnityEditor;
 using UnityEngine;
 
 namespace TNodeGraphViewImpl.Editor.Cache{
@@ -42,6 +43,25 @@ namespace TNodeGraphViewImpl.Editor.Cache{
         }
 
         private static readonly string[] ExcludedAssemblies = new string[]{"Microsoft", "UnityEngine","UnityEditor","mscorlib","System"};
+        public static T CreateViewComponentFromBaseType<T>(){
+            var implementedType = NodeEditorSingleton.Instance.FromGenericToSpecific[typeof(T)];
+            var instance = (T)Activator.CreateInstance(implementedType);
+            return instance;
+        }
+        public static object CreateViewComponentFromBaseType(Type t){
+            if (NodeEditorSingleton.Instance.FromGenericToSpecific.ContainsKey(t)){
+                var implementedType = NodeEditorSingleton.Instance.FromGenericToSpecific[t];
+                var instance = Activator.CreateInstance(implementedType);
+                return instance;
+            }
+            
+            //check if t is a generic type node view
+            if (t is{IsGenericType: true} && t.GetGenericTypeDefinition() == typeof(BaseNodeView<>)){
+                var instance = Activator.CreateInstance(typeof(BaseNodeView<NodeData>));
+                return instance;
+            }
+            return null;
+        }
 
         private NodeEditorSingleton(){
             //exclude  unity ,system ,and microsoft types
@@ -60,9 +80,14 @@ namespace TNodeGraphViewImpl.Editor.Cache{
                     }
                 }
             }
+            GraphEditorData.GraphViewImplCreator+=GraphViewImplCreator;
         }
-        
 
+        private IBaseDataGraphView GraphViewImplCreator(Type arg){
+            var genericType = typeof(BaseDataGraphView<>).MakeGenericType(arg);
+            var instance = CreateViewComponentFromBaseType(genericType) as IBaseDataGraphView;
+            return instance;
+        }
         private void SetGraphUsageAttribute(Type type){
             foreach (var attribute in type.GetCustomAttributes(typeof(GraphUsageAttribute), true)){
                 var parent = type.BaseType;
@@ -116,6 +141,11 @@ namespace TNodeGraphViewImpl.Editor.Cache{
                 //TODO Note that a node component only applied to a specific type of editor,so ,same GraphView could behave differently in different editor.it's a todo feature.
             }
         }
+
+        public void Initialize(){
+            //Do nothing  indeed
+            Debug.Log("Hello");
+        }
     }
     //Outer wrapper for the singleton class
     public static class NodeEditorExtensions{
@@ -124,11 +154,7 @@ namespace TNodeGraphViewImpl.Editor.Cache{
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static T CreateViewComponentFromBaseType<T>(){
-            var implementedType = NodeEditorSingleton.Instance.FromGenericToSpecific[typeof(T)];
-            var instance = (T)Activator.CreateInstance(implementedType);
-            return instance;
-        }
+
         public static string GetTypeCategory(Type type){
             var category = type.GetCustomAttribute<GraphUsageAttribute>();
             return category?.Category ?? "";
@@ -138,26 +164,11 @@ namespace TNodeGraphViewImpl.Editor.Cache{
         /// by given a generic type t,return the implementation instance  of the generic type
         /// </summary>
         /// <returns></returns>
-        public static object CreateViewComponentFromBaseType(Type t){
-            if (NodeEditorSingleton.Instance.FromGenericToSpecific.ContainsKey(t)){
-                var implementedType = NodeEditorSingleton.Instance.FromGenericToSpecific[t];
-                var instance = Activator.CreateInstance(implementedType);
-                return instance;
-            }
-            
-            //check if t is a generic type node view
-            if (t is{IsGenericType: true} && t.GetGenericTypeDefinition() == typeof(BaseNodeView<>)){
-                var instance = Activator.CreateInstance(typeof(BaseNodeView<NodeData>));
-                return instance;
-            }
-            return null;
-        }
-        
+
         public static IBlackboardView CreateBlackboardDataFromBlackboardDataType(Type t){
             var type = typeof(GraphBlackboardView<>).MakeGenericType(t);
-            var res = CreateViewComponentFromBaseType(type) as IBlackboardView;
+            var res = NodeEditorSingleton.CreateViewComponentFromBaseType(type) as IBlackboardView;
             return res ?? new DefaultGraphBlackboardView();
-
         }
 
         public static IBlackboardView CreateBlackboardWithGraphData(GraphData graphData){
@@ -246,6 +257,12 @@ namespace TNodeGraphViewImpl.Editor.Cache{
                 return new DefaultBaseNodeView();
             }
             
+        }
+    }
+    [InitializeOnLoad]
+    public class Launcher{
+        static Launcher(){
+            NodeEditorSingleton.Instance.Initialize();
         }
     }
 }

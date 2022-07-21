@@ -147,7 +147,6 @@ namespace TNodeCore.RuntimeCache{
         public object GetConvertedValue(Type from,Type to,object value){
             if(!CachedPortConverters.ContainsKey(from)){
                 throw new ConversionFailedException("No converter found for type "+from);
-                return value;
             }
             if(!CachedPortConverters[from].ContainsKey(to)){
                 return value;

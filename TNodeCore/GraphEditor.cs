@@ -1,16 +1,13 @@
-using System;
 using TNodeCore.Editor;
 using TNodeCore.Editor.EditorPersistence;
 using TNodeCore.Editor.NodeGraphView;
 using TNodeCore.Models;
-using TNodeGraphViewImpl.Editor.Cache;
-using TNodeGraphViewImpl.Editor.NodeGraphView;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 
-namespace TNodeGraphViewImpl.Editor{
+namespace TNodeEditor.Editor{
     
     // public class SelectGraphWindow : EditorWindow{
     //     public EditorWindow parent;
@@ -48,7 +45,7 @@ namespace TNodeGraphViewImpl.Editor{
     //     }
     // }
     public abstract class GraphEditor<T> : EditorWindow,IGraphEditor where T:GraphData{ 
-        protected BaseDataGraphView<T> GraphView;
+        protected IDataGraphView<T> GraphView;
         [SerializeField]
         private VisualTreeAsset mVisualTreeAsset = default;
         //Persist editor data ,such as node position,node size ,etc ,in this script object
@@ -84,9 +81,9 @@ namespace TNodeGraphViewImpl.Editor{
             GraphView.IsRuntimeGraph = false;
         }
         private void BuildGraphView(){
-            GraphView = NodeEditorExtensions.CreateViewComponentFromBaseType<BaseDataGraphView<T>>();
-            rootVisualElement.Add(GraphView);
-            GraphView.StretchToParentSize();
+            GraphView = graphEditorData.GetGraphView<T>();
+            rootVisualElement.Add((VisualElement)GraphView);
+            ((VisualElement)GraphView).StretchToParentSize();
         }
 
         private void DefineGraphEditorActions(){
@@ -126,7 +123,7 @@ namespace TNodeGraphViewImpl.Editor{
         }
 
         public void SetGraphView(IBaseDataGraphView graphView){
-            GraphView = graphView as BaseDataGraphView<T>;
+            GraphView = (IDataGraphView<T>)graphView;
         }
 
         public IBaseDataGraphView GetGraphView(){

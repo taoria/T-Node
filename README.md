@@ -1,10 +1,11 @@
 # T-Node
-Simple wrapper for unity experimental graphview and if possible latter,GTF.
+Node graph creation tool based on unity experimental graphview and if possible latter,GTF.
 the main goal of the repo is to make graph creation easier and more intuitive.
 
 Note **it's not usable and productive on current stage** and need  a better
 development .
 and it's mainly for my own use now.
+
 
 # Install
 
