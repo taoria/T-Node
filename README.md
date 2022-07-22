@@ -32,7 +32,6 @@ currently under development
 No ,It's better not to use TNode at current stage until it's stable.
 
 ### Convention
-Property is 
 
 
 
