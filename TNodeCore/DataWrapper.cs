@@ -30,7 +30,9 @@ namespace TNodeCore{
             fieldInfo.SetValue(data,value);
             OnValueChanged?.Invoke(this);
         }
-
+        public void ForceNotify(){
+            OnValueChanged?.Invoke(this);
+        }
         public object GetValue(string path){
             var fieldInfo = data.GetType().GetField(path);
             return fieldInfo.GetValue(data);

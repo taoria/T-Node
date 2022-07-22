@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using TNode.Editor.Inspector;
 using TNodeCore.Editor.Blackboard;
 using TNodeCore.Editor.EditorPersistence;
@@ -14,6 +15,7 @@ using TNodeEditor.Editor;
 using TNodeGraphViewImpl.Editor.Cache;
 using TNodeGraphViewImpl.Editor.NodeViews;
 using TNodeGraphViewImpl.Editor.Search;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
@@ -32,6 +34,8 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
         private NodeInspector _nodeInspector;
         private Dictionary<string,Node> _nodeDict = new();
         private IBlackboardView _blackboard;
+        private bool _runtimeGraphUpdate;
+
         public T Data{
             get{ return _data; }
             set{
@@ -106,8 +110,7 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
                                    
                                     _runtimeGraph = gameObject.GetComponent<RuntimeGraph>();
                                     IsRuntimeGraph = true;
-                                    
-                                    
+                                    BuildRuntimeGraphBehaviour();
                                     Data = gameObject.GetComponent<RuntimeGraph>().graphData as T;
                                     if(Data==null){
                                         Debug.LogError($"Dragged a wrong graph data to editor,expected {typeof(T)} but got {gameObject.GetComponent<RuntimeGraph>().graphData.GetType()}");
@@ -143,6 +146,27 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
                 }
             };
         }
+
+        private void BuildRuntimeGraphBehaviour(){
+            EditorApplication.update+= UpdateRuntimeGraphBehaviour;
+            
+        }
+        
+        private void UpdateRuntimeGraphBehaviour(){
+            if(_runtimeGraph != null){
+                if (_runtimeGraphUpdate){
+                    _runtimeGraph.ResolveDependency();
+                    _runtimeGraphUpdate = false;
+                    AfterRuntimeGraphUpdate?.Invoke();
+                }
+          
+                
+            }
+            else{
+                EditorApplication.update -= UpdateRuntimeGraphBehaviour;
+            }
+        }
+
         private void CheckDataAfterInit(){
             if(Data == null){
                 WaitingForAGraph();
@@ -520,6 +544,13 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
         public void SetGraphData(GraphData graph){
             Data = graph as T;
         }
+
+        public void NotifyRuntimeUpdate(){
+            
+            _runtimeGraphUpdate = true;
+        }
+
+        public Action AfterRuntimeGraphUpdate{ get; set; }
 
         #endregion
     }

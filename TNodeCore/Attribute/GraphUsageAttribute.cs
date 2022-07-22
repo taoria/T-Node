@@ -1,6 +1,7 @@
 ﻿using System;
 using JetBrains.Annotations;
 using TNodeCore.Models;
+using TNodeCore.Runtime.Interfaces;
 
 namespace TNodeCore.Attribute{
     /// <summary>
@@ -11,8 +12,8 @@ namespace TNodeCore.Attribute{
     /// </example>
     /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
-    [BaseTypeRequired(typeof(IModel))]
     [UsedImplicitly]
+    [MeansImplicitUse]
     public class GraphUsageAttribute:System.Attribute{
         public readonly Type GraphDataType;
         public string Category;

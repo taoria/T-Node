@@ -1,4 +1,5 @@
-﻿using TNodeCore.Models;
+﻿using System;
+using TNodeCore.Models;
 using TNodeCore.Runtime;
 using UnityEngine;
 
@@ -23,6 +24,9 @@ namespace TNodeCore.Editor.NodeGraphView{
         public RuntimeGraph GetRuntimeGraph();
 
         public void SetGraphData(GraphData graph);
-        
+
+        void NotifyRuntimeUpdate();
+
+        public Action AfterRuntimeGraphUpdate{ get; set; }
     }
 }

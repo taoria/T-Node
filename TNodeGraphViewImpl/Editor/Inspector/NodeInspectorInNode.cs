@@ -51,7 +51,12 @@ namespace TNode.Editor.Inspector{
                 var showInNodeViewAttribute = field.GetCustomAttribute<ShowInNodeViewAttribute>() != null;
                 if (!showInNodeViewAttribute)
                     continue;
-                var drawer = new PropertyField(serializedObject.FindProperty("data").FindPropertyRelative(field.Name),field.Name);
+                var drawer = new PropertyField(serializedObject.FindProperty("data").FindPropertyRelative(field.Name));
+                drawer.RegisterValueChangeCallback((evt) => {
+                    serializedObject.Update();
+                    serializedObject.ApplyModifiedProperties();
+                    ((NodeDataWrapper)_data).ForceNotify();
+                });
                 drawer.Bind(serializedObject);
                 Add(drawer);
 

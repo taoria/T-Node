@@ -26,19 +26,10 @@ namespace TNode.Editor.NodeViews{
             var serializedData = new SerializedObject(blackboardWrapper);
             var serializedProperty = serializedData.FindProperty("data").FindPropertyRelative(obj.blackDragData);
             
-            //
-            // field.Bind(serializedData);
-            // var p = label.parent.parent.parent;
-            // p.Add(field);
-            // field.SendToBack();
-            // field.SetEnabled(false);
-            // p.style.alignItems = Align.Center;
-            // p.style.justifyContent = Justify.Center;
-            // p.style.paddingTop = 0;
-            // p.style.paddingBottom = 0;
-            label.text = obj.blackDragData;
+            label.text = ObjectNames.NicifyVariableName(obj.blackDragData);
+     
             //Get serialized property's icon
-            var icon = AssetPreview.GetMiniThumbnail(serializedProperty.objectReferenceValue);
+            var icon = AssetPreview.GetMiniThumbnail(serializedProperty.boxedValue as UnityEngine.Object);
          
             label.parent.Add(new Image(){
                 image = icon

@@ -7,6 +7,7 @@ using TNodeCore.Attribute.Ports;
 using TNodeCore.Editor.NodeGraphView;
 using TNodeCore.Editor.Serialization;
 using TNodeCore.Models;
+using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -38,6 +39,9 @@ namespace TNodeGraphViewImpl.Editor.NodeViews{
 
         private void OnDataValueChanged(DataWrapper<NodeDataWrapper, NodeData> obj){
             Refresh();
+            if (BaseDataGraphView.IsRuntimeGraph){
+                BaseDataGraphView.NotifyRuntimeUpdate();
+            }
         }
         public sealed override string title{
             get => base.title;
@@ -103,7 +107,7 @@ namespace TNodeGraphViewImpl.Editor.NodeViews{
                 if (propertyInfo.GetCustomAttributes(typeof(OutputAttribute),true).FirstOrDefault() is OutputAttribute attribute){
                     Port port = InstantiatePort(Orientation.Horizontal, Direction.Output,Port.Capacity.Multi,BuildPortType(attribute,propertyInfo));
                     this.outputContainer.Add(port);
-                    var portName = BuildPortName(attribute,propertyInfo);
+                    var portName = ObjectNames.NicifyVariableName(BuildPortName(attribute,propertyInfo));
                     port.portName = portName;
                     port.name = propertyInfo.Name;
                     

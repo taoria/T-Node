@@ -30,11 +30,11 @@ namespace TNodeGraphViewImpl.Editor.GraphBlackboard{
                 //skip if the field is a list or Ilist
                 if (!typeof(IList).IsAssignableFrom(field.FieldType)){
                     VisualElement visualElement = new VisualElement();
-                    var propertyField = new BlackboardField(new BlackboardProperty.BlackboardProperty(field.Name,field.FieldType));
+                    var propertyField = new BlackboardField(new BlackboardProperty.BlackboardProperty(ObjectNames.NicifyVariableName(field.Name),field.FieldType));
                     var foldoutData = new Foldout{
-                        text = field.Name
+                        text = ObjectNames.NicifyVariableName(field.Name)
                     };
-                    var drawer = new GraphBlackboardPropertyField(serializedObject.FindProperty("data").FindPropertyRelative(field.Name),field.Name,isRuntimeGraph);
+                    var drawer = new GraphBlackboardPropertyField(serializedObject.FindProperty("data").FindPropertyRelative(field.Name),isRuntimeGraph);
                     drawer.Bind(serializedObject);
                     foldoutData.Add(drawer);
                     visualElement.Add(propertyField);

@@ -54,7 +54,7 @@ namespace TNodeGraphViewImpl.Editor.Search{
                 if (typeof(NodeData).IsAssignableFrom(type)){
                     //Make an instance of the type
                     if (NodeCreator.InstantiateNodeData(type) is { } nodeData){
-                        nodeData.nodeName = $"New {type.Name}";
+                        nodeData.nodeName = $"{type.Name}";
                         ((IBaseDataGraphView) _graphView).AddTNode(nodeData, new Rect(localPos.x, localPos.y, 100, 100));
                     }
                 }

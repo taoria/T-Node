@@ -6,7 +6,7 @@ namespace TNodeGraphViewImpl.Editor.GraphBlackboard{
     public class GraphBlackboardPropertyField:PropertyField{
         private readonly bool _runtime;
 
-        public GraphBlackboardPropertyField(SerializedProperty findPropertyRelative, string fieldName,bool runtime):base(findPropertyRelative, fieldName){
+        public GraphBlackboardPropertyField(SerializedProperty findPropertyRelative,bool runtime):base(findPropertyRelative){
             _runtime = runtime;
         }
         

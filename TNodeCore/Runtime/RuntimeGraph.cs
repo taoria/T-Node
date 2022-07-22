@@ -20,6 +20,16 @@ namespace TNodeCore.Runtime{
             /// elements are read only ,do not modify them
             /// </summary>
             public readonly Dictionary<string, RuntimeNode> RuntimeNodes;
+            public void DirectlyTraversal(){
+                foreach (var node in TopologicalOrder){
+                    var links = node.OutputLink;
+                    foreach (var link in links){
+                        var targetNode = RuntimeNodes[link.inPort.nodeDataId];
+                        HandlingLink(link);
+                        targetNode.NodeData.Process();
+                    }
+                }
+            }
             public void DependencyTraversal(RuntimeNode runtimeNode){
                 var links = runtimeNode.InputLink;
                 foreach (var link in links){
@@ -116,6 +126,14 @@ namespace TNodeCore.Runtime{
             if (_graphTool == null)
                 return false;
             _graphTool.DependencyTraversal(Get(startNode));
+            return true;
+        }
+        public bool ResolveDependency(){
+            if(!_build)
+                Build();
+            if (_graphTool == null)
+                return false;
+            _graphTool.DirectlyTraversal();
             return true;
         }
         private void ModifyOrCreateInNode(NodeLink linkData){
