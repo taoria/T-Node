@@ -1,24 +1,38 @@
 # T-Node
-Simple wrapper for unity experimental graphview and if possible latter,GTF.
+Node graph creation tool based on unity experimental graphview and if possible latter,GTF.
 the main goal of the repo is to make graph creation easier and more intuitive.
 
 Note **it's not usable and productive on current stage** and need  a better
 development .
 and it's mainly for my own use now.
 
+The tool separate its graph editor implementation and the graph creation logic.
+
 # Install
 
 currently under development
 
-# Features
+# Main Features
 
-1. Create graph script by the creator tool
-2. Node creation based on specified type of graph
-3. Easy port creation via attribute
-4. Runtime graph
-5. Blackboard for runtime graph as exposed parameters
-6. Runtime graph execution
-7. Test Mode (Runtime graph only)
+* Create graph script by the creator tool
+* Node creation based on specified type of graph
+* Easy port creation via attribute 
+* Runtime graph
+* Blackboard for runtime graph as exposed parameters
+* Runtime graph execution
+* An easy test mode (Runtime graph only)
+
+# Some To-dos
+* Caching runtime state for faster execution
+* Undo redo support
+* Function as port
+* Better blackboard support
 
 # Usage
+No ,It's better not to use TNode at current stage until it's stable.
+
+### Convention
+
+
+
 

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using TNode.Editor.Inspector;
-using TNode.Editor.Search;
 using TNodeCore.Editor.Blackboard;
 using TNodeCore.Editor.EditorPersistence;
 using TNodeCore.Editor.NodeGraphView;
@@ -11,8 +10,8 @@ using TNodeCore.Editor.Tools.NodeCreator;
 using TNodeCore.Models;
 using TNodeCore.Runtime;
 using TNodeCore.RuntimeCache;
+using TNodeEditor.Editor;
 using TNodeGraphViewImpl.Editor.Cache;
-using TNodeGraphViewImpl.Editor.GraphBlackboard;
 using TNodeGraphViewImpl.Editor.NodeViews;
 using TNodeGraphViewImpl.Editor.Search;
 using UnityEditor;
@@ -23,7 +22,7 @@ using BlackboardField = TNodeGraphViewImpl.Editor.GraphBlackboard.BlackboardFiel
 using Edge = UnityEditor.Experimental.GraphView.Edge;
 
 namespace TNodeGraphViewImpl.Editor.NodeGraphView{
-    public  abstract  class BaseDataGraphView<T>:GraphView,IDataGraphView<T> where T:GraphData{
+    public   class BaseDataGraphView<T>:GraphView,IDataGraphView<T> where T:GraphData{
         #region variables and properties
         private T _data;
         private RuntimeGraph _runtimeGraph;
@@ -31,7 +30,6 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
         private bool _isInspectorOn;
         private NodeSearchWindowProvider _nodeSearchWindowProvider;
         private NodeInspector _nodeInspector;
-        public GraphEditor<T> Owner;
         private Dictionary<string,Node> _nodeDict = new();
         private IBlackboardView _blackboard;
         public T Data{
@@ -44,6 +42,8 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
                 ResetGraphView();
             }
         }
+
+        public GraphEditor<T> Owner{ get; set; }
         public event DataChangedEventHandler OnDataChanged;
         #endregion
         #region event declarations
