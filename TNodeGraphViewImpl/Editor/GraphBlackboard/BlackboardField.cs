@@ -1,4 +1,5 @@
-﻿using UnityEditor.Experimental.GraphView;
+﻿using UnityEditor;
+using UnityEditor.Experimental.GraphView;
 
 namespace TNodeGraphViewImpl.Editor.GraphBlackboard{
     public class BlackboardField:UnityEditor.Experimental.GraphView.BlackboardField{
@@ -6,7 +7,5 @@ namespace TNodeGraphViewImpl.Editor.GraphBlackboard{
          public BlackboardField(BlackboardProperty.BlackboardProperty blackboardProperty):base(null,blackboardProperty.PropertyName,null){
                 BlackboardProperty = blackboardProperty;
          }
-         
-            
     }
 }

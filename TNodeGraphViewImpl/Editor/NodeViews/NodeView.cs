@@ -20,7 +20,7 @@ namespace TNodeGraphViewImpl.Editor.NodeViews{
 
         public IBaseDataGraphView BaseDataGraphView{
             get{
-                var visualElement = this.GetFirstAncestorOfType<IBaseDataGraphView>() as IBaseDataGraphView;
+                var visualElement = this.GetFirstAncestorOfType<IBaseDataGraphView>();
                 return visualElement;
             }
         }

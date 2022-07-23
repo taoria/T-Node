@@ -7,9 +7,8 @@ using UnityEngine;
 namespace TNodeCore.Models{
     [Serializable]
     [InternalUsage]
-    public class BlackboardDragNodeData:RuntimeNodeData{
+    public class BlackboardDragNodeData:SceneNodeData{
         public string blackDragData;
-      
         /// <summary>
         /// it's very hacky way to get blackboard data ,even when the value is null,type info is not null!
         /// </summary>
@@ -23,7 +22,8 @@ namespace TNodeCore.Models{
         
     }
     [Serializable]
-    public class RuntimeNodeData:NodeData{
+    public class SceneNodeData:NodeData{
+       
    
         public BlackboardData BlackboardData{ get; set; }
         

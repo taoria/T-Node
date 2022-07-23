@@ -1,7 +1,7 @@
 ﻿namespace TNodeCore.Runtime.Interfaces{
 
-    public interface IPortTypeConversion<in TFrom, out TTo>{
-        public TTo Convert(TFrom tFrom);
+    public abstract class PortTypeConversion<TFrom, TTo>{
+        public abstract TTo Convert(TFrom tFrom);
     }
 
 }

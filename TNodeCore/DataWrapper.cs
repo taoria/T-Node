@@ -14,7 +14,7 @@ namespace TNodeCore{
                 return CreateInstance<TWrapper>();
             }
             if(Cache.ContainsKey(data)){
-                return Cache[data];
+                return Cache[data]==null?CreateInstance<TWrapper>():Cache[data];
             }
             var wrapper = CreateInstance<TWrapper>();
             wrapper.data = data;

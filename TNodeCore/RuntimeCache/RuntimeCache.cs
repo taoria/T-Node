@@ -14,8 +14,10 @@ namespace TNodeCore.RuntimeCache{
         public readonly Action<T1, T2> Set;
         public PropAccessor(string propName){
             Type t = typeof(T1);
+     
             MethodInfo getter = t.GetMethod("get_" + propName);
             MethodInfo setter = t.GetMethod("set_" + propName);
+            Type = getter?.ReturnType??setter?.GetParameters()[0].ParameterType;
             if(getter!=null)
                 Get = (Func<T1, T2>)Delegate.CreateDelegate(typeof(Func<T1, T2>), null, getter);
             if(setter!=null)
@@ -32,12 +34,14 @@ namespace TNodeCore.RuntimeCache{
         public void SetValue(object model, object value){
             Set((T1)model,(T2)value);
         }
+
+        public Type Type{ get; set; }
     }
 
     internal class PortConverterHelper<T1,T2> : IPortConverterHelper{
-        private readonly IPortTypeConversion<T1, T2> _converter;
+        private readonly PortTypeConversion<T1, T2> _converter;
         public PortConverterHelper(Type type){
-            _converter = Activator.CreateInstance(type) as IPortTypeConversion<T1, T2>;
+            _converter = Activator.CreateInstance(type) as PortTypeConversion<T1, T2>;
         }
         public object Convert(object value){
             return _converter.Convert((T1)value);
@@ -116,23 +120,31 @@ namespace TNodeCore.RuntimeCache{
                 CacheRuntimeNodeData(type);
             }
             //Check if the type is implementing IPortTypeConversion<T1,T2>
-            if(typeof(IPortTypeConversion<,>).IsAssignableFrom(type)){
+            if(type.BaseType is{IsGenericType: true} && type.BaseType.GetGenericTypeDefinition()==typeof(PortTypeConversion<,>)){
                 //if it is, add it to the cache
+                Debug.Log("find conversion");
                 CacheRuntimePortTypeConversion(type);
+            }
+            else{
+                Debug.Log(type);
             }
         }
 
         private void CacheRuntimePortTypeConversion(Type type){
-            if (type.IsGenericType == false){
+            if (type.BaseType != null){
+                var genericType = type.BaseType.GetGenericTypeDefinition();
+                if (genericType != typeof(PortTypeConversion<,>)){
+                    return;
+                }
+            }
+            else{
                 return;
             }
-            var genericType = type.GetGenericTypeDefinition();
-            if (genericType != typeof(IPortTypeConversion<,>)){
-                return;
-            }
-            var type1 = type.GetGenericArguments()[0];
-            var type2 = type.GetGenericArguments()[1];
 
+            var type1 = type.BaseType.GetGenericArguments()[0];
+            var type2 = type.BaseType.GetGenericArguments()[1];
+            Debug.Log(type1);
+            Debug.Log(type2);
             var specificType = typeof(PortConverterHelper<,>).MakeGenericType(type1, type2);
             var instance = Activator.CreateInstance(specificType, type) as IPortConverterHelper;
             if (instance == null){
@@ -256,8 +268,9 @@ namespace TNodeCore.RuntimeCache{
             return (T) method.Invoke(data);
         }
         public static object GetValue(this  IModel data, string path,Type type=null){
-            var method = RuntimeCache.Instance.CachedDelegatesForGettingValue[type??data.GetType()][path];
-            return method.Invoke(data);
+            var dic = RuntimeCache.Instance.CachedDelegatesForGettingValue[type ?? data.GetType()];
+            var method = dic.ContainsKey(path) ? dic[path] : null;
+            return method?.Invoke(data);
         }
     
         public static void SetValue<T>(this IModel data,string path,T value,Type type=null){

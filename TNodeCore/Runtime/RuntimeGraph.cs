@@ -22,12 +22,11 @@ namespace TNodeCore.Runtime{
             public readonly Dictionary<string, RuntimeNode> RuntimeNodes;
             public void DirectlyTraversal(){
                 foreach (var node in TopologicalOrder){
-                    var links = node.OutputLink;
+                    var links = node.InputLink;
                     foreach (var link in links){
-                        var targetNode = RuntimeNodes[link.inPort.nodeDataId];
                         HandlingLink(link);
-                        targetNode.NodeData.Process();
                     }
+                    node.NodeData.Process();
                 }
             }
             public void DependencyTraversal(RuntimeNode runtimeNode){
@@ -47,6 +46,7 @@ namespace TNodeCore.Runtime{
                 //out node is node output data
                 //in node is node receive data
                 var outValue = outNode.GetOutput(nodeLink.outPort.portEntryName);
+    
                 inNode.SetInput(nodeLink.inPort.portEntryName, outValue);
             }
             public GraphTool(List<RuntimeNode> list, Dictionary<string, RuntimeNode> graphNodes){
@@ -101,6 +101,10 @@ namespace TNodeCore.Runtime{
             Debug.Log("hi");
             var nodeList = RuntimeNodes.Values;
             _graphTool = new GraphTool(nodeList.ToList(),RuntimeNodes);
+            var sceneNodes = RuntimeNodes.Values.Where(x => x.NodeData is SceneNodeData).Select(x => x.NodeData as SceneNodeData);
+            foreach (var sceneNode in sceneNodes){
+                if (sceneNode != null) sceneNode.BlackboardData = runtimeBlackboardData;
+            }
             _build = true;
         }
 

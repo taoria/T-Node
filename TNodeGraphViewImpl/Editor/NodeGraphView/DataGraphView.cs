@@ -155,8 +155,9 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
         private void UpdateRuntimeGraphBehaviour(){
             if(_runtimeGraph != null){
                 if (_runtimeGraphUpdate){
-                    _runtimeGraph.ResolveDependency();
                     _runtimeGraphUpdate = false;
+                    _runtimeGraph.ResolveDependency();
+           
                     AfterRuntimeGraphUpdate?.Invoke();
                 }
           
@@ -283,7 +284,7 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
                 //Get the node type
                 var nodeType = dataNode.GetType();
                 //Get the derived type of NodeAttribute View from the node type
-                if (dataNode is RuntimeNodeData runtimeNodeData){
+                if (dataNode is SceneNodeData runtimeNodeData){
                     runtimeNodeData.BlackboardData = GetBlackboardData();
                 }
                 var nodePos = Owner.graphEditorData.graphElementsData.
@@ -445,7 +446,6 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
             if (supportedTypes != null){
                 compatiblePorts.AddRange(ports.Where(x => supportedTypes.Contains(x.portType)).ToList());
             }
-
             return compatiblePorts;
 
 

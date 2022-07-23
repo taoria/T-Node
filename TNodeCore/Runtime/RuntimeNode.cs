@@ -5,6 +5,7 @@ using Codice.Client.Common.TreeGrouper;
 using TNodeCore.Attribute.Ports;
 using TNodeCore.Models;
 using TNodeCore.RuntimeCache;
+using UnityEngine;
 
 namespace TNodeCore.Runtime{
     public class RuntimeNode{
@@ -18,7 +19,22 @@ namespace TNodeCore.Runtime{
         public Type NodeType => _type;
 
         public void SetInput(string portName,object value){
-            _portAccessors[portName].SetValue(this.NodeData,value);
+            var valueType = value.GetType();
+            var portType = _portAccessors[portName].Type;
+            Debug.Log(valueType);
+            Debug.Log(portType);
+            if(portType!=valueType && !portType.IsAssignableFrom(valueType)){
+                var res =RuntimeCache.RuntimeCache.Instance.GetConvertedValue(valueType, portType, value);
+                _portAccessors[portName].SetValue(this.NodeData, res);
+            }
+            else{
+                    
+                _portAccessors[portName].SetValue(this.NodeData,value);
+            }
+       
+
+        
+   
            
         }
         public object GetOutput(string portName){
