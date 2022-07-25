@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using TNodeCore.Models;
+using TNodeCore.Runtime;
 using UnityEngine;
 
-namespace TNodeCore.Runtime{
+namespace TNodeCore.Components{
     public class RuntimeGraph:MonoBehaviour{
         public GraphData graphData;
+        public List<SceneNodeData> sceneNodes;
 
         public readonly Dictionary<string, RuntimeNode> RuntimeNodes = new Dictionary<string, RuntimeNode>();
-
         private GraphTool _graphTool;
         
         private class GraphTool{
@@ -181,6 +182,13 @@ namespace TNodeCore.Runtime{
         public void OnDestroy(){
             RuntimeNodes.Clear();
             _build = false;
+        }
+
+        public void Start(){
+            Build();
+        }
+        public virtual void RuntimeExecute(){
+            _graphTool.DirectlyTraversal();
         }
        
     }
