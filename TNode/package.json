@@ -1,0 +1,20 @@
+﻿{
+  "name": "com.taoria.t-node",
+  "version": "0.0.1",
+  "displayName": "T-Node",
+  "description": "A graph edition tool for unity",
+  "unity": "2022.1",
+  "unityRelease": "0b5",
+  "dependencies": {
+  },
+  "keywords": [
+    "graph",
+    "node",
+    "wrapper"
+  ],
+  "author": {
+    "name": "taoria",
+    "email": "445625470@qq.com",
+    "url": "taoria@github.io"
+  }
+}
