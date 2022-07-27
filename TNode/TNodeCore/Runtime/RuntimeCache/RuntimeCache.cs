@@ -267,6 +267,9 @@ namespace TNodeCore.RuntimeCache{
             return (T) method.Invoke(data);
         }
         public static object GetValue(this  IModel data, string path,Type type=null){
+            if(!RuntimeCache.Instance.CachedDelegatesForGettingValue.ContainsKey(type??data.GetType())){
+                return null;
+            }
             var dic = RuntimeCache.Instance.CachedDelegatesForGettingValue[type ?? data.GetType()];
             var method = dic.ContainsKey(path) ? dic[path] : null;
             return method?.Invoke(data);

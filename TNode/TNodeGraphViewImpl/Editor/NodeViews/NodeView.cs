@@ -105,7 +105,8 @@ namespace TNodeGraphViewImpl.Editor.NodeViews{
    
             foreach (var propertyInfo in propertyInfos){
                 if (propertyInfo.GetCustomAttributes(typeof(OutputAttribute),true).FirstOrDefault() is OutputAttribute attribute){
-                    Port port = InstantiatePort(Orientation.Horizontal, Direction.Output,Port.Capacity.Multi,BuildPortType(attribute,propertyInfo));
+             
+                    Port port = InstantiatePort(Orientation.Horizontal, Direction.Output,attribute.Multiple?Port.Capacity.Multi:Port.Capacity.Single,BuildPortType(attribute,propertyInfo));
                     this.outputContainer.Add(port);
                     var portName = ObjectNames.NicifyVariableName(BuildPortName(attribute,propertyInfo));
                     port.portName = portName;
@@ -115,7 +116,7 @@ namespace TNodeGraphViewImpl.Editor.NodeViews{
             }
             foreach (var propertyInfo in propertyInfos){
                 if(propertyInfo.GetCustomAttributes(typeof(InputAttribute),true).FirstOrDefault() is InputAttribute attribute){
-                    Port port = InstantiatePort(Orientation.Horizontal, Direction.Input,Port.Capacity.Single,BuildPortType(attribute,propertyInfo));
+                    Port port = InstantiatePort(Orientation.Horizontal, Direction.Input,attribute.Multiple?Port.Capacity.Multi:Port.Capacity.Single,BuildPortType(attribute,propertyInfo));
                     this.inputContainer.Add(port);
                     var portName = BuildPortName(attribute,propertyInfo);
                     port.portName = portName;

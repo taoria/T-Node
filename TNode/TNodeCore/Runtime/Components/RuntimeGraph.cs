@@ -17,6 +17,8 @@ namespace TNodeCore.Components{
             [NonSerialized]
             public readonly List<RuntimeNode> TopologicalOrder = new List<RuntimeNode>();
             public readonly List<RuntimeNode> EntryNodes = new List<RuntimeNode>();
+            public readonly Dictionary<string, object> OutputCached = new Dictionary<string, object>();
+            private bool _isCachingOutput = false;
             /// <summary>
             /// elements are read only ,do not modify them
             /// </summary>
@@ -30,24 +32,52 @@ namespace TNodeCore.Components{
                     node.NodeData.Process();
                 }
             }
-            public void DependencyTraversal(RuntimeNode runtimeNode){
+            //Cache outport info in the graph tool so that we can directly access it in the traversal
+            public void StartCachingPort(){
+                _isCachingOutput = true;
+            }
+            public void EndCachingPort(){
+                _isCachingOutput = false;
+                OutputCached.Clear();
+            }
+            public void ResolveDependency(RuntimeNode runtimeNode,int dependencyLevel=0){
                 var links = runtimeNode.InputLink;
                 foreach (var link in links){
                     var outputNode = RuntimeNodes[link.outPort.nodeDataId];
-                    DependencyTraversal(outputNode);
+                    ResolveDependency(outputNode,dependencyLevel+1);
                     HandlingLink(link);
                 }
+
+                if (dependencyLevel > DependencyLevelMax){
+                    throw new Exception("Dependency anomaly detected,check if there is a loop in the graph");
+                }
+
+       
+                //if the runtime node has no output ,it will not be processed
+                if (runtimeNode.OutputLink.Count == 0 && dependencyLevel != 0){
+                    return;
+                }
                 runtimeNode.NodeData.Process();
+                
+          
             }
-            
+
+            private const int DependencyLevelMax = 1145;
+
             public void HandlingLink(NodeLink nodeLink){
+                //out node is node output data
+                //in node is node receive data
                 var inNode = RuntimeNodes[nodeLink.inPort.nodeDataId];
                 var outNode = RuntimeNodes[nodeLink.outPort.nodeDataId];
                 
-                //out node is node output data
-                //in node is node receive data
-                var outValue = outNode.GetOutput(nodeLink.outPort.portEntryName);
-    
+                
+                //TODO looks like this string would be too long to make a cache
+                
+                var cachedKey = $"{outNode.NodeData.id}-{nodeLink.inPort.portEntryName}";
+                var outValue = OutputCached.ContainsKey(cachedKey) ? OutputCached[cachedKey] : outNode.GetOutput(nodeLink.outPort.portEntryName);;
+                if (_isCachingOutput){
+                    OutputCached[cachedKey] = outValue;
+                }
                 inNode.SetInput(nodeLink.inPort.portEntryName, outValue);
             }
             public GraphTool(List<RuntimeNode> list, Dictionary<string, RuntimeNode> graphNodes){
@@ -125,12 +155,12 @@ namespace TNodeCore.Components{
             return null;
         }
         //DFS search for resolving dependency
-        public bool ResolveDependency(NodeData startNode){
+        public bool RunOnDependency(NodeData startNode){
             if(!_build)
                 Build();
             if (_graphTool == null)
                 return false;
-            _graphTool.DependencyTraversal(Get(startNode));
+            _graphTool.ResolveDependency(Get(startNode));
             return true;
         }
         public bool ResolveDependency(){
@@ -152,10 +182,20 @@ namespace TNodeCore.Components{
             
         }
         public List<RuntimeNode> GetRuntimeNodesOfType<T>(){
-            return RuntimeNodes.Values.Where(x => x.NodeType == typeof(T)).ToList();
+            return RuntimeNodes.Values.Where(x => typeof(T).IsAssignableFrom(x.NodeType)).ToList();
         }
         public  List<RuntimeNode> GetRuntimeNodesOfType(Type type){
-            return RuntimeNodes.Values.Where(x => x.NodeType == type).ToList();
+            return RuntimeNodes.Values.Where(x => type.IsAssignableFrom(type)).ToList();
+        }
+        public void RunNodesOfType(Type t){
+            var nodes = GetRuntimeNodesOfType(t);
+            _graphTool.StartCachingPort();
+            foreach (var runtimeNode in nodes){
+                RunOnDependency(runtimeNode.NodeData);
+            }
+            _graphTool.EndCachingPort();
+            
+            
         }
         private void ModifyOrCreateOutNode(NodeLink linkData){
             var outNodeId = linkData.outPort.nodeDataId;
@@ -170,7 +210,7 @@ namespace TNodeCore.Components{
         public void OnValidate(){
             if(runtimeBlackboardData==null||runtimeBlackboardData.GetType()==typeof(BlackboardData)){
                 if (graphData != null)
-                    runtimeBlackboardData = graphData.blackboardData.Clone() as BlackboardData;
+                    runtimeBlackboardData = graphData.blackboardData?.Clone() as BlackboardData;
             }
         }
 
@@ -186,6 +226,7 @@ namespace TNodeCore.Components{
 
         public void Start(){
             Build();
+          
         }
         public virtual void RuntimeExecute(){
             _graphTool.DirectlyTraversal();
