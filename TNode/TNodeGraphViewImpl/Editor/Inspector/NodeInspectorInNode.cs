@@ -80,7 +80,7 @@ namespace TNode.Editor.Inspector{
                     if(!test.IsRuntimeGraph) return;
                     var runtimeGraph = test.GetRuntimeGraph();
                     if (runtimeGraph != null){
-                       var res = runtimeGraph.ResolveDependency(_data);
+                       var res = runtimeGraph.RunOnDependency(_data);
                     }
                     _data.OnTest();
                 }
