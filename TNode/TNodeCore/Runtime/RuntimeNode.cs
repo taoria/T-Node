@@ -21,8 +21,6 @@ namespace TNodeCore.Runtime{
         public void SetInput(string portName,object value){
             var valueType = value.GetType();
             var portType = _portAccessors[portName].Type;
-            Debug.Log(valueType);
-            Debug.Log(portType);
             if(portType!=valueType && !portType.IsAssignableFrom(valueType)){
                 var res =RuntimeCache.RuntimeCache.Instance.GetConvertedValue(valueType, portType, value);
                 _portAccessors[portName].SetValue(this.NodeData, res);
