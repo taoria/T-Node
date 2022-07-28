@@ -185,6 +185,7 @@ namespace TNodeCore.Components{
         /// Build the graph tool and other dependencies for the runtime graph
         /// </summary>
         public void Build(){
+            if (_build) return;
             
             var link = graphData.NodeLinks;
             //iterate links and create runtime nodes
@@ -259,15 +260,35 @@ namespace TNodeCore.Components{
         public  List<RuntimeNode> GetRuntimeNodesOfType(Type type){
             return RuntimeNodes.Values.Where(x => type.IsAssignableFrom(type)).ToList();
         }
-        public void RunNodesOfType(Type t){
+        public void RunNodesOfType(Type t,bool isCaching= false){
             var nodes = GetRuntimeNodesOfType(t);
-            _graphTool.StartCachingPort();
+            if(isCaching)
+                _graphTool.StartCachingPort();
             foreach (var runtimeNode in nodes){
                 RunOnDependency(runtimeNode.NodeData);
             }
-            _graphTool.EndCachingPort();
-            
-            
+            if(isCaching)
+                _graphTool.EndCachingPort();
+        }
+
+        /// <summary>
+        /// Run some nodes ,if the node is not in the graph ,then pass
+        /// </summary>
+        /// <param name="runtimeNodes"></param>
+        /// <param name="isCaching"></param>
+        public void RunNodes(List<RuntimeNode> runtimeNodes,bool isCaching= false){
+            if (isCaching){
+                _graphTool.StartCachingPort();
+            }
+            foreach (var runtimeNode in runtimeNodes){
+                if(!RuntimeNodes.ContainsKey(runtimeNode.NodeData.id)){
+                    continue;
+                }
+                RunOnDependency(runtimeNode.NodeData);
+            }
+            if (isCaching){
+                _graphTool.EndCachingPort();
+            }
         }
         private void ModifyOrCreateOutNode(NodeLink linkData){
             var outNodeId = linkData.outPort.nodeDataId;
