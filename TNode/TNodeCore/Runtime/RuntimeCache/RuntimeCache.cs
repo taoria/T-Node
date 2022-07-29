@@ -121,11 +121,9 @@ namespace TNodeCore.RuntimeCache{
             //Check if the type is implementing IPortTypeConversion<T1,T2>
             if(type.BaseType is{IsGenericType: true} && type.BaseType.GetGenericTypeDefinition()==typeof(PortTypeConversion<,>)){
                 //if it is, add it to the cache
-                Debug.Log("find conversion");
                 CacheRuntimePortTypeConversion(type);
             }
             else{
-                Debug.Log(type);
             }
         }
 
@@ -142,8 +140,6 @@ namespace TNodeCore.RuntimeCache{
 
             var type1 = type.BaseType.GetGenericArguments()[0];
             var type2 = type.BaseType.GetGenericArguments()[1];
-            Debug.Log(type1);
-            Debug.Log(type2);
             var specificType = typeof(PortConverterHelper<,>).MakeGenericType(type1, type2);
             var instance = Activator.CreateInstance(specificType, type) as IPortConverterHelper;
             if (instance == null){
