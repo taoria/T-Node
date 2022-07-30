@@ -48,8 +48,6 @@ namespace TNodeCore.Runtime{
 
             _portAccessors = RuntimeCache.RuntimeCache.Instance.CachedPropertyAccessors[_type];
             
-         
-            
       
         }
         public List<string> GetInputNodesId(){

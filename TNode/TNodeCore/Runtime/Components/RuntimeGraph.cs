@@ -19,11 +19,12 @@ namespace TNodeCore.Components{
         /// <summary>
         /// Map of node id to runtime node
         /// </summary>
-
+        [NonSerialized]
         public readonly Dictionary<string, RuntimeNode> RuntimeNodes = new Dictionary<string, RuntimeNode>();
         ///<summary>
         /// The graph tool the current runtime graph is using
         /// </summary>
+        [NonSerialized]
         private GraphTool _graphTool;
         /// <summary>
         /// Inner graph tool to help with graph operations
