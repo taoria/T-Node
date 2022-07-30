@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using TNodeCore.Attribute;
 using UnityEngine;
 
@@ -25,6 +26,10 @@ namespace TNodeCore.Models{
         public virtual void Process(){
             
         }
+        public virtual IEnumerator AfterProcess(){
+            yield return null;
+        }
+
         
 #if UNITY_EDITOR
         [HideInInspector] public bool isTest;

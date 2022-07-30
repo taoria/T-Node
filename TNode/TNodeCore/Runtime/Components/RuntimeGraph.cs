@@ -19,11 +19,12 @@ namespace TNodeCore.Components{
         /// <summary>
         /// Map of node id to runtime node
         /// </summary>
-
+        [NonSerialized]
         public readonly Dictionary<string, RuntimeNode> RuntimeNodes = new Dictionary<string, RuntimeNode>();
         ///<summary>
         /// The graph tool the current runtime graph is using
         /// </summary>
+        [NonSerialized]
         private GraphTool _graphTool;
         /// <summary>
         /// Inner graph tool to help with graph operations
@@ -35,6 +36,8 @@ namespace TNodeCore.Components{
             /// </summary>
             [NonSerialized]
             public readonly List<RuntimeNode> TopologicalOrder = new List<RuntimeNode>();
+
+            public RuntimeGraph Parent;
             
             /// <summary>
             /// Entry nodes of the graph. These are the nodes that has no input.
@@ -100,8 +103,7 @@ namespace TNodeCore.Components{
                     return;
                 }
                 runtimeNode.NodeData.Process();
-                
-          
+                Parent.StartCoroutine(runtimeNode.NodeData.AfterProcess());
             }
             /// <summary>
             /// Max depth of dependency traversal,in case of some special situation. the dependency level bigger than this number will be considered as a loop.
@@ -133,8 +135,9 @@ namespace TNodeCore.Components{
             /// <param name="list">List of nodes you need to traversal to build graph tool</param>
             /// <param name="graphNodes">Map stores the mapping of node data id to runtime node</param>
         
-            public GraphTool(List<RuntimeNode> list, Dictionary<string, RuntimeNode> graphNodes){
+            public GraphTool(List<RuntimeNode> list, Dictionary<string, RuntimeNode> graphNodes,RuntimeGraph graph){
                 RuntimeNodes = graphNodes;
+                Parent = graph;
                 if (list == null) return;
                 Queue<RuntimeNode> queue = new Queue<RuntimeNode>();
                 Dictionary<string,int> inDegreeCounterForTopologicalSort = new Dictionary<string, int>();
@@ -195,7 +198,7 @@ namespace TNodeCore.Components{
             }
             Debug.Log("hi");
             var nodeList = RuntimeNodes.Values;
-            _graphTool = new GraphTool(nodeList.ToList(),RuntimeNodes);
+            _graphTool = new GraphTool(nodeList.ToList(),RuntimeNodes,this);
             var sceneNodes = RuntimeNodes.Values.Where(x => x.NodeData is SceneNodeData).Select(x => x.NodeData as SceneNodeData);
             foreach (var sceneNode in sceneNodes){
                 if (sceneNode != null) sceneNode.BlackboardData = runtimeBlackboardData;
