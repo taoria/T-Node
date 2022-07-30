@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using Codice.Client.Common.TreeGrouper;
@@ -29,11 +30,6 @@ namespace TNodeCore.Runtime{
                     
                 _portAccessors[portName].SetValue(this.NodeData,value);
             }
-       
-
-        
-   
-           
         }
         public object GetOutput(string portName){
             
@@ -42,7 +38,7 @@ namespace TNodeCore.Runtime{
 
 
         private readonly Dictionary<string, IModelPropertyAccessor> _portAccessors;
-
+        public Action Process;
    
         public RuntimeNode(NodeData nodeData){
             NodeData = nodeData;
@@ -51,6 +47,10 @@ namespace TNodeCore.Runtime{
             var info = nodeData.GetType().GetProperties();
 
             _portAccessors = RuntimeCache.RuntimeCache.Instance.CachedPropertyAccessors[_type];
+            
+         
+            
+      
         }
         public List<string> GetInputNodesId(){
             List<string> dependencies = new List<string>();
