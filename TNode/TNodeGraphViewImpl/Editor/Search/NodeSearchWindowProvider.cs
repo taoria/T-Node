@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TNodeCore.Editor.NodeGraphView;
 using TNodeCore.Editor.Tools.NodeCreator;
-using TNodeCore.Models;
+using TNodeCore.Runtime.Models;
 using TNodeGraphViewImpl.Editor.Cache;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;

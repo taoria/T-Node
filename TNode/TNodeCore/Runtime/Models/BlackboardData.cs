@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TNodeCore.Models{
+namespace TNodeCore.Runtime.Models{
     /// <summary>
     /// Black board data can store scene data
     /// </summary>

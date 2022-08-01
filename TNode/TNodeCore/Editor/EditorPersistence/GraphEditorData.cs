@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using TNodeCore.Editor.NodeGraphView;
-using TNodeCore.Models;
+using TNodeCore.Runtime.Models;
 using UnityEngine;
 
 namespace TNodeCore.Editor.EditorPersistence{

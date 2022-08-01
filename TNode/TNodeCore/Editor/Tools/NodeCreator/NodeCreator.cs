@@ -1,5 +1,5 @@
 ﻿using System;
-using TNodeCore.Models;
+using TNodeCore.Runtime.Models;
 
 namespace TNodeCore.Editor.Tools.NodeCreator{
     public static class NodeCreator{

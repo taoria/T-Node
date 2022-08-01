@@ -1,6 +1,6 @@
-﻿using TNodeCore.Attribute;
-using TNodeCore.Editor.Serialization;
-using TNodeCore.Models;
+﻿using TNodeCore.Editor.Serialization;
+using TNodeCore.Runtime.Attributes;
+using TNodeCore.Runtime.Models;
 using TNodeGraphViewImpl.Editor.NodeViews;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;

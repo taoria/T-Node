@@ -1,13 +1,12 @@
-using TNodeCore.Editor;
 using TNodeCore.Editor.EditorPersistence;
 using TNodeCore.Editor.NodeGraphView;
-using TNodeCore.Models;
+using TNodeCore.Runtime.Models;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 
-namespace TNodeEditor.Editor{
+namespace TNodeCore.Editor{
     
     // public class SelectGraphWindow : EditorWindow{
     //     public EditorWindow parent;

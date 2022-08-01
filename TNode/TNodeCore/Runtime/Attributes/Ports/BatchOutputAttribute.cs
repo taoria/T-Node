@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TNodeCore.Attribute.Ports{
+namespace TNodeCore.Runtime.Attributes.Ports{
     /// <summary>
     /// Batch out port attribute could specify a batch out port,allowing large scale calculation.
     /// </summary>

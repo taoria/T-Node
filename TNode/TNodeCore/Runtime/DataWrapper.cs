@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
-namespace TNodeCore{
+namespace TNodeCore.Runtime{
     [Serializable]
     public class DataWrapper<TWrapper,TData>:ScriptableObject where TWrapper:DataWrapper<TWrapper,TData>,new(){
         [SerializeReference]

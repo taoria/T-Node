@@ -1,7 +1,7 @@
 ﻿using System;
 using JetBrains.Annotations;
 
-namespace TNodeCore.Attribute.Ports{
+namespace TNodeCore.Runtime.Attributes.Ports{
 
     public enum PortNameHandling{
         Auto,

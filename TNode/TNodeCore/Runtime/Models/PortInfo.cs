@@ -1,7 +1,6 @@
 ﻿using System;
-using UnityEngine.Serialization;
 
-namespace TNodeCore.Models{
+namespace TNodeCore.Runtime.Models{
     [Serializable]
     public class PortInfo{
         public string portEntryName;

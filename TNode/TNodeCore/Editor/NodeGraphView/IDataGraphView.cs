@@ -1,6 +1,5 @@
 ﻿using TNodeCore.Editor.EditorPersistence;
-using TNodeCore.Models;
-using TNodeEditor.Editor;
+using TNodeCore.Runtime.Models;
 
 namespace TNodeCore.Editor.NodeGraphView{
     public interface IDataGraphView<T> : IBaseDataGraphView where T:GraphData{

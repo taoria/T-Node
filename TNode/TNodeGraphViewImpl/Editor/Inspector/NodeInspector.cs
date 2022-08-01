@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using TNode.Editor.NodeViews;
-using TNodeCore.Models;
+using TNodeCore.Runtime.Models;
 using TNodeGraphViewImpl.Editor.NodeGraphView;
 using TNodeGraphViewImpl.Editor.NodeViews;
 using Unity.VisualScripting;

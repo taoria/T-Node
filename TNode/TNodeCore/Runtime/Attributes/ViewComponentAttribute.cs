@@ -1,7 +1,7 @@
 ﻿using System;
 using JetBrains.Annotations;
 
-namespace TNodeCore.Attribute{
+namespace TNodeCore.Runtime.Attributes{
     
     //Check if the ide is Rider
     

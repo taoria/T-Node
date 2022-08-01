@@ -1,6 +1,3 @@
-﻿using JetBrains.Annotations;
-using TNodeCore.Models;
-
-namespace TNodeCore.Attribute{
+﻿namespace TNodeCore.Runtime.Attributes{
  
 }

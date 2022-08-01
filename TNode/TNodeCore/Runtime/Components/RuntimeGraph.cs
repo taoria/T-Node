@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using TNodeCore.Models;
-using TNodeCore.Runtime;
+using TNodeCore.Runtime.Models;
 using UnityEngine;
 
-namespace TNodeCore.Components{
+namespace TNodeCore.Runtime.Components{
     public class RuntimeGraph:MonoBehaviour{
         /// <summary>
         /// Graph data reference to be used in runtime
@@ -42,6 +41,7 @@ namespace TNodeCore.Components{
             /// <summary>
             /// Entry nodes of the graph. These are the nodes that has no input.
             /// </summary>
+            [NonSerialized]
             public readonly List<RuntimeNode> EntryNodes = new List<RuntimeNode>();
             /// <summary>
             /// Cached data for Dependency traversal.
@@ -196,7 +196,6 @@ namespace TNodeCore.Components{
                 ModifyOrCreateInNode(linkData);
                 ModifyOrCreateOutNode(linkData);
             }
-            Debug.Log("hi");
             var nodeList = RuntimeNodes.Values;
             _graphTool = new GraphTool(nodeList.ToList(),RuntimeNodes,this);
             var sceneNodes = RuntimeNodes.Values.Where(x => x.NodeData is SceneNodeData).Select(x => x.NodeData as SceneNodeData);

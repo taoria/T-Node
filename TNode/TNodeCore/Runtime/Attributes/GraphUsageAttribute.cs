@@ -1,9 +1,8 @@
 ﻿using System;
 using JetBrains.Annotations;
-using TNodeCore.Models;
-using TNodeCore.Runtime.Interfaces;
+using TNodeCore.Runtime.Models;
 
-namespace TNodeCore.Attribute{
+namespace TNodeCore.Runtime.Attributes{
     /// <summary>
     /// Use this attribute to claim the usage of a type derived IModel IModel
     /// it can be  applied to the same node multiple times.

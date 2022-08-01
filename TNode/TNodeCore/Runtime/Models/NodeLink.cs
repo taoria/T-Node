@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TNodeCore.Models{
+namespace TNodeCore.Runtime.Models{
     //NodeAttribute links are stored in output side of the two node port.
     [Serializable]
     public class NodeLink{
