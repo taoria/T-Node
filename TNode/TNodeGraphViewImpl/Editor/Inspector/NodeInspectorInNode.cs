@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
-using TNodeCore.Attribute;
 using TNodeCore.Editor.NodeGraphView;
 using TNodeCore.Editor.Serialization;
-using TNodeCore.Models;
+using TNodeCore.Runtime.Attributes;
+using TNodeCore.Runtime.Models;
 using TNodeGraphViewImpl.Editor.NodeViews;
 using UnityEditor;
 using UnityEditor.UIElements;

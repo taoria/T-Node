@@ -4,15 +4,15 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using TNode.Editor.Inspector;
-using TNodeCore.Components;
+using TNodeCore.Editor;
 using TNodeCore.Editor.Blackboard;
 using TNodeCore.Editor.EditorPersistence;
 using TNodeCore.Editor.NodeGraphView;
 using TNodeCore.Editor.Tools.NodeCreator;
-using TNodeCore.Models;
 using TNodeCore.Runtime;
-using TNodeCore.RuntimeCache;
-using TNodeEditor.Editor;
+using TNodeCore.Runtime.Components;
+using TNodeCore.Runtime.Models;
+using TNodeCore.Runtime.RuntimeCache;
 using TNodeGraphViewImpl.Editor.Cache;
 using TNodeGraphViewImpl.Editor.NodeViews;
 using TNodeGraphViewImpl.Editor.Search;
@@ -304,7 +304,6 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
                     input = inputNodeView.inputContainer.Q<Port>(edge.inPort.portEntryName),
                     output = outputNodeView.outputContainer.Q<Port>(edge.outPort.portEntryName)
                 };
-
                 newEdge.input?.Connect(newEdge);
                 newEdge.output?.Connect(newEdge);
                 AddElement(newEdge);

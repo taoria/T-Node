@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace TNodeCore.Models{
+namespace TNodeCore.Runtime.Models{
     [Serializable]
     public class GraphData:ScriptableObject,ISerializationCallbackReceiver{
         public Dictionary<string,NodeData> NodeDictionary = new Dictionary<string,NodeData>();

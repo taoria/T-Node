@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 
-namespace TNodeCore.Models{
+namespace TNodeCore.Runtime.Models{
     
     /// <summary>
     /// Scene Object wrapper use to serialize blackboard data

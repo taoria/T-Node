@@ -1,4 +1,4 @@
-﻿namespace TNodeCore.Attribute.Ports{
+﻿namespace TNodeCore.Runtime.Attributes.Ports{
     public class OutputAttribute:PortAttribute{
 
 

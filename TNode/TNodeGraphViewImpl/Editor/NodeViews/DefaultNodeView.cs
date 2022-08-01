@@ -1,5 +1,5 @@
 ﻿using TNode.Editor.NodeViews;
-using TNodeCore.Models;
+using TNodeCore.Runtime.Models;
 using TNodeGraphViewImpl.Editor.NodeViews;
 
 namespace TNode.Editor{

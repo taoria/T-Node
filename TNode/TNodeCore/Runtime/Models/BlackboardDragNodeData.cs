@@ -1,10 +1,9 @@
 ﻿using System;
-using TNodeCore.Attribute;
-using TNodeCore.Attribute.Ports;
-using TNodeCore.RuntimeCache;
-using UnityEngine;
+using TNodeCore.Runtime.Attributes;
+using TNodeCore.Runtime.Attributes.Ports;
+using TNodeCore.Runtime.RuntimeCache;
 
-namespace TNodeCore.Models{
+namespace TNodeCore.Runtime.Models{
     [Serializable]
     [InternalUsage]
     public class BlackboardDragNodeData:SceneNodeData{

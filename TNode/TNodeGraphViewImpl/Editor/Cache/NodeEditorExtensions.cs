@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using TNode.Editor;
-using TNodeCore.Attribute;
 using TNodeCore.Editor.Blackboard;
 using TNodeCore.Editor.EditorPersistence;
 using TNodeCore.Editor.NodeGraphView;
-using TNodeCore.Models;
+using TNodeCore.Runtime.Attributes;
+using TNodeCore.Runtime.Models;
 using TNodeGraphViewImpl.Editor.GraphBlackboard;
 using TNodeGraphViewImpl.Editor.NodeGraphView;
 using TNodeGraphViewImpl.Editor.NodeViews;
@@ -144,7 +144,6 @@ namespace TNodeGraphViewImpl.Editor.Cache{
 
         public void Initialize(){
             //Do nothing  indeed
-            Debug.Log("Hello");
         }
     }
     //Outer wrapper for the singleton class

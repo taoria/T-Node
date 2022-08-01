@@ -1,7 +1,7 @@
 ﻿using System;
-using TNodeCore.Components;
-using TNodeCore.Models;
 using TNodeCore.Runtime;
+using TNodeCore.Runtime.Components;
+using TNodeCore.Runtime.Models;
 using UnityEngine;
 
 namespace TNodeCore.Editor.NodeGraphView{

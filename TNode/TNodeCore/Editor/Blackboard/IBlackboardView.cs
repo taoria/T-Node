@@ -1,5 +1,5 @@
 ﻿using TNodeCore.Editor.NodeGraphView;
-using TNodeCore.Models;
+using TNodeCore.Runtime.Models;
 using UnityEditor;
 
 namespace TNodeCore.Editor.Blackboard{

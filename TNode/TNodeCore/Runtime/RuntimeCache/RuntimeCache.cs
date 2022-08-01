@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using TNodeCore.Attribute;
-using TNodeCore.Models;
+using TNodeCore.Runtime.Attributes;
 using TNodeCore.Runtime.Interfaces;
-using UnityEngine;
+using TNodeCore.Runtime.Models;
 
-namespace TNodeCore.RuntimeCache{
+namespace TNodeCore.Runtime.RuntimeCache{
     public class PropAccessor<T1, T2>:IModelPropertyAccessor{
         public readonly Func<T1, T2> Get;
         public readonly Action<T1, T2> Set;

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections;
-using TNodeCore.Attribute;
+using TNodeCore.Runtime.Attributes;
 using UnityEngine;
 
-namespace TNodeCore.Models{
+namespace TNodeCore.Runtime.Models{
     /// <summary>
     /// this class is used to store the data of a node
     /// inherit it to implement your own node

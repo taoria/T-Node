@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using TNodeCore.Models;
+using TNodeCore.Runtime;
+using TNodeCore.Runtime.Models;
 using UnityEngine;
 
 namespace TNodeCore.Editor.Serialization{

@@ -2,7 +2,7 @@
 using System.IO;
 using UnityEngine;
 
-namespace TNodeCore.Components{
+namespace TNodeCore.Runtime.Components{
     public class RuntimeDataSaver:MonoBehaviour{
         public string saveName;
         public string saveExtension = "tng";

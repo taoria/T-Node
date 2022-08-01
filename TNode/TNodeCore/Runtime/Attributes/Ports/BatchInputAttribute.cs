@@ -1,4 +1,4 @@
-﻿namespace TNode.TNodeCore.Runtime.Attributes.Ports{
+﻿namespace TNodeCore.Runtime.Attributes.Ports{
     public class BatchInputAttribute{
         
     }

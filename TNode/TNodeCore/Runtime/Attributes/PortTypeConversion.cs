@@ -1,3 +1,3 @@
-﻿namespace TNode.TNodeCore.Runtime.Attributes{
+﻿namespace TNodeCore.Runtime.Attributes{
 
 }

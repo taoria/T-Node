@@ -1,7 +1,7 @@
 ﻿using JetBrains.Annotations;
-using TNodeCore.Models;
+using TNodeCore.Runtime.Models;
 
-namespace TNodeCore.Attribute{
+namespace TNodeCore.Runtime.Attributes{
     [MeansImplicitUse]
     [BaseTypeRequired(typeof(NodeData))]
     

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace TNodeCore.Models{
+﻿namespace TNodeCore.Runtime.Models{
     public interface IModel{
 
     }
