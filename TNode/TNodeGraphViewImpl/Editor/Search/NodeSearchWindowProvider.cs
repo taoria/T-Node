@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TNode.TNodeGraphViewImpl.Editor.Cache;
 using TNodeCore.Editor.NodeGraphView;
+using TNodeCore.Editor.Serialization;
 using TNodeCore.Editor.Tools.NodeCreator;
 using TNodeCore.Runtime.Models;
 using UnityEditor;
@@ -62,5 +63,11 @@ namespace TNode.TNodeGraphViewImpl.Editor.Search{
             }
             return false;
         }
+
+        private void UndoCreateNodePerformed(){
+            
+        }
+
+   
     }
 }

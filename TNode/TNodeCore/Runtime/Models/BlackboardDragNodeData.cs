@@ -31,7 +31,6 @@ namespace TNodeCore.Runtime.Models{
                 }
                 else{
                     var split = BlackDragData.Split('.');
-                    Debug.Log(blackDragData);
                     var index = int.Parse(split[1]);
               
                     return BlackboardData.GetListValue(split[0],index);

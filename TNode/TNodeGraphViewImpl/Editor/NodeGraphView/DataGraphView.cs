@@ -11,6 +11,7 @@ using TNodeCore.Editor;
 using TNodeCore.Editor.Blackboard;
 using TNodeCore.Editor.EditorPersistence;
 using TNodeCore.Editor.NodeGraphView;
+using TNodeCore.Editor.Serialization;
 using TNodeCore.Editor.Tools.NodeCreator;
 using TNodeCore.Runtime.Components;
 using TNodeCore.Runtime.Models;
@@ -34,9 +35,6 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
         private Dictionary<string,Node> _nodeDict = new();
         private IBlackboardView _blackboard;
         private bool _runtimeGraphUpdate;
-
-        
-        
         public T Data{
             get{ return _data; }
             set{
@@ -95,7 +93,6 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
                 },
                 name = "HintLabel"
             };
-            
             visualElement.RegisterCallback<DragPerformEvent>((evt) => {
                 //check if the dragged object is a graph data or a Game Object contains a runtime graph
                 var res = DragAndDrop.objectReferences;
@@ -202,6 +199,16 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
             CheckDataAfterInit();
             
             OnGraphViewCreate();
+
+            BuildUndo();
+        }
+
+        private void BuildUndo(){
+            Undo.undoRedoPerformed+=UndoRedoPerformed;
+        }
+
+        private void UndoRedoPerformed(){
+            ResetGraphView();
         }
 
         public virtual void AfterEditorLoadGraphView(){
@@ -284,8 +291,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
           
         }
         #endregion
-
-
+        
 
         public void ResetGraphView(){
             //Clear all nodes
@@ -295,8 +301,8 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
             foreach (var edge in edges){
                 RemoveElement(edge);
             }
-      
             if (_nodeDict == null) throw new ArgumentNullException(nameof(_nodeDict));
+      
             foreach (var dataNode in _data.NodeDictionary.Values){
                 if(dataNode==null)
                     continue;
@@ -317,7 +323,6 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
                 }
   
             }
-
             foreach (var edge in _data.NodeLinks){
                 var inputNode = _data.NodeDictionary[edge.inPort.nodeDataId];
                 var outputNode = _data.NodeDictionary[edge.outPort.nodeDataId];
@@ -509,7 +514,10 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
                     nodeViewInterface.SetNodeData(nodeData);
                 }
                 _nodeDict.Add(nodeData.id, nodeView);
-                
+                if (_data.NodeDictionary.ContainsKey(nodeData.id) == false){
+                    Undo.RegisterCompleteObjectUndo(_data,"Node Creation");
+                    _data.NodeDictionary.Add(nodeData.id,nodeData);
+                }
                 //register an callback ,when right click context menu
                 nodeView.RegisterCallback<ContextClickEvent>(evt => {
                     var menu = new GenericMenu();
@@ -521,12 +529,11 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
                     });
                     menu.ShowAsContext();
                 });
-                
             }
         }
 
         public void RemoveTNode(NodeData nodeData){
-            
+            Undo.RegisterCompleteObjectUndo(_data,"Node deletion");
             _data.NodeDictionary.Remove(nodeData.id);
             var nodeView = _nodeDict[nodeData.id];
             _nodeDict.Remove(nodeData.id);
@@ -536,7 +543,18 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
                     RemoveElement(edge);
                 }
             }
+            //TODO: rect x,y move to node region
             Owner.graphEditorData.graphElementsData.RemoveAll(x => x.guid == nodeData.id);
+        }
+
+        public void AddLink(NodeLink nodeLink){
+            Undo.RegisterCompleteObjectUndo(_data,"node linked");
+           _data.NodeLinks.Add(nodeLink);
+        }
+
+        public void RemoveLink(NodeLink nodeLink){
+            Undo.RegisterCompleteObjectUndo(_data,"node unlinked");
+            _data.NodeLinks.Remove(nodeLink);
         }
 
         public bool TestMode{ get; set; }
@@ -549,7 +567,6 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
             Add(castedBlackboard);
             Rect blackboardPos = new Rect(0,0,300,700);
             castedBlackboard?.SetPosition(blackboardPos);
-            
             OnDataChanged+= (sender, e) => { BlackboardUpdate(); };
         }
 
@@ -579,6 +596,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
             
             _runtimeGraphUpdate = true;
         }
+
 
         public Action AfterRuntimeGraphUpdate{ get; set; }
 
