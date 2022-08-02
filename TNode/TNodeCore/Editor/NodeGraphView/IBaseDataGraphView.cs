@@ -9,6 +9,10 @@ namespace TNodeCore.Editor.NodeGraphView{
         public void AddTNode(NodeData nodeData, Rect rect);
         public void RemoveTNode(NodeData nodeData);
 
+        public void AddLink(NodeLink nodeLink);
+        
+        public void RemoveLink(NodeLink nodeLink);
+
         
         public bool TestMode{ get; set; }
         public void CreateBlackboard();

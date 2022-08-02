@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using TNode.TNodeGraphViewImpl.Editor.Inspector;
+using TNode.TNodeGraphViewImpl.Editor.Ports;
 using TNodeCore.Editor.NodeGraphView;
 using TNodeCore.Editor.Serialization;
 using TNodeCore.Runtime;
@@ -105,8 +106,11 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeViews{
    
             foreach (var propertyInfo in propertyInfos){
                 if (propertyInfo.GetCustomAttributes(typeof(OutputAttribute),true).FirstOrDefault() is OutputAttribute attribute){
-             
-                    Port port = InstantiatePort(Orientation.Horizontal, Direction.Output,attribute.Multiple?Port.Capacity.Multi:Port.Capacity.Single,BuildPortType(attribute,propertyInfo));
+
+                    Port port = new CustomPort(Orientation.Horizontal, Direction.Output,
+                        attribute.Multiple ? Port.Capacity.Multi : Port.Capacity.Single,
+                        BuildPortType(attribute, propertyInfo));
+                
                     this.outputContainer.Add(port);
                     var portName = ObjectNames.NicifyVariableName(BuildPortName(attribute,propertyInfo));
                     port.portName = portName;
@@ -116,7 +120,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeViews{
             }
             foreach (var propertyInfo in propertyInfos){
                 if(propertyInfo.GetCustomAttributes(typeof(InputAttribute),true).FirstOrDefault() is InputAttribute attribute){
-                    Port port = InstantiatePort(Orientation.Horizontal, Direction.Input,attribute.Multiple?Port.Capacity.Multi:Port.Capacity.Single,BuildPortType(attribute,propertyInfo));
+                    Port port = new CustomPort(Orientation.Horizontal, Direction.Input,attribute.Multiple?Port.Capacity.Multi:Port.Capacity.Single,BuildPortType(attribute,propertyInfo));
                     this.inputContainer.Add(port);
                     var portName = BuildPortName(attribute,propertyInfo);
                     port.portName = portName;
