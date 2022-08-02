@@ -1,16 +1,20 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using TNode.TNodeGraphViewImpl.Editor.GraphBlackboard;
+using TNodeCore.Editor.Blackboard;
 using TNodeCore.Editor.NodeGraphView;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace TNode.TNodeGraphViewImpl.Editor.Search{
     public class BlackboardSearchWindowProvider:ScriptableObject,ISearchWindowProvider{
         private Type _graphType;
         private IBaseDataGraphView _graphView;
         private EditorWindow _editor;
+        private IBlackboardView _blackboard;
 
         private struct InternalSearchTreeUserData{
             public IList List;
@@ -38,31 +42,49 @@ namespace TNode.TNodeGraphViewImpl.Editor.Search{
                                 List = field.GetValue(blackboardData) as IList,
                                 Type = field.FieldType.GetGenericArguments()[0]
                             }
-                            
                         });
                     }
                 }
+
+                if (field.FieldType.IsArray){
+                    list.Add(new SearchTreeEntry(new GUIContent(field.Name,icon)){
+                        level = 1,
+                        userData = new InternalSearchTreeUserData(){
+                            List = field.GetValue(blackboardData) as Array,
+                            Type = field.FieldType.GetElementType()
+                        }
+                    });
+                }
             }
-            Debug.Log($"{list.Count}");
             return list;
         }
 
         public bool OnSelectEntry(SearchTreeEntry SearchTreeEntry, SearchWindowContext context){
             var userData = SearchTreeEntry.userData;
+           
             if (userData is InternalSearchTreeUserData){
                 var list = ((InternalSearchTreeUserData) userData).List;
+                Debug.Log(list);
                 var type = ((InternalSearchTreeUserData) userData).Type;
-                var newItem = Activator.CreateInstance(type);
-                list?.Add(newItem);
+                if (!typeof(Object).IsAssignableFrom(type)){
+                    var newItem = Activator.CreateInstance(type);
+                    list?.Add(newItem);
+                }
+                else{
+                    var newItem = EditorUtility.InstanceIDToObject(EditorGUIUtility.GetObjectPickerControlID());
+                    list?.Add(newItem);
+                }
+                _blackboard.NotifyUpdate();
                 return true;
             }
             return false;
         }
 
-        public void Setup(Type graph,IBaseDataGraphView graphView,EditorWindow editor){
+        public void Setup(Type graph,IBaseDataGraphView graphView,EditorWindow editor,IBlackboardView blackboard){
             _graphType = graph;
             _graphView = graphView;
             _editor = editor;
+            _blackboard = blackboard;
         }
     }
     

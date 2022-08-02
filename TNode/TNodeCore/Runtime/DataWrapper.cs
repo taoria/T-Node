@@ -36,10 +36,19 @@ namespace TNodeCore.Runtime{
             var fieldInfo = data.GetType().GetField(path);
             return fieldInfo.GetValue(data);
         }
-        
+
+        public KeyValuePair<string,object>[] GetAllFieldValue(){
+            var fieldInfos = data.GetType().GetFields();
+            var list = new List<KeyValuePair<string,object>>();
+            foreach (var fieldInfo in fieldInfos){
+                list.Add(new KeyValuePair<string, object>(fieldInfo.Name,fieldInfo.GetValue(data)));
+            }
+            return list.ToArray();
+        }
         public virtual TData GetData(){
             return data;
         }
+        
         public static implicit operator TData(DataWrapper<TWrapper,TData> wrapper){
             if (wrapper == null)
                 return default(TData);

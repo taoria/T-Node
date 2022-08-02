@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -268,6 +269,21 @@ namespace TNodeCore.Runtime.RuntimeCache{
             var dic = RuntimeCache.Instance.CachedDelegatesForGettingValue[type ?? data.GetType()];
             var method = dic.ContainsKey(path) ? dic[path] : null;
             return method?.Invoke(data);
+        }
+        public static object GetListValue(this IModel data,string path,int index,Type type=null){
+            if(!RuntimeCache.Instance.CachedDelegatesForGettingValue.ContainsKey(type??data.GetType())){
+                return null;
+            }
+            var dic = RuntimeCache.Instance.CachedDelegatesForGettingValue[type ?? data.GetType()];
+            var method = dic.ContainsKey(path) ? dic[path] : null;
+            if(method == null){
+                return null;
+            }
+            var list = method.Invoke(data) as IList;
+            if(list == null){
+                return null;
+            }
+            return list[index];
         }
     
         public static void SetValue<T>(this IModel data,string path,T value,Type type=null){

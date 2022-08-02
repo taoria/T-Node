@@ -17,8 +17,12 @@ namespace TNodeCore.Editor.EditorPersistence{
         
         public IDataGraphView<T> GetGraphView<T> () where T:GraphData{
             switch (graphImplType){
-                case GraphImplType.GraphViewImpl:
+                case GraphImplType.GraphViewImpl:{
                     return (IDataGraphView<T>)GraphViewImplCreator.Invoke(typeof(T));
+                    
+                }
+                    
+                
                 case GraphImplType.GraphToolsFoundationImpl:
                     throw new NotImplementedException();
                 default:

@@ -29,5 +29,6 @@ namespace TNodeCore.Editor.NodeGraphView{
         void NotifyRuntimeUpdate();
 
         public Action AfterRuntimeGraphUpdate{ get; set; }
+        void AfterEditorLoadGraphView();
     }
 }
