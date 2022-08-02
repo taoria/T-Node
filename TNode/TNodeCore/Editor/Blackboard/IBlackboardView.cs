@@ -10,6 +10,7 @@ namespace TNodeCore.Editor.Blackboard{
         public void AddItem();
 
         void Setup(IBaseDataGraphView graphView,EditorWindow ownerWindow);
+        void NotifyUpdate();
     }
     public interface IBlackboardView<T> : IBlackboardView where T : BlackboardData{
         

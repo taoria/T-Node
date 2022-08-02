@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using TNode.TNodeGraphViewImpl.Editor.Cache;
+using TNode.TNodeGraphViewImpl.Editor.GraphBlackboard;
 using TNode.TNodeGraphViewImpl.Editor.Inspector;
 using TNode.TNodeGraphViewImpl.Editor.NodeViews;
 using TNode.TNodeGraphViewImpl.Editor.Search;
@@ -34,6 +35,8 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
         private IBlackboardView _blackboard;
         private bool _runtimeGraphUpdate;
 
+        
+        
         public T Data{
             get{ return _data; }
             set{
@@ -195,8 +198,14 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
 
         private void OnInit(){
             ConstructDefaultBehaviour();
-            OnGraphViewCreate();
+            
             CheckDataAfterInit();
+            
+            OnGraphViewCreate();
+        }
+
+        public virtual void AfterEditorLoadGraphView(){
+            
         }
 
         protected void CreateMenu(){
@@ -247,11 +256,22 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
                         //Make a constructor of  BlackboardDragNodeData<field.PropertyType > by reflection
                         var dragNodeData = NodeCreator.InstantiateNodeData<BlackboardDragNodeData>();
                         dragNodeData.BlackboardData = GetBlackboardData();
-                        dragNodeData.blackDragData = field.BlackboardProperty.PropertyName;
+                        dragNodeData.BlackDragData = field.BlackboardProperty.PropertyName;
                         AddTNode(dragNodeData,new Rect(evt.mousePosition,new Vector2(200,200)));
                     }
                 }
-             
+
+                var blackboardEntries = data.OfType<BlackboardDataEntry>();
+                foreach (var selectable in blackboardEntries){
+                    if(selectable is { } entry) {
+                        //Make a constructor of  BlackboardDragNodeData<field.PropertyType > by reflection
+                        var dragNodeData = NodeCreator.InstantiateNodeData<BlackboardDragNodeData>();
+                        dragNodeData.BlackboardData = GetBlackboardData();
+                        dragNodeData.BlackDragData = entry.propertyPath;
+                        AddTNode(dragNodeData,new Rect(evt.mousePosition,new Vector2(200,200)));
+                    }
+                }
+
             }
         }
 
@@ -261,6 +281,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
                 DragAndDrop.visualMode = DragAndDropVisualMode.Move;
                 //high light the 
             }
+          
         }
         #endregion
 
@@ -523,7 +544,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
         public void CreateBlackboard(){
             _blackboard = NodeEditorExtensions.CreateBlackboardWithGraphData(typeof(T));
             _blackboard.Setup(this,Owner);
-      
+            Debug.Log(Owner);
             var castedBlackboard = _blackboard as Blackboard;
             Add(castedBlackboard);
             Rect blackboardPos = new Rect(0,0,300,700);

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace TNodeCore.Runtime.Models{
     [Serializable]
     public class GraphData:ScriptableObject,ISerializationCallbackReceiver{
+        [NonSerialized]
         public Dictionary<string,NodeData> NodeDictionary = new Dictionary<string,NodeData>();
         
         [SerializeReference]
@@ -28,8 +30,6 @@ namespace TNodeCore.Runtime.Models{
     
   
         public void OnBeforeSerialize(){
-     
-   
             nodeList.Clear();
             foreach(var node in NodeDictionary.Values){
                 nodeList.Add(node);

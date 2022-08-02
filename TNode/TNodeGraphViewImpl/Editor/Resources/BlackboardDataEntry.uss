@@ -1,0 +1,12 @@
+﻿BlackboardDataEntry{
+    border-width: 1px;
+    border-color: aqua;
+}
+.typeComponent{
+    border-width: 1px;
+    border-color: rgba(201, 249, 116, 255);
+}
+.vector{
+    border-width: 1px;
+    border-color: rgba(0.788, 0.969, 0.455, 1.000);
+}

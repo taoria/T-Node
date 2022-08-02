@@ -14,11 +14,18 @@ namespace TNode.TNodeGraphViewImpl.Editor.GraphBlackboard{
         protected EditorWindow OwnerWindow;
         private T _data;
 
+        public void AddItem(){
+           
+        }
+
         public void Setup(IBaseDataGraphView graphView,EditorWindow ownerWindow){
             Owner = graphView;
             OwnerWindow = ownerWindow;
         }
 
+        public void NotifyUpdate(){
+            UpdateBlackboard(GetBlackboardData());
+        }
 
 
         public new void SetPosition(Rect rect){
@@ -44,8 +51,6 @@ namespace TNode.TNodeGraphViewImpl.Editor.GraphBlackboard{
             Data = (T) data;
         }
 
-        public void AddItem(){
-           
-        }
+  
     }
 }

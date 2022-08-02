@@ -81,7 +81,11 @@ namespace TNodeCore.Editor{
         }
         private void BuildGraphView(){
             GraphView = graphEditorData.GetGraphView<T>();
+            GraphView.Owner = this;
+       
             rootVisualElement.Add((VisualElement)GraphView);
+
+            GraphView.AfterEditorLoadGraphView();
             ((VisualElement)GraphView).StretchToParentSize();
         }
 

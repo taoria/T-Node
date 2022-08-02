@@ -10,5 +10,7 @@ namespace TNodeCore.Runtime.Models{
         public object Clone(){
             return this.MemberwiseClone();
         }
+
+   
     }
 }

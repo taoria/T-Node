@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using TNodeCore.Runtime.Models;
+using UnityEditor;
 using UnityEngine;
 
 namespace TNodeCore.Runtime.Components{
@@ -13,7 +14,6 @@ namespace TNodeCore.Runtime.Components{
         /// <summary>
         /// Runtime copy of scene node data to hold references to scene objects
         /// </summary>
-        public List<SceneNodeData> sceneNodes;
         
         /// <summary>
         /// Map of node id to runtime node
@@ -264,21 +264,25 @@ namespace TNodeCore.Runtime.Components{
         #region build scene node data
         #if UNITY_EDITOR
         public void BuildSceneNodePersistentData(SceneNodeData sceneNodeData){
-            var tr = transform.Find("PersistentData");
-            GameObject go;
-            if (tr == null){
-                go = new GameObject("PersistentData");
-                go.transform.SetParent(transform);
-                go.AddComponent<SceneDataPersistent>();
-            }
-            go = tr.gameObject;
-            var persistentData = go.GetComponent<SceneDataPersistent>();
+            var persistentData = transform.Find("PersistentData").GetComponent<SceneDataPersistent>();
             persistentData.SceneNodeDataDictionary.Add(sceneNodeData.id,sceneNodeData);
         }
 
+        public SceneDataPersistent CreateSceneNodePersistentGameObject(){
+            var go = new GameObject("PersistentData");
+            go.transform.SetParent(transform);
+            return go.AddComponent<SceneDataPersistent>();
+        }
+
         public void BuildSceneNode(){
-            var fetchedSceneNode = graphData.NodeDictionary.Values.Where(x => x is SceneNodeData and not BlackboardDragNodeData);
-            var scenePersistent = transform.Find("PersistentData").GetComponent<SceneDataPersistent>();
+            var fetchedSceneNode = graphData.NodeDictionary.Values.Where(x => x is SceneNodeData and not BlackboardDragNodeData).ToArray();
+            if (!fetchedSceneNode.Any()) return;
+            var scenePersistent = transform.Find("PersistentData")?.GetComponent<SceneDataPersistent>();
+            
+            if(scenePersistent == null){
+               scenePersistent =  CreateSceneNodePersistentGameObject();
+                
+            }
             foreach (var nodeData in fetchedSceneNode){
                 if (scenePersistent.SceneNodeDataDictionary.ContainsKey(nodeData.id)){
                     var sceneNodeData = scenePersistent.SceneNodeDataDictionary[nodeData.id];
@@ -396,6 +400,7 @@ namespace TNodeCore.Runtime.Components{
     }
 
     public class SceneDataPersistent:MonoBehaviour,ISerializationCallbackReceiver{
+        [NonSerialized]
         
         public readonly Dictionary<string,SceneNodeData> SceneNodeDataDictionary = new();
         
@@ -404,6 +409,7 @@ namespace TNodeCore.Runtime.Components{
 
 
         public void OnBeforeSerialize(){
+      
             sceneNodeData.Clear();
             foreach(var node in SceneNodeDataDictionary.Values){
                 sceneNodeData.Add(node);
@@ -416,7 +422,7 @@ namespace TNodeCore.Runtime.Components{
             }
         }
     }
-
+    
     public enum ProcessingStrategy{
         BreadthFirst,
         DepthFirst

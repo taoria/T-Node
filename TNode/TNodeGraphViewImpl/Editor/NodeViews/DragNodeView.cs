@@ -21,13 +21,25 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeViews{
             var blackboard = obj.BlackboardData;
             BlackboardDataWrapper blackboardWrapper = (BlackboardDataWrapper)blackboard;
             var serializedData = new SerializedObject(blackboardWrapper);
-            var serializedProperty = serializedData.FindProperty("data").FindPropertyRelative(obj.blackDragData);
-            
-            label.text = ObjectNames.NicifyVariableName(obj.blackDragData);
-     
+            var arrayElement = obj.isListElement;
+            SerializedProperty serializedProperty = null;
+            if (arrayElement){
+                var part = obj.BlackDragData.Split('.');
+                serializedProperty = serializedData.FindProperty("data").FindPropertyRelative(part[0]).GetArrayElementAtIndex(int.Parse(part[1]));
+            }
+            else{
+                 serializedProperty = serializedData.FindProperty("data").FindPropertyRelative(obj.BlackDragData);
+            }
+            label.text = ObjectNames.NicifyVariableName(obj.BlackDragData);
             //Get serialized property's icon
-            var icon = AssetPreview.GetMiniThumbnail(serializedProperty.boxedValue as UnityEngine.Object);
-         
+            Texture2D icon = null;
+            if (serializedProperty.boxedValue is Object value){
+                icon = AssetPreview.GetMiniThumbnail(value);
+            }
+            else{
+                icon = AssetPreview.GetMiniTypeThumbnail(serializedProperty.boxedValue.GetType());
+            }
+
             label.parent.Add(new Image(){
                 image = icon
             });
