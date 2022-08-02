@@ -1,12 +1,11 @@
-﻿using TNode.Editor.Search;
-using TNodeCore.Editor.Blackboard;
+﻿using TNodeCore.Editor.Blackboard;
 using TNodeCore.Editor.NodeGraphView;
 using TNodeCore.Runtime.Models;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
-namespace TNodeGraphViewImpl.Editor.GraphBlackboard{
+namespace TNode.TNodeGraphViewImpl.Editor.GraphBlackboard{
     /// <summary>
     /// Implement this class to create graph black board for specified graph
     /// </summary>

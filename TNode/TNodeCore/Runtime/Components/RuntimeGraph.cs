@@ -202,6 +202,9 @@ namespace TNodeCore.Runtime.Components{
             foreach (var sceneNode in sceneNodes){
                 if (sceneNode != null) sceneNode.BlackboardData = runtimeBlackboardData;
             }
+#if UNITY_EDITOR
+            BuildSceneNode();
+#endif
             _build = true;
         }
 
@@ -246,6 +249,59 @@ namespace TNodeCore.Runtime.Components{
             _graphTool.DirectlyTraversal();
             return true;
         }
+        #region build scene node data
+        #if UNITY_EDITOR
+        public void BuildSceneNodePersistentData(SceneNodeData sceneNodeData){
+            var tr = transform.Find("PersistentData");
+            GameObject go;
+            if (tr == null){
+                go = new GameObject("PersistentData");
+                go.transform.SetParent(transform);
+                go.AddComponent<SceneDataPersistent>();
+            }
+            go = tr.gameObject;
+            var persistentData = go.GetComponent<SceneDataPersistent>();
+            persistentData.SceneNodeDataDictionary.Add(sceneNodeData.id,sceneNodeData);
+        }
+
+        public void BuildSceneNode(){
+            var fetchedSceneNode = graphData.NodeDictionary.Values.Where(x => x is SceneNodeData and not BlackboardDragNodeData);
+            foreach (var nodeData in fetchedSceneNode){
+                if (transform.Find(nodeData.id.GetHashCode().ToString())){
+                    var scenePersistent = transform.Find("PersistentData").GetComponent<SceneDataPersistent>();
+                    if (scenePersistent.SceneNodeDataDictionary.ContainsKey(nodeData.id)){
+                        var sceneNodeData = scenePersistent.SceneNodeDataDictionary[nodeData.id];
+                        RuntimeNodes[nodeData.id].NodeData = sceneNodeData;
+                    }
+                }
+                else if (nodeData.Clone() is SceneNodeData clonedNodeData){
+                    clonedNodeData.BlackboardData = runtimeBlackboardData;
+                    RuntimeNodes.Remove(nodeData.id);
+                    RuntimeNodes.Add(nodeData.id,new RuntimeNode(clonedNodeData));
+                    BuildSceneNodePersistentData(clonedNodeData);
+                }
+            }
+            UpdatePersistentData();
+        }
+
+        private void UpdatePersistentData(){
+            var persistentData = transform.Find("PersistentData")?.GetComponent<SceneDataPersistent>();
+            if (persistentData == null) return;
+            var fetchedSceneNode = 
+                RuntimeNodes
+                    .Where(x => x.Value.NodeData is SceneNodeData and not BlackboardDragNodeData)
+                    .Select(x=>x.Value.NodeData).ToArray();
+ 
+            var dic = persistentData.SceneNodeDataDictionary;
+            foreach (var sceneNodeData in dic.Values){
+                if(!fetchedSceneNode.Contains(sceneNodeData)){
+                    persistentData.SceneNodeDataDictionary.Remove(sceneNodeData.id);
+                }
+            }
+        }
+        #endif
+        #endregion
+
         private void ModifyOrCreateInNode(NodeLink linkData){
             var inNodeId = linkData.inPort.nodeDataId;
             var inNode = graphData.NodeDictionary[inNodeId];
@@ -327,6 +383,28 @@ namespace TNodeCore.Runtime.Components{
             _graphTool.DirectlyTraversal();
         }
        
+    }
+
+    public class SceneDataPersistent:MonoBehaviour,ISerializationCallbackReceiver{
+        
+        public readonly Dictionary<string,SceneNodeData> SceneNodeDataDictionary = new();
+        
+        [SerializeReference]
+        public List<SceneNodeData> sceneNodeData=new ();
+
+
+        public void OnBeforeSerialize(){
+            sceneNodeData.Clear();
+            foreach(var node in SceneNodeDataDictionary.Values){
+                sceneNodeData.Add(node);
+            }
+        }
+        public void OnAfterDeserialize(){
+            SceneNodeDataDictionary.Clear();
+            foreach(var node in sceneNodeData){
+                SceneNodeDataDictionary.Add(node.id,node);
+            }
+        }
     }
 
     public enum ProcessingStrategy{

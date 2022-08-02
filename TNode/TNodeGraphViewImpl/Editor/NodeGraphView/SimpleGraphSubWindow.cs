@@ -1,11 +1,10 @@
 ﻿using System.Linq;
-using TNode.Editor;
 using TNodeCore.Editor.EditorPersistence;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
 
-namespace TNodeGraphViewImpl.Editor.NodeGraphView{
+namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
     public class SimpleGraphSubWindow:GraphElement,IGraphViewPersistence{
         private readonly Dragger _dragger = new Dragger();
 

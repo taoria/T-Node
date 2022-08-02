@@ -37,5 +37,8 @@ namespace TNodeCore.Runtime.Models{
             
         }
  #endif
+        public object Clone(){
+            return this.MemberwiseClone();
+        }
     }
 }

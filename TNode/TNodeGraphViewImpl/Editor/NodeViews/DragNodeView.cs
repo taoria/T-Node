@@ -1,15 +1,12 @@
 ﻿using TNodeCore.Editor.Serialization;
 using TNodeCore.Runtime.Attributes;
 using TNodeCore.Runtime.Models;
-using TNodeGraphViewImpl.Editor.NodeViews;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
-using UnityEditor.Graphs;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace TNode.Editor.NodeViews{
+namespace TNode.TNodeGraphViewImpl.Editor.NodeViews{
     [ViewComponent]
     public class DragBaseNodeView:BaseNodeView<BlackboardDragNodeData>{
         public DragBaseNodeView() : base(){

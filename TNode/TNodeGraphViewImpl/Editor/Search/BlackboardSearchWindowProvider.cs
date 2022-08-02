@@ -6,7 +6,7 @@ using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
-namespace TNode.Editor.Search{
+namespace TNode.TNodeGraphViewImpl.Editor.Search{
     public class BlackboardSearchWindowProvider:ScriptableObject,ISearchWindowProvider{
         private Type _graphType;
         private IBaseDataGraphView _graphView;

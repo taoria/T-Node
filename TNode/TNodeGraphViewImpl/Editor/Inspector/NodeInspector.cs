@@ -1,18 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using TNode.Editor.NodeViews;
+﻿using TNode.TNodeGraphViewImpl.Editor.NodeGraphView;
+using TNode.TNodeGraphViewImpl.Editor.NodeViews;
 using TNodeCore.Runtime.Models;
-using TNodeGraphViewImpl.Editor.NodeGraphView;
-using TNodeGraphViewImpl.Editor.NodeViews;
-using Unity.VisualScripting;
-using UnityEditor;
 using UnityEditor.Experimental.GraphView;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace TNode.Editor.Inspector{
+namespace TNode.TNodeGraphViewImpl.Editor.Inspector{
     public class NodeInspector:SimpleGraphSubWindow{
         private NodeData _data;
         public NodeData Data{
