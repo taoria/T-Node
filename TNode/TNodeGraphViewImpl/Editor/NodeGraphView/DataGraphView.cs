@@ -281,10 +281,12 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
                     continue;
                 //Get the derived type of NodeAttribute View from the node type
                 if (dataNode is SceneNodeData runtimeNodeData){
-                    if (runtimeNodeData is not BlackboardDragNodeData){
+                    if (runtimeNodeData is  BlackboardDragNodeData){
                         runtimeNodeData.BlackboardData = GetBlackboardData();
+                        AddPersistentNode(runtimeNodeData);
                     }
                     else{
+            
                         var node = _runtimeGraph.Get(runtimeNodeData.id).NodeData as SceneNodeData;
                         AddPersistentNode(node);
                     }

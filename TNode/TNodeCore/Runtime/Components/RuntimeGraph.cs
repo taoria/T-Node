@@ -196,6 +196,10 @@ namespace TNodeCore.Runtime.Components{
                 ModifyOrCreateInNode(linkData);
                 ModifyOrCreateOutNode(linkData);
             }
+            //iterate nodes and create runtime nodes
+            foreach (var nodeData in graphData.NodeDictionary.Values){
+                CreateRuntimeNodeIfNone(nodeData);
+            }
             var nodeList = RuntimeNodes.Values;
             _graphTool = new GraphTool(nodeList.ToList(),RuntimeNodes,this);
             var sceneNodes = RuntimeNodes.Values.Where(x => x.NodeData is SceneNodeData).Select(x => x.NodeData as SceneNodeData);
@@ -206,6 +210,12 @@ namespace TNodeCore.Runtime.Components{
             BuildSceneNode();
 #endif
             _build = true;
+        }
+
+        private void CreateRuntimeNodeIfNone(NodeData nodeData){
+            if (RuntimeNodes.ContainsKey(nodeData.id)) return;
+            var runtimeNode = new RuntimeNode(nodeData);
+            RuntimeNodes.Add(nodeData.id,runtimeNode);
         }
 
         /// <summary>
@@ -227,6 +237,8 @@ namespace TNodeCore.Runtime.Components{
         /// <param name="id"></param>
         /// <returns></returns>
         public RuntimeNode Get(string id){
+            if(!_build)
+                Build();
             if (RuntimeNodes.ContainsKey(id)){
                 return RuntimeNodes[id];
             }
@@ -266,13 +278,11 @@ namespace TNodeCore.Runtime.Components{
 
         public void BuildSceneNode(){
             var fetchedSceneNode = graphData.NodeDictionary.Values.Where(x => x is SceneNodeData and not BlackboardDragNodeData);
+            var scenePersistent = transform.Find("PersistentData").GetComponent<SceneDataPersistent>();
             foreach (var nodeData in fetchedSceneNode){
-                if (transform.Find(nodeData.id.GetHashCode().ToString())){
-                    var scenePersistent = transform.Find("PersistentData").GetComponent<SceneDataPersistent>();
-                    if (scenePersistent.SceneNodeDataDictionary.ContainsKey(nodeData.id)){
-                        var sceneNodeData = scenePersistent.SceneNodeDataDictionary[nodeData.id];
-                        RuntimeNodes[nodeData.id].NodeData = sceneNodeData;
-                    }
+                if (scenePersistent.SceneNodeDataDictionary.ContainsKey(nodeData.id)){
+                    var sceneNodeData = scenePersistent.SceneNodeDataDictionary[nodeData.id];
+                    RuntimeNodes[nodeData.id].NodeData = sceneNodeData;
                 }
                 else if (nodeData.Clone() is SceneNodeData clonedNodeData){
                     clonedNodeData.BlackboardData = runtimeBlackboardData;
