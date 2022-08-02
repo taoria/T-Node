@@ -2,29 +2,26 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
-using TNode.Editor.Inspector;
+using TNode.TNodeGraphViewImpl.Editor.Cache;
+using TNode.TNodeGraphViewImpl.Editor.Inspector;
+using TNode.TNodeGraphViewImpl.Editor.NodeViews;
+using TNode.TNodeGraphViewImpl.Editor.Search;
 using TNodeCore.Editor;
 using TNodeCore.Editor.Blackboard;
 using TNodeCore.Editor.EditorPersistence;
 using TNodeCore.Editor.NodeGraphView;
 using TNodeCore.Editor.Tools.NodeCreator;
-using TNodeCore.Runtime;
 using TNodeCore.Runtime.Components;
 using TNodeCore.Runtime.Models;
 using TNodeCore.Runtime.RuntimeCache;
-using TNodeGraphViewImpl.Editor.Cache;
-using TNodeGraphViewImpl.Editor.NodeViews;
-using TNodeGraphViewImpl.Editor.Search;
-using Unity.VisualScripting;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
-using BlackboardField = TNodeGraphViewImpl.Editor.GraphBlackboard.BlackboardField;
+using BlackboardField = TNode.TNodeGraphViewImpl.Editor.GraphBlackboard.BlackboardField;
 using Edge = UnityEditor.Experimental.GraphView.Edge;
 
-namespace TNodeGraphViewImpl.Editor.NodeGraphView{
+namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
     public   class BaseDataGraphView<T>:GraphView,IDataGraphView<T> where T:GraphData{
         #region variables and properties
         private T _data;
@@ -71,8 +68,9 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
             SetupZoom(ContentZoomer.DefaultMinScale, ContentZoomer.DefaultMaxScale);
             RegisterDragEvent();
             OnInit();
-            
         }
+
+
         /// <summary>
         /// Probably reusable in later GTFs version
         /// </summary>
@@ -281,17 +279,22 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
             foreach (var dataNode in _data.NodeDictionary.Values){
                 if(dataNode==null)
                     continue;
-                
-                //Get the node type
-                var nodeType = dataNode.GetType();
                 //Get the derived type of NodeAttribute View from the node type
                 if (dataNode is SceneNodeData runtimeNodeData){
-                    runtimeNodeData.BlackboardData = GetBlackboardData();
+                    if (runtimeNodeData is  BlackboardDragNodeData){
+                        runtimeNodeData.BlackboardData = GetBlackboardData();
+                        AddPersistentNode(runtimeNodeData);
+                    }
+                    else{
+            
+                        var node = _runtimeGraph.Get(runtimeNodeData.id).NodeData as SceneNodeData;
+                        AddPersistentNode(node);
+                    }
                 }
-                var nodePos = Owner.graphEditorData.graphElementsData.
-                    FirstOrDefault(x => x.guid == dataNode.id)?.pos??new Rect(0,0,200,200);
-      
-                AddTNode(dataNode,nodePos);
+                else{
+                    AddPersistentNode(dataNode);
+                }
+  
             }
 
             foreach (var edge in _data.NodeLinks){
@@ -309,6 +312,12 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
                 AddElement(newEdge);
             }
             _nodeDict.Clear();
+        }
+
+        private void AddPersistentNode(NodeData dataNode){
+            var nodePos = Owner.graphEditorData.graphElementsData.FirstOrDefault(x => x.guid == dataNode.id)?.pos ??
+                          new Rect(0, 0, 200, 200);
+            AddTNode(dataNode, nodePos);
         }
         //OnDataChanged event
 

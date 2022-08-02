@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TNodeGraphViewImpl.Editor.GraphBlackboard.BlackboardProperty{
+namespace TNode.TNodeGraphViewImpl.Editor.GraphBlackboard.BlackboardProperty{
     public class BlackboardProperty{
         public string PropertyName;
         public Type PropertyType;

@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using TNode.Editor.Inspector;
-using TNodeCore;
+using TNode.TNodeGraphViewImpl.Editor.Inspector;
 using TNodeCore.Editor.NodeGraphView;
 using TNodeCore.Editor.Serialization;
 using TNodeCore.Runtime;
@@ -13,7 +12,7 @@ using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace TNodeGraphViewImpl.Editor.NodeViews{
+namespace TNode.TNodeGraphViewImpl.Editor.NodeViews{
     
     public abstract class BaseNodeView<T> : Node,INodeView<T> where T:NodeData,new(){
         protected T _data;

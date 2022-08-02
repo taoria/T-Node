@@ -3,13 +3,11 @@ using TNodeCore.Editor.NodeGraphView;
 using TNodeCore.Editor.Serialization;
 using TNodeCore.Runtime.Attributes;
 using TNodeCore.Runtime.Models;
-using TNodeGraphViewImpl.Editor.NodeViews;
 using UnityEditor;
 using UnityEditor.UIElements;
-using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace TNode.Editor.Inspector{
+namespace TNode.TNodeGraphViewImpl.Editor.Inspector{
     public class NodeInspectorInNode:VisualElement{
         private NodeData _data;
         public NodeData Data{
@@ -57,10 +55,16 @@ namespace TNode.Editor.Inspector{
                     serializedObject.ApplyModifiedProperties();
                     ((NodeDataWrapper)_data).ForceNotify();
                 });
+                if (_data is SceneNodeData and not BlackboardDragNodeData){
+                    
+                }
+                else{
+                    if (drawer.Q<ObjectField>() != null){
+                        drawer.Q<ObjectField>().allowSceneObjects = false;
+                    }
+                }
                 drawer.Bind(serializedObject);
                 Add(drawer);
-
-     
             }
 
             var globalTest = GetFirstAncestorOfType<IBaseDataGraphView>()?.TestMode;

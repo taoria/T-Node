@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 using System.Reflection;
-using TNode.Editor.Search;
+using TNode.TNodeGraphViewImpl.Editor.Search;
 using TNodeCore.Editor.NodeGraphView;
 using TNodeCore.Editor.Serialization;
 using TNodeCore.Runtime.Attributes;
@@ -11,7 +11,7 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace TNodeGraphViewImpl.Editor.GraphBlackboard{
+namespace TNode.TNodeGraphViewImpl.Editor.GraphBlackboard{
     [ViewComponent]
     public class DefaultGraphBlackboardView:GraphBlackboardView<BlackboardData>{
         public DefaultGraphBlackboardView():base(){
