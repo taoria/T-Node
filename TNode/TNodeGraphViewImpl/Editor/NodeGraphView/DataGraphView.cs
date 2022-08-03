@@ -98,15 +98,14 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
                 var res = DragAndDrop.objectReferences;
                 foreach (var obj in res){
                     if (obj is T graphData){
-                        Data = graphData;
                         IsRuntimeGraph = false;
+                        Data = graphData;
                     }
                     else{
                         if (obj is GameObject gameObject){
                             
                             if (gameObject.GetComponent<RuntimeGraph>() != null){
                                 if (gameObject.GetComponent<RuntimeGraph>().graphData != null){
-                                   
                                     _runtimeGraph = gameObject.GetComponent<RuntimeGraph>();
                                     IsRuntimeGraph = true;
                                     BuildRuntimeGraphBehaviour();
@@ -114,7 +113,6 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
                                     if(Data==null){
                                         Debug.LogError($"Dragged a wrong graph data to editor,expected {typeof(T)} but got {gameObject.GetComponent<RuntimeGraph>().graphData.GetType()}");
                                     }
-                                    
                                 }
                             }
                         }
@@ -341,8 +339,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
         }
 
         private void AddPersistentNode(NodeData dataNode){
-            var nodePos = Owner.graphEditorData.graphElementsData.FirstOrDefault(x => x.guid == dataNode.id)?.pos ??
-                          new Rect(0, 0, 200, 200);
+            var nodePos = dataNode.positionInView;
             AddTNode(dataNode, nodePos);
         }
         //OnDataChanged event
@@ -391,21 +388,21 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
         }
 
         public void SaveEditorData(GraphEditorData graphEditorData){
-            graphEditorData.graphElementsData?.Clear();
-            //iterator nodes
-            if (graphEditorData.graphElementsData == null){
-                graphEditorData.graphElementsData = new List<GraphElementEditorData>();
-            }
-            foreach (var node in this.nodes){
-                var nodeEditorData = new GraphElementEditorData{
-                    pos = node.GetPosition(),
-                };
-                if (node is IBaseNodeView nodeView){
-                    nodeEditorData.guid = nodeView.GetNodeData().id;
-                }
-                graphEditorData.graphElementsData.Add(nodeEditorData);
-                EditorUtility.SetDirty(graphEditorData);
-            }
+            // graphEditorData.graphElementsData?.Clear();
+            // //iterator nodes
+            // if (graphEditorData.graphElementsData == null){
+            //     graphEditorData.graphElementsData = new List<GraphElementEditorData>();
+            // }
+            // foreach (var node in this.nodes){
+            //     var nodeEditorData = new GraphElementEditorData{
+            //         pos = node.GetPosition(),
+            //     };
+            //     if (node is IBaseNodeView nodeView){
+            //         nodeEditorData.guid = nodeView.GetNodeData().id;
+            //     }
+            //     graphEditorData.graphElementsData.Add(nodeEditorData);
+            //     EditorUtility.SetDirty(graphEditorData);
+            // }
         }
         
         public  void SaveWithEditorData(GraphEditorData graphEditorData){
@@ -499,8 +496,15 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
         #region implement interfaces
         public void AddTNode(NodeData nodeData, Rect rect){
             if (NodeEditorExtensions.CreateNodeViewFromNodeType(nodeData.GetType()) is Node nodeView){
-                nodeView.SetPosition(rect);
+                //convert rect at graph space
+                
+                var resPos = this.viewTransform.matrix.inverse.MultiplyPoint3x4(rect.position);
+                rect.position = resPos;
+                if(nodeView is IBaseNodeView nodeViewInterface){
+                    nodeViewInterface.SetNodeData(nodeData);
+                }
                 AddElement(nodeView);
+                ((IBaseNodeView)nodeView).InitializePosition(rect);
                 //Add a select callback to the nodeView
                 nodeView.RegisterCallback<MouseDownEvent>(evt => {
                     if (evt.clickCount == 1){
@@ -510,14 +514,17 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
                         }
                     }
                 });
-                if(nodeView is IBaseNodeView nodeViewInterface){
-                    nodeViewInterface.SetNodeData(nodeData);
-                }
-                _nodeDict.Add(nodeData.id, nodeView);
+                
+                
+
+                if(_nodeDict.ContainsKey(nodeData.id)==false) 
+                    _nodeDict.Add(nodeData.id, nodeView);
                 if (_data.NodeDictionary.ContainsKey(nodeData.id) == false){
                     Undo.RegisterCompleteObjectUndo(_data,"Node Creation");
                     _data.NodeDictionary.Add(nodeData.id,nodeData);
                 }
+
+                
                 //register an callback ,when right click context menu
                 nodeView.RegisterCallback<ContextClickEvent>(evt => {
                     var menu = new GenericMenu();
@@ -558,6 +565,13 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
         }
 
         public bool TestMode{ get; set; }
+        
+        public override EventPropagation DeleteSelection(){
+            Undo.RegisterCompleteObjectUndo(_data,"Delete Selection");
+            var res = base.DeleteSelection();
+            ResetGraphView();
+            return res;
+        }
 
         public void CreateBlackboard(){
             _blackboard = NodeEditorExtensions.CreateBlackboardWithGraphData(typeof(T));

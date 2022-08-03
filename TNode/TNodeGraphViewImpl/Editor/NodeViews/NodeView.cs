@@ -184,6 +184,18 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeViews{
             Refresh();
         }
 
+        public override void SetPosition(Rect newPos){
+            var graphView = (GraphView)BaseDataGraphView;
+            //Cast newPos s position to global space
+            var globalPos = graphView.contentViewContainer.LocalToWorld(newPos.position);
+            _data.positionInView.position = globalPos;
+            base.SetPosition(newPos);
+        }
+
+        public  void InitializePosition(Rect pos){
+            base.SetPosition(pos);
+        }
+
         public void Refresh(){
             title = _data.nodeName;
         }
@@ -195,6 +207,8 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeViews{
         public void OnDataModified();
 
         IBaseDataGraphView BaseDataGraphView{ get; }
+        
+        public void InitializePosition(Rect pos);
     }
 
     public interface INodeView<T>:IBaseNodeView where T:NodeData,new(){

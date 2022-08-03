@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 namespace TNodeCore.Runtime.Models{
     /// <summary>
@@ -6,11 +7,10 @@ namespace TNodeCore.Runtime.Models{
     /// </summary>
     [Serializable]
     
-    public class BlackboardData:IModel,ICloneable{
-        public object Clone(){
-            return this.MemberwiseClone();
-        }
+    public class BlackboardData:Model,ICloneable{
 
-   
+
+
+     
     }
 }
