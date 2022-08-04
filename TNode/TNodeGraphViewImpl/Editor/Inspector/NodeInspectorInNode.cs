@@ -67,7 +67,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.Inspector{
                 Add(drawer);
             }
 
-            var globalTest = GetFirstAncestorOfType<IBaseDataGraphView>()?.TestMode;
+            var globalTest = GetFirstAncestorOfType<IBaseDataGraphView>()?.AutoUpdate;
             if(globalTest??false){
                 CreateTestButton();
             }

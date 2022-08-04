@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TNodeCore.Editor.NodeGraphView;
 using TNodeCore.Runtime.Models;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace TNodeCore.Editor.EditorPersistence{
     
@@ -14,7 +15,8 @@ namespace TNodeCore.Editor.EditorPersistence{
         public GraphImplType graphImplType = GraphImplType.GraphViewImpl;
         public static Func<Type,IBaseDataGraphView> GraphViewImplCreator;
         public static Func<Type,IBaseDataGraphView> GtfImplCreator;
-        
+        [FormerlySerializedAs("testMode")] public bool autoUpdate;
+
         public IDataGraphView<T> GetGraphView<T> () where T:GraphData{
             switch (graphImplType){
                 case GraphImplType.GraphViewImpl:{

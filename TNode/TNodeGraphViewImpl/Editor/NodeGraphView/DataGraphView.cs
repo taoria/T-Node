@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using TNode.TNodeGraphViewImpl.Editor.Cache;
 using TNode.TNodeGraphViewImpl.Editor.GraphBlackboard;
 using TNode.TNodeGraphViewImpl.Editor.Inspector;
@@ -16,6 +17,7 @@ using TNodeCore.Editor.Tools.NodeCreator;
 using TNodeCore.Runtime.Components;
 using TNodeCore.Runtime.Models;
 using TNodeCore.Runtime.RuntimeCache;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
@@ -25,16 +27,18 @@ using Edge = UnityEditor.Experimental.GraphView.Edge;
 
 namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
     public   class BaseDataGraphView<T>:GraphView,IDataGraphView<T> where T:GraphData{
+        #region const 
+        public const float RefreshRate = 1f;
+        #endregion
         #region variables and properties
         private T _data;
         private RuntimeGraph _runtimeGraph;
-
         private bool _isInspectorOn;
         private NodeSearchWindowProvider _nodeSearchWindowProvider;
         private NodeInspector _nodeInspector;
         private Dictionary<string,Node> _nodeDict = new();
         private IBlackboardView _blackboard;
-        private bool _runtimeGraphUpdate;
+        private bool _loaded;
         public T Data{
             get{ return _data; }
             set{
@@ -145,25 +149,36 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
         }
 
         private void BuildRuntimeGraphBehaviour(){
-            EditorApplication.update+= UpdateRuntimeGraphBehaviour;
+            //EditorApplication.update+= UpdateRuntimeGraphBehaviour;
+            UpdateRuntimeGraphBehaviourInTime();
             
         }
-        
-        private void UpdateRuntimeGraphBehaviour(){
-            if(_runtimeGraph != null){
-                if (_runtimeGraphUpdate){
-                    _runtimeGraphUpdate = false;
-                    _runtimeGraph.ResolveDependency();
-           
-                    AfterRuntimeGraphUpdate?.Invoke();
+
+        private async void UpdateRuntimeGraphBehaviourInTime(){
+            
+            while (_loaded){
+                await Task.Delay(TimeSpan.FromSeconds(RefreshRate));
+                if(_runtimeGraph != null){
+                    if (AutoUpdate){
+                        _runtimeGraph.ResolveDependency();
+                        AfterGraphResolved?.Invoke();
+                    }
                 }
-          
-                
-            }
-            else{
-                EditorApplication.update -= UpdateRuntimeGraphBehaviour;
             }
         }
+        // private void UpdateRuntimeGraphBehaviour(){
+        //     if(_runtimeGraph != null){
+        //         if (_runtimeGraphUpdate){
+        //             _runtimeGraphUpdate = false;
+        //             _runtimeGraph.ResolveDependency();
+        //    
+        //             AfterGraphResolved?.Invoke();
+        //         }
+        //     }
+        //     else{
+        //         EditorApplication.update -= UpdateRuntimeGraphBehaviour;
+        //     }
+        // }
 
         private void CheckDataAfterInit(){
             if(Data == null){
@@ -199,6 +214,18 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
             OnGraphViewCreate();
 
             BuildUndo();
+
+            _loaded = true;
+
+            SetDetachedFromPanel();
+
+
+        }
+
+        private void SetDetachedFromPanel(){
+            this.RegisterCallback<DetachFromPanelEvent>(evt => {
+                _loaded = false;
+            });
         }
 
         private void BuildUndo(){
@@ -225,22 +252,32 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
             
             
             //Add a toggle button to toggle test mode
-            var testModeToggle = new Toggle{
+            var autoUpdateToggle = new Toggle{
                 name = "TestModeToggle",
                 label = "Test Mode",
-                value = false
+                value = AutoUpdate
             };
-            testModeToggle.RegisterValueChangedCallback(evt => {
+            autoUpdateToggle.RegisterValueChangedCallback(evt => {
                 if (evt.newValue){
-                    TestMode = true;
+                    AutoUpdate = true;
                 }
                 else{
-                    TestMode = false;
+                    AutoUpdate = false;
                 }
             });
-            visualElement.Add(testModeToggle);
+            visualElement.Add(autoUpdateToggle);
             
-
+            var runButton = new Button{
+                name = "RunButton",
+                text = "Run Once"
+            };
+            runButton.RegisterCallback<ClickEvent>(evt => {
+                if (IsRuntimeGraph){
+                    _runtimeGraph.ResolveDependency();
+                    AfterGraphResolved?.Invoke();
+                }
+            });
+            visualElement.Add(runButton);
         }
         
         public void RegisterDragEvent(){
@@ -536,6 +573,8 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
                     });
                     menu.ShowAsContext();
                 });
+                
+                
             }
         }
 
@@ -564,11 +603,14 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
             _data.NodeLinks.Remove(nodeLink);
         }
 
-        public bool TestMode{ get; set; }
+        public bool AutoUpdate{
+            get=>Owner.graphEditorData.autoUpdate; set=>Owner.graphEditorData.autoUpdate = value;
+        }
         
         public override EventPropagation DeleteSelection(){
             Undo.RegisterCompleteObjectUndo(_data,"Delete Selection");
             var res = base.DeleteSelection();
+            SaveGraphData();
             ResetGraphView();
             return res;
         }
@@ -576,7 +618,6 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
         public void CreateBlackboard(){
             _blackboard = NodeEditorExtensions.CreateBlackboardWithGraphData(typeof(T));
             _blackboard.Setup(this,Owner);
-            Debug.Log(Owner);
             var castedBlackboard = _blackboard as Blackboard;
             Add(castedBlackboard);
             Rect blackboardPos = new Rect(0,0,300,700);
@@ -608,11 +649,9 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
 
         public void NotifyRuntimeUpdate(){
             
-            _runtimeGraphUpdate = true;
         }
-
-
-        public Action AfterRuntimeGraphUpdate{ get; set; }
+        
+        public Action AfterGraphResolved{ get; set; }
 
         #endregion
     }
