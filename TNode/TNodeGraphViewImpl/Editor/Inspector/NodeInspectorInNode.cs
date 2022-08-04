@@ -46,7 +46,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.Inspector{
             foreach (var field in _data.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public|BindingFlags.NonPublic)){
                 //Create corresponding property field
                 //check if the field has ShowInNodeView attribute
-                var showInNodeViewAttribute = field.GetCustomAttribute<ShowInNodeViewAttribute>() != null;
+                var showInNodeViewAttribute = field.GetCustomAttribute<ShowInNode>() != null;
                 if (!showInNodeViewAttribute)
                     continue;
                 var drawer = new PropertyField(serializedObject.FindProperty("data").FindPropertyRelative(field.Name));
