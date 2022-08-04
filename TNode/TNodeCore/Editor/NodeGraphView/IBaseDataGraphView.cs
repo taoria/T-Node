@@ -14,7 +14,7 @@ namespace TNodeCore.Editor.NodeGraphView{
         public void RemoveLink(NodeLink nodeLink);
 
         
-        public bool TestMode{ get; set; }
+        public bool AutoUpdate{ get; set; }
         public void CreateBlackboard();
         public GraphData GetGraphData();
         public BlackboardData GetBlackboardData();
@@ -30,9 +30,12 @@ namespace TNodeCore.Editor.NodeGraphView{
 
         public void SetGraphData(GraphData graph);
 
+
+        public Action AfterGraphResolved{ get; set; }
+        void AfterEditorLoadGraphView();
+        
+        //todo remove it later ,keep it now
         void NotifyRuntimeUpdate();
 
-        public Action AfterRuntimeGraphUpdate{ get; set; }
-        void AfterEditorLoadGraphView();
     }
 }

@@ -18,6 +18,27 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeViews{
     public abstract class BaseNodeView<T> : Node,INodeView<T> where T:NodeData,new(){
         protected T _data;
         private readonly NodeInspectorInNode _nodeInspectorInNode;
+        private NodeViewLogger _viewLogger;
+
+        private class NodeViewLogger:INodeLoggerImpl{
+            public BaseNodeView<T> NodeView { get; set; }
+            public void Log(string message){
+                var loggerAreaParent = NodeView.extensionContainer;
+                if (loggerAreaParent == null){
+                    return;
+                }
+                var loggerArea = loggerAreaParent.Q<TextField>("loggerArea");
+                if(loggerArea == null){
+                    loggerArea = new TextField();
+                    loggerArea.name = "loggerArea";
+                    loggerArea.AddToClassList("loggerArea");
+                    loggerAreaParent.Add(loggerArea);
+                }
+
+                loggerArea.multiline = true;
+                loggerArea.value = message;
+            }
+        }
 
         public IBaseDataGraphView BaseDataGraphView{
             get{
@@ -31,18 +52,22 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeViews{
                 if(_data!=null)
                     ((NodeDataWrapper)_data).OnValueChanged -= OnDataValueChanged;
                 _data = value;
+                
                 OnDataChanged?.Invoke(value);
                 if(_data!=null)
                     ((NodeDataWrapper)_data).OnValueChanged += OnDataValueChanged;
-   
             }
         }
 
         private void OnDataValueChanged(DataWrapper<NodeDataWrapper, NodeData> obj){
+            
             Refresh();
+            if (BaseDataGraphView == null) return;
             if (BaseDataGraphView.IsRuntimeGraph){
                 BaseDataGraphView.NotifyRuntimeUpdate();
             }
+
+            
         }
         public sealed override string title{
             get => base.title;
@@ -64,6 +89,13 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeViews{
             this.title = _data.nodeName;
             if (_nodeInspectorInNode != null){
                 _nodeInspectorInNode.Data = obj;
+            }
+            _viewLogger ??= new NodeViewLogger{NodeView = this};
+            if (NodeLogger.Loggers.ContainsKey(obj.id)){
+                NodeLogger.Loggers[obj.id] = _viewLogger;
+            }
+            else{
+                NodeLogger.Loggers.Add(obj.id,_viewLogger);
             }
             BuildInputAndOutputPort();
             this.expanded = true;
@@ -106,7 +138,6 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeViews{
    
             foreach (var propertyInfo in propertyInfos){
                 if (propertyInfo.GetCustomAttributes(typeof(OutputAttribute),true).FirstOrDefault() is OutputAttribute attribute){
-
                     Port port = new CustomPort(Orientation.Horizontal, Direction.Output,
                         attribute.Multiple ? Port.Capacity.Multi : Port.Capacity.Single,
                         BuildPortType(attribute, propertyInfo));
@@ -115,16 +146,18 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeViews{
                     var portName = ObjectNames.NicifyVariableName(BuildPortName(attribute,propertyInfo));
                     port.portName = portName;
                     port.name = propertyInfo.Name;
-                    
                 }
             }
             foreach (var propertyInfo in propertyInfos){
                 if(propertyInfo.GetCustomAttributes(typeof(InputAttribute),true).FirstOrDefault() is InputAttribute attribute){
+              
+           
                     Port port = new CustomPort(Orientation.Horizontal, Direction.Input,attribute.Multiple?Port.Capacity.Multi:Port.Capacity.Single,BuildPortType(attribute,propertyInfo));
                     this.inputContainer.Add(port);
                     var portName = BuildPortName(attribute,propertyInfo);
                     port.portName = portName;
                     port.name = propertyInfo.Name;
+            
                 }
             }
         }
@@ -184,6 +217,18 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeViews{
             Refresh();
         }
 
+        public override void SetPosition(Rect newPos){
+            var graphView = (GraphView)BaseDataGraphView;
+            //Cast newPos s position to global space
+            var globalPos = graphView.contentViewContainer.LocalToWorld(newPos.position);
+            _data.positionInView.position = globalPos;
+            base.SetPosition(newPos);
+        }
+
+        public  void InitializePosition(Rect pos){
+            base.SetPosition(pos);
+        }
+
         public void Refresh(){
             title = _data.nodeName;
         }
@@ -195,6 +240,8 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeViews{
         public void OnDataModified();
 
         IBaseDataGraphView BaseDataGraphView{ get; }
+        
+        public void InitializePosition(Rect pos);
     }
 
     public interface INodeView<T>:IBaseNodeView where T:NodeData,new(){

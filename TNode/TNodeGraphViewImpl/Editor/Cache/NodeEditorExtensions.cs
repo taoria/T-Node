@@ -89,7 +89,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.Cache{
         private void SetGraphUsageAttribute(Type type){
             foreach (var attribute in type.GetCustomAttributes(typeof(GraphUsageAttribute), true)){
                 var parent = type.BaseType;
-                if (typeof(IModel).IsAssignableFrom(type.BaseType)){
+                if (typeof(Model).IsAssignableFrom(type.BaseType)){
                     //Check if GraphDataUsage dictionary has GraphDataType of attribute
 
                     if (typeof(NodeData).IsAssignableFrom(type)){

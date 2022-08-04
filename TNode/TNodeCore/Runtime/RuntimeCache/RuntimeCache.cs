@@ -64,8 +64,8 @@ namespace TNodeCore.Runtime.RuntimeCache{
             get{ return _instance ??= new RuntimeCache(); }
         }
         //delegate return a value from a nodedata
-        public delegate object GetValueDelegate(IModel nodeData);
-        public delegate void SetValueDelegate(IModel nodeData,object value);
+        public delegate object GetValueDelegate(Model nodeData);
+        public delegate void SetValueDelegate(Model nodeData,object value);
 
 
 
@@ -258,11 +258,11 @@ namespace TNodeCore.Runtime.RuntimeCache{
     public static class RuntimeExtension{
      
         //todo  latter on i will try some way caching reflection more efficiently
-        public static T GetValue<T>(this IModel data,string path,Type type=null){
+        public static T GetValue<T>(this Model data,string path,Type type=null){
             var method = RuntimeCache.Instance.CachedDelegatesForGettingValue[type??data.GetType()][path];
             return (T) method.Invoke(data);
         }
-        public static object GetValue(this  IModel data, string path,Type type=null){
+        public static object GetValue(this  Model data, string path,Type type=null){
             if(!RuntimeCache.Instance.CachedDelegatesForGettingValue.ContainsKey(type??data.GetType())){
                 return null;
             }
@@ -270,7 +270,7 @@ namespace TNodeCore.Runtime.RuntimeCache{
             var method = dic.ContainsKey(path) ? dic[path] : null;
             return method?.Invoke(data);
         }
-        public static object GetListValue(this IModel data,string path,int index,Type type=null){
+        public static object GetListValue(this Model data,string path,int index,Type type=null){
             if(!RuntimeCache.Instance.CachedDelegatesForGettingValue.ContainsKey(type??data.GetType())){
                 return null;
             }
@@ -286,11 +286,11 @@ namespace TNodeCore.Runtime.RuntimeCache{
             return list[index];
         }
     
-        public static void SetValue<T>(this IModel data,string path,T value,Type type=null){
+        public static void SetValue<T>(this Model data,string path,T value,Type type=null){
             var method = RuntimeCache.Instance.CachedDelegatesForSettingValue[type??data.GetType()][path];
             method.Invoke(data,value);
         }
-        public static void SetValue(this IModel data,string path,object value,Type type=null){
+        public static void SetValue(this Model data,string path,object value,Type type=null){
             var method = RuntimeCache.Instance.CachedDelegatesForSettingValue[type??data.GetType()][path];
             method.Invoke(data,value);
         }

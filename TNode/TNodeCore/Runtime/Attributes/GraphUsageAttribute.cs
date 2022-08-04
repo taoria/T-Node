@@ -4,7 +4,7 @@ using TNodeCore.Runtime.Models;
 
 namespace TNodeCore.Runtime.Attributes{
     /// <summary>
-    /// Use this attribute to claim the usage of a type derived IModel IModel
+    /// Use this attribute to claim the usage of a type derived Model Model
     /// it can be  applied to the same node multiple times.
     /// <example>
     /// [GraphUsage(DialogueGraph)]

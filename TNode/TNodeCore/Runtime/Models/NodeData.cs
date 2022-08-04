@@ -12,7 +12,7 @@ namespace TNodeCore.Runtime.Models{
     /// 
     /// </summary>
     [Serializable]
-    public class NodeData:IModel{
+    public class NodeData:Model{
    
         public NodeData() : base(){
             //Object Registration
@@ -37,8 +37,7 @@ namespace TNodeCore.Runtime.Models{
             
         }
  #endif
-        public object Clone(){
-            return this.MemberwiseClone();
-        }
+
+        
     }
 }
