@@ -10,7 +10,9 @@ using TNodeCore.Editor.EditorPersistence;
 using TNodeCore.Editor.NodeGraphView;
 using TNodeCore.Runtime.Attributes;
 using TNodeCore.Runtime.Models;
+using Unity.VisualScripting;
 using UnityEditor;
+using UnityEngine;
 
 namespace TNode.TNodeGraphViewImpl.Editor.Cache{
     /// <summary>
@@ -40,7 +42,12 @@ namespace TNode.TNodeGraphViewImpl.Editor.Cache{
             get{ return _instance ??= new NodeEditorSingleton(); }
         }
 
-        private static readonly string[] ExcludedAssemblies = new string[]{"Microsoft", "UnityEngine","UnityEditor","mscorlib","System"};
+        
+        private static readonly string[] ExcludedAssemblies = new[]{
+            "Microsoft", "UnityEngine","UnityEditor","mscorlib",
+            "System","Mono","PlasticPipe","unityplastic","ExCSS",
+            "Unity","PlayerBuildProgramLibrary","netstandard","log4net","Newtonsoft","Bee","nunit","PsdPlugin"
+        };
         public static T CreateViewComponentFromBaseType<T>(){
             var implementedType = NodeEditorSingleton.Instance.FromGenericToSpecific[typeof(T)];
             var instance = (T)Activator.CreateInstance(implementedType);
@@ -63,10 +70,12 @@ namespace TNode.TNodeGraphViewImpl.Editor.Cache{
 
         private NodeEditorSingleton(){
             //exclude  unity ,system ,and microsoft types
-            var assemblies = AppDomain.
-                    CurrentDomain.GetAssemblies()
-                    .Where(x=>ExcludedAssemblies.All(y=>!x.GetName().Name.Split(".")[0].Equals(y)));
-            
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+ 
+
+            assemblies = assemblies.Where(x => !ExcludedAssemblies.Contains(x.FullName.Split('.',',',' ')[0])).ToArray();
+            foreach (var ass in assemblies){
+            }
             foreach(var assembly in assemblies){
                 foreach(var type in assembly.GetTypes()){
                     if(type.IsClass && !type.IsAbstract){
@@ -91,6 +100,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.Cache{
             return instance;
         }
         private void SetGraphUsageAttribute(Type type){
+      
             foreach (var attribute in type.GetCustomAttributes(typeof(GraphUsageAttribute), true)){
                 var parent = type.BaseType;
                 if (typeof(Model).IsAssignableFrom(type.BaseType)){
@@ -205,11 +215,15 @@ namespace TNode.TNodeGraphViewImpl.Editor.Cache{
         }
 
         public static List<string> GetGraphCategories(Type t){
+            if(!NodeEditorSingleton.Instance.GraphDataUsage.ContainsKey(t)){
+                return new List<string>();
+            }
             var list = NodeEditorSingleton.Instance.GraphDataUsage[t];
             //Merge same category
             var res = list.Select(x=>x.GetCustomAttribute<GraphUsageAttribute>().Category).Distinct().ToList();
             return res;
         }
+        //TODO Move this method to runtime place
         public static BlackboardData GetAppropriateBlackboardData(Type t){
             if (NodeEditorSingleton.Instance.GraphBlackboard.ContainsKey(t)){
                 return (BlackboardData)Activator.CreateInstance(NodeEditorSingleton.Instance.GraphBlackboard[t]);
@@ -261,8 +275,10 @@ namespace TNode.TNodeGraphViewImpl.Editor.Cache{
         }
     }
     [InitializeOnLoad]
+
     public class Launcher{
         static Launcher(){
+            Debug.Log("NES Launched");
             NodeEditorSingleton.Instance.Initialize();
         }
     }

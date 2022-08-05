@@ -7,10 +7,7 @@ namespace TNodeCore.Runtime.Models{
     /// </summary>
     [Serializable]
     
-    public class BlackboardData:Model,ICloneable{
-
-
-
-     
+    public abstract class BlackboardData:Model{
+        
     }
 }

@@ -33,6 +33,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeViews{
             label.text = ObjectNames.NicifyVariableName(obj.BlackDragData);
             //Get serialized property's icon
             Texture2D icon = null;
+            if (serializedProperty == null) return;
             if (serializedProperty.boxedValue is Object value){
                 icon = AssetPreview.GetMiniThumbnail(value);
             }

@@ -1,3 +1,4 @@
+using Samples;
 using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEngine;
@@ -8,7 +9,7 @@ public class HelloEditor : GraphEditor<HelloGraph>{
              var graph = EditorUtility.InstanceIDToObject(instanceID) as HelloGraph;
              if (graph != null)  {
                  var wnd = GetWindow<HelloEditor>();
-                 wnd.titleContent = new GUIContent("EasyGraph Editor");
+                 wnd.titleContent = new GUIContent("HelloGraph Editor");
                  wnd.Show();
                  wnd.SetupNonRuntime(graph);
                  return true;
@@ -18,7 +19,7 @@ public class HelloEditor : GraphEditor<HelloGraph>{
         [MenuItem("Window/HelloEditor")]
         public static void ShowWindow(){
             var res = GetWindow<HelloEditor>();
-            res.titleContent = new GUIContent("EasyGraph Editor");
+            res.titleContent = new GUIContent("HelloGraph Editor");
             res.Show();
         }
                 

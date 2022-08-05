@@ -31,17 +31,21 @@ namespace TNode.TNodeGraphViewImpl.Editor.Search{
             if (list == null) throw new ArgumentNullException(nameof(list));
             //search fields with List type
             Texture2D icon = new Texture2D(2,2);
-  
             foreach (var field in type.GetFields()){
                 if (field.FieldType.IsGenericType){
                     var genericType = field.FieldType.GetGenericTypeDefinition();
                     if (genericType == typeof(List<>)){
+                        var castedList = field.GetValue(blackboardData) as IList;
+                        if (castedList == null){
+                            field.SetValue(blackboardData, Activator.CreateInstance(field.FieldType));
+                        }
                         list.Add(new SearchTreeEntry(new GUIContent(field.Name,icon)){
                             level = 1,
                             userData = new InternalSearchTreeUserData(){
                                 List = field.GetValue(blackboardData) as IList,
                                 Type = field.FieldType.GetGenericArguments()[0]
                             }
+                          
                         });
                     }
                 }
@@ -64,7 +68,9 @@ namespace TNode.TNodeGraphViewImpl.Editor.Search{
            
             if (userData is InternalSearchTreeUserData){
                 var list = ((InternalSearchTreeUserData) userData).List;
-                Debug.Log(list);
+                if (list == null){
+                    
+                }
                 var type = ((InternalSearchTreeUserData) userData).Type;
                 if (!typeof(Object).IsAssignableFrom(type)){
                     var newItem = Activator.CreateInstance(type);

@@ -145,6 +145,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
                 if (Data != null){
                     visualElement.RemoveFromHierarchy();
                 }
+                CreateMenu();
             };
         }
 
@@ -218,8 +219,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
             _loaded = true;
 
             SetDetachedFromPanel();
-
-
+            
         }
 
         private void SetDetachedFromPanel(){
@@ -241,6 +241,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
         }
 
         protected void CreateMenu(){
+            if (this.Q("TopMenu") != null) return;
             var visualElement = new VisualElement{
                 name = "TopMenu"
             };
@@ -278,6 +279,16 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
                 }
             });
             visualElement.Add(runButton);
+            
+            var blackboardButton = new Button{
+                name = "blackboardButton",
+                text = "Blackboard"
+            };
+            blackboardButton.RegisterCallback<ClickEvent>(evt => {
+                if(_blackboard==null)
+                    CreateBlackboard();
+            });
+            visualElement.Add(blackboardButton);
         }
         
         public void RegisterDragEvent(){
@@ -399,12 +410,14 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
         }
 
 
-        private void BlackboardUpdate(){
+        private void UpdateBlackboardData(){
+            if (_data == null) return;
+   
             if (_data.blackboardData == null || _data.blackboardData.GetType()==(typeof(BlackboardData))){
+      
                 _data.blackboardData = NodeEditorExtensions.GetAppropriateBlackboardData(_data.GetType());
-
+                Debug.Log(_data.blackboardData);
                 if (_data.blackboardData == null) return;
-                
             }
             _blackboard.SetBlackboardData(GetBlackboardData());
         }
@@ -506,15 +519,45 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
                 });
         }
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter){
-            var supportedTypes = RuntimeCache.Instance.GetSupportedTypes(startPort.portType);
-
+            
+         
             var compatiblePorts = ports.Where(x => startPort != x &&
-                                        (x.portType == startPort.portType ||
-                                         x.portType.IsAssignableFrom(startPort.portType)
-                                        )).ToList();
-            if (supportedTypes != null){
-                compatiblePorts.AddRange(ports.Where(x => supportedTypes.Contains(x.portType)).ToList());
+                                                   (x.portType == startPort.portType ||
+                                                    x.portType.IsAssignableFrom(startPort.portType)
+                                                   )).ToList();
+            if(startPort.direction==Direction.Input){
+                //Search output to find ports with type that have implicit conversion or define converter that convert to type of the startPort
+                var outputPorts = ports.Where(x => x.direction == Direction.Output).ToList();
+                foreach (var outputPort in outputPorts){
+                    //Want a port type that can convert to to the type of the startPort
+                    if (HasImplicitConversion(outputPort.portType,startPort.portType)){
+                        compatiblePorts.Add(outputPort);
+                    }
+                    if (RuntimeCache.Instance.GetSupportedTypes(outputPort.portType).Contains(startPort.portType)){
+                        compatiblePorts.Add(outputPort);
+                    }
+                }
             }
+            else{
+                var inputPorts = ports.Where(x => x.direction == Direction.Input).ToList();
+                
+                foreach (var inputPort in inputPorts){
+                    //check if start port could implicitly convert to input port type
+                    if (HasImplicitConversion(startPort.portType,inputPort.portType)){
+                        compatiblePorts.Add(inputPort);
+                    }
+                    //Check if input port type is supported by output port type
+                    if (RuntimeCache.Instance.GetSupportedTypes(startPort.portType).Contains(inputPort.portType)){
+                        compatiblePorts.Add(inputPort);
+                    }
+                }
+            }
+            
+            
+   
+            
+            
+            
             return compatiblePorts;
 
 
@@ -607,6 +650,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
             get=>Owner.graphEditorData.autoUpdate; set=>Owner.graphEditorData.autoUpdate = value;
         }
         
+        
         public override EventPropagation DeleteSelection(){
             Undo.RegisterCompleteObjectUndo(_data,"Delete Selection");
             var res = base.DeleteSelection();
@@ -616,13 +660,14 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
         }
 
         public void CreateBlackboard(){
-            _blackboard = NodeEditorExtensions.CreateBlackboardWithGraphData(typeof(T));
+            _blackboard = NodeEditorExtensions.CreateBlackboardWithGraphData(typeof(T)) ;
             _blackboard.Setup(this,Owner);
             var castedBlackboard = _blackboard as Blackboard;
             Add(castedBlackboard);
             Rect blackboardPos = new Rect(0,0,300,700);
             castedBlackboard?.SetPosition(blackboardPos);
-            OnDataChanged+= (sender, e) => { BlackboardUpdate(); };
+            UpdateBlackboardData();
+            OnDataChanged+= (sender, e) => { UpdateBlackboardData(); };
         }
 
         public GraphData GetGraphData(){

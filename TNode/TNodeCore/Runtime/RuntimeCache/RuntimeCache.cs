@@ -175,7 +175,7 @@ namespace TNodeCore.Runtime.RuntimeCache{
             }
         }
         private readonly Dictionary<Tuple<Type,Type>,bool> _possibleImplicitConversions = new ();
-        private bool HasImplicitConversion(Type baseType, Type targetType){
+        public bool HasImplicitConversion(Type baseType, Type targetType){
             var tuple = new Tuple<Type, Type>(baseType, targetType);
             if (_possibleImplicitConversions.ContainsKey(tuple)){
                 return _possibleImplicitConversions[tuple];
@@ -188,6 +188,7 @@ namespace TNodeCore.Runtime.RuntimeCache{
                 });
             return _possibleImplicitConversions[tuple] = res;
         }
+        
 
         private void CachingImplicitConversion(Type baseType, Type targetType){
             if (HasImplicitConversion(baseType, targetType)) return;
@@ -201,8 +202,8 @@ namespace TNodeCore.Runtime.RuntimeCache{
             CachedPortConverters[baseType].Add(targetType,typeConverter);
           
         }
+        
         public object GetConvertedValue(Type from,Type to,object value){
-
             if(!CachedPortConverters.ContainsKey(from)){
                 //Find the cached port failed ,check if there is an implicit conversion
                 //This inner cache method would only run once,so add a guard to prevent it run again,even though the function itself has a guard statement.
@@ -226,7 +227,7 @@ namespace TNodeCore.Runtime.RuntimeCache{
 
         public List<Type> GetSupportedTypes(Type type){
             if(!CachedPortConverters.ContainsKey(type)){
-                return null;
+                return new List<Type>();
             }
             return CachedPortConverters[type].Keys.ToList();
         }
