@@ -45,11 +45,23 @@ namespace TNodeCore.Runtime.RuntimeCache{
         public object Convert(object value){
             return _converter.Convert((T1)value);
         }
-        
-    }
 
+ 
+    }
+    //Store a t1 to t2 conversion but use two way converter's convert back method
+
+    internal class PortConverterHelperReverse<T1, T2> : IPortConverterHelper{
+        private readonly TwoWayPortTypeConversion<T2, T1> _converter;
+        public object Convert(object value){
+            return _converter.ConvertBack((T1)value);
+        }
+        public PortConverterHelperReverse(Type type){
+            _converter = Activator.CreateInstance(type) as TwoWayPortTypeConversion<T2, T1>;
+        }
+    }
     internal interface IPortConverterHelper{
         public object Convert(object value);
+   
     }
 
     public class PropertyNotFoundException : Exception{
@@ -126,18 +138,17 @@ namespace TNodeCore.Runtime.RuntimeCache{
             else{
             }
         }
-
+        
         private void CacheRuntimePortTypeConversion(Type type){
+            if (type.BaseType == null) return;
             if (type.BaseType != null){
                 var genericType = type.BaseType.GetGenericTypeDefinition();
-                if (genericType != typeof(PortTypeConversion<,>)){
+                if (genericType != typeof(PortTypeConversion<,>)|| genericType != typeof(TwoWayPortTypeConversion<,>)){
                     return;
                 }
             }
-            else{
-                return;
-            }
-
+            
+            //Forward direction
             var type1 = type.BaseType.GetGenericArguments()[0];
             var type2 = type.BaseType.GetGenericArguments()[1];
             var specificType = typeof(PortConverterHelper<,>).MakeGenericType(type1, type2);
@@ -149,17 +160,70 @@ namespace TNodeCore.Runtime.RuntimeCache{
                 CachedPortConverters.Add(type1,new Dictionary<Type,IPortConverterHelper>());
             }
             CachedPortConverters[type1].Add(type2,instance);
+            
+            //Reverse direction
+            if(type.BaseType.GetGenericTypeDefinition()==typeof(TwoWayPortTypeConversion<,>)){
+                var specificTypeReverse = typeof(PortConverterHelperReverse<,>).MakeGenericType(type2, type1);
+                var instanceReverse = Activator.CreateInstance(specificTypeReverse, type) as IPortConverterHelper;
+                if (instanceReverse == null){
+                    return;
+                }
+                if (!CachedPortConverters.ContainsKey(type2)){
+                    CachedPortConverters.Add(type2,new Dictionary<Type,IPortConverterHelper>());
+                }
+                CachedPortConverters[type2].Add(type1,instanceReverse);
+            }
         }
-        
+        private readonly Dictionary<Tuple<Type,Type>,bool> _possibleImplicitConversions = new ();
+        private bool HasImplicitConversion(Type baseType, Type targetType){
+            var tuple = new Tuple<Type, Type>(baseType, targetType);
+            if (_possibleImplicitConversions.ContainsKey(tuple)){
+                return _possibleImplicitConversions[tuple];
+            }
+            var res =baseType.GetMethods(BindingFlags.Public | BindingFlags.Static)
+                .Where(mi => mi.Name == "op_Implicit" && mi.ReturnType == targetType)
+                .Any(mi => {
+                    ParameterInfo pi = mi.GetParameters().FirstOrDefault();
+                    return pi != null && pi.ParameterType == baseType;
+                });
+            return _possibleImplicitConversions[tuple] = res;
+        }
+
+        private void CachingImplicitConversion(Type baseType, Type targetType){
+            if (HasImplicitConversion(baseType, targetType)) return;
+            
+            //Create Implicit Conversion Helper that caches the implicit cast function
+            var typeConverter = Activator.CreateInstance(typeof(ImplicitConversionHelper<,>).MakeGenericType(baseType, targetType)) as IPortConverterHelper;
+            
+            if (!CachedPortConverters.ContainsKey(baseType)){
+                CachedPortConverters.Add(baseType,new Dictionary<Type,IPortConverterHelper>());
+            }
+            CachedPortConverters[baseType].Add(targetType,typeConverter);
+          
+        }
         public object GetConvertedValue(Type from,Type to,object value){
+
             if(!CachedPortConverters.ContainsKey(from)){
-                throw new ConversionFailedException("No converter found for type "+from);
+                //Find the cached port failed ,check if there is an implicit conversion
+                //This inner cache method would only run once,so add a guard to prevent it run again,even though the function itself has a guard statement.
+                if(HasImplicitConversion(from,to)){
+                    CachingImplicitConversion(from,to);
+                }
             }
             if(!CachedPortConverters[from].ContainsKey(to)){
+                //Just like above, this function should be checked in here too
+                if(HasImplicitConversion(from,to)){
+                    CachingImplicitConversion(from,to);
+                }
                 return value;
             }
             return CachedPortConverters[from][to].Convert(value);
         }
+
+        private bool GetImplcitConvertedValue(Type from, Type to){
+            throw new NotImplementedException();
+        }
+
         public List<Type> GetSupportedTypes(Type type){
             if(!CachedPortConverters.ContainsKey(type)){
                 return null;
@@ -246,6 +310,25 @@ namespace TNodeCore.Runtime.RuntimeCache{
         }
         
   
+    }
+
+    public class ImplicitConversionHelper<T1,T2> : IPortConverterHelper{
+        public Func<T1, T2> ConvertFunc;
+        public ImplicitConversionHelper(){
+            //Caching the implicit method that converts t1 to t2
+            var method = typeof(T2).GetMethod("op_Implicit", BindingFlags.Public | BindingFlags.Static, null, new[] { typeof(T1) }, null);
+            if (method == null){
+                //Search it in T1
+                method = typeof(T1).GetMethod("op_Implicit", BindingFlags.Public | BindingFlags.Static, null, new[] { typeof(T2) }, null);
+            }
+            //Create the delegate
+            if (method != null) 
+                ConvertFunc = (Func<T1, T2>) Delegate.CreateDelegate(typeof(Func<T1, T2>), method);
+        }
+
+        public object Convert(object value){
+            return ConvertFunc((T1) value);
+        }
     }
 
     public class ConversionFailedException : Exception{

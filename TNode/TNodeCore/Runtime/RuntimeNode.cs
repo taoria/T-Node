@@ -23,16 +23,15 @@ namespace TNodeCore.Runtime{
             var portType = _portAccessors[portName].Type;
             if(portType!=valueType && !portType.IsAssignableFrom(valueType)){
                 var res =RuntimeCache.RuntimeCache.Instance.GetConvertedValue(valueType, portType, value);
-                _portAccessors[portName].SetValue(this.NodeData, res);
+                _portAccessors[portName].SetValue(NodeData, res);
             }
             else{
-                    
-                _portAccessors[portName].SetValue(this.NodeData,value);
+                _portAccessors[portName].SetValue(NodeData,value);
             }
         }
         public object GetOutput(string portName){
             
-            return _portAccessors[portName].GetValue(this.NodeData);
+            return _portAccessors[portName].GetValue(NodeData);
         }
 
 
