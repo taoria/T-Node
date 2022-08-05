@@ -1,5 +1,4 @@
 ﻿using System;
-using TNode.GraphCreator.Editor;
 using TNodeCore.Runtime.Attributes;
 
 namespace TNode.GraphCreator.Runtime.Nodes{

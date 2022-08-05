@@ -1,22 +1,25 @@
-﻿using TNode.Editor;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEditor.Callbacks;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-using UnityEngine.UIElements;
-using System;
+using TNodeCore.Editor;
 public class $EditorClassName$ : GraphEditor<$GraphClassName$>{
         [OnOpenAsset]
         public static bool OnOpenAsset(int instanceID, int line){
-            var graph = EditorUtility.InstanceIDToObject(instanceID) as $GraphClassName$;
-            if (graph != null)
-            {
-                var wnd = GetWindow<$EditorClassName$>();
-                wnd.titleContent = new GUIContent("$GraphClassName$ Editor");
-                wnd.CreateGUI();
-                wnd._graphView.Data = graph;
-                return true;
-            }
-            return false;
+             var graph = EditorUtility.InstanceIDToObject(instanceID) as $GraphClassName$;
+             if (graph != null)  {
+             var wnd = GetWindow<$EditorClassName$>();
+             wnd.titleContent = new GUIContent("$GraphClassName$ Editor");
+             wnd.Show();
+             wnd.SetupNonRuntime(graph);
+             return true;
+             }
+             return false;
         }
+        [MenuItem("Window/$EditorClassName$")]
+        public static void ShowWindow(){
+            var res = GetWindow<$EditorClassName$>();
+            res.titleContent = new GUIContent("$GraphClassName$ Editor");
+            res.Show();
+        }
+                
 }

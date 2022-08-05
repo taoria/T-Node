@@ -6,6 +6,7 @@ using TNode.TNodeGraphViewImpl.Editor.Ports;
 using TNodeCore.Editor.NodeGraphView;
 using TNodeCore.Editor.Serialization;
 using TNodeCore.Runtime;
+using TNodeCore.Runtime.Attributes;
 using TNodeCore.Runtime.Attributes.Ports;
 using TNodeCore.Runtime.Models;
 using UnityEditor;
@@ -141,24 +142,28 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeViews{
                     Port port = new CustomPort(Orientation.Horizontal, Direction.Output,
                         attribute.Multiple ? Port.Capacity.Multi : Port.Capacity.Single,
                         BuildPortType(attribute, propertyInfo));
-                
-                    this.outputContainer.Add(port);
-                    var portName = ObjectNames.NicifyVariableName(BuildPortName(attribute,propertyInfo));
-                    port.portName = portName;
-                    port.name = propertyInfo.Name;
+                    BuildPort(port, attribute, propertyInfo,outputContainer);
                 }
             }
             foreach (var propertyInfo in propertyInfos){
                 if(propertyInfo.GetCustomAttributes(typeof(InputAttribute),true).FirstOrDefault() is InputAttribute attribute){
-              
-           
-                    Port port = new CustomPort(Orientation.Horizontal, Direction.Input,attribute.Multiple?Port.Capacity.Multi:Port.Capacity.Single,BuildPortType(attribute,propertyInfo));
-                    this.inputContainer.Add(port);
-                    var portName = BuildPortName(attribute,propertyInfo);
-                    port.portName = portName;
-                    port.name = propertyInfo.Name;
-            
+                    Port port = new CustomPort
+                        (Orientation.Horizontal, 
+                            Direction.Input,attribute.Multiple?Port.Capacity.Multi: Port.Capacity.Single,BuildPortType(attribute,propertyInfo));
+                    BuildPort(port,attribute,propertyInfo,inputContainer);
                 }
+            }
+        }
+
+        private void BuildPort(Port port, PortAttribute attribute, PropertyInfo propertyInfo,VisualElement portContainer){
+            portContainer.Add(port);
+            var portName = ObjectNames.NicifyVariableName(BuildPortName(attribute, propertyInfo));
+            port.portName = portName;
+            port.name = propertyInfo.Name;
+            var colorAtt = propertyInfo.PropertyType.GetCustomAttribute<PortColorAttribute>();
+            if (colorAtt != null){
+                var color = colorAtt.Color;
+                port.portColor = color;
             }
         }
 
@@ -220,8 +225,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeViews{
         public override void SetPosition(Rect newPos){
             var graphView = (GraphView)BaseDataGraphView;
             //Cast newPos s position to global space
-            var globalPos = graphView.contentViewContainer.LocalToWorld(newPos.position);
-            _data.positionInView.position = globalPos;
+            _data.positionInView.position = newPos.position;
             base.SetPosition(newPos);
         }
 

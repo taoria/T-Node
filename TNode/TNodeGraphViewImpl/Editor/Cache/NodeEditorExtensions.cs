@@ -84,6 +84,10 @@ namespace TNode.TNodeGraphViewImpl.Editor.Cache{
         private IBaseDataGraphView GraphViewImplCreator(Type arg){
             var genericType = typeof(BaseDataGraphView<>).MakeGenericType(arg);
             var instance = CreateViewComponentFromBaseType(genericType) as IBaseDataGraphView;
+            if (instance == null){
+                //fallback to default graph view
+                instance = (IBaseDataGraphView) Activator.CreateInstance(genericType);
+            }
             return instance;
         }
         private void SetGraphUsageAttribute(Type type){

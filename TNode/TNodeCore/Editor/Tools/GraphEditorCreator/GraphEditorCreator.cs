@@ -26,7 +26,7 @@ namespace TNodeCore.Editor.Tools.GraphEditorCreator{
             GraphEditorCreator wnd = GetWindow<GraphEditorCreator>();
             wnd.titleContent = new GUIContent("GraphEditorCreator");
             //Set position to the center of the screen
-            wnd.position = new(Screen.width / 2, Screen.height / 2, 500, 300);
+            wnd.position = new(Screen.width / 2.0f, Screen.height / 2.0f, 500, 300);
             //set this window non resizable
             wnd.minSize = new Vector2(500, 300);
             wnd.maxSize = new Vector2(500, 300);
@@ -125,13 +125,13 @@ namespace TNodeCore.Editor.Tools.GraphEditorCreator{
             var source = _sourceGeneratorForGraphEditor.GenerateGraphEditor(editorName, graphName);
 
             var sourceGraph = _sourceGeneratorForGraphEditor.GenerateGraph(graphName);
-            var sourceGraphView = _sourceGeneratorForGraphEditor.GenerateGraphView(graphViewName, graphName);
+            //var sourceGraphView = _sourceGeneratorForGraphEditor.GenerateGraphView(graphViewName, graphName);
             string editorPath = Path.Combine(path, editorName + ".cs");
             string graphPath = Path.Combine(pathBeforeEditor, graphName + ".cs");
-            string graphViewPath = Path.Combine(path, graphViewName + ".cs");
+            //string graphViewPath = Path.Combine(path, graphViewName + ".cs");
             File.WriteAllText(editorPath, source);
             File.WriteAllText(graphPath, sourceGraph);
-            File.WriteAllText(graphViewPath, sourceGraphView);
+            //File.WriteAllText(graphViewPath, sourceGraphView);
             //Refresh the AssetDatabase to import the new file
             AssetDatabase.Refresh();
 
