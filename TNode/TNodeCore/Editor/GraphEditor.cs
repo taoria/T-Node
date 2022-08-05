@@ -80,6 +80,7 @@ namespace TNodeCore.Editor{
             GraphView.IsRuntimeGraph = false;
         }
         private void BuildGraphView(){
+           
             GraphView = graphEditorData.GetGraphView<T>();
             GraphView.Owner = this;
        

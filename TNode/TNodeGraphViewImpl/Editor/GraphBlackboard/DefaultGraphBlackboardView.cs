@@ -50,24 +50,24 @@ namespace TNode.TNodeGraphViewImpl.Editor.GraphBlackboard{
                     blackboardList.Add(foldout);
                     
                     Add(blackboardList);
+                    if(field.GetValue(data)==null) continue;
                     if (field.GetValue(data) is IList list){
                         for (var i = 0; i < list.Count; i++){
                             CreateBlackboardDataEntryForListItem(field, serializedObject, isRuntimeGraph, blackboardList, i);
                         }
                     }
-
                     if (field.GetValue(data).GetType().IsArray){
                         var array = (Array)field.GetValue(data);
+                        if(array==null) continue;
                         for (var i = 0; i < array.Length; i++){
                             CreateBlackboardDataEntryForListItem(field, serializedObject, isRuntimeGraph, blackboardList, i);
                         }
                     }
                 }
             }
-            addItemRequested += (sender) => {
+            addItemRequested = (sender) => {
                  var res = ScriptableObject.CreateInstance<BlackboardSearchWindowProvider>();
-                
-                
+                 Debug.Log(res);
                  //Get right top corner of the blackboard
                 
                  var blackboardPos = GetPosition().position+OwnerWindow.position.position;
@@ -79,7 +79,6 @@ namespace TNode.TNodeGraphViewImpl.Editor.GraphBlackboard{
                  res.Setup(Owner.GetGraphData().GetType(),Owner,OwnerWindow,this);
                  
                  SearchWindow.Open(searchWindowContext, res);
-                
                  
             };
         }
@@ -87,7 +86,8 @@ namespace TNode.TNodeGraphViewImpl.Editor.GraphBlackboard{
         private static void CreateBlackboardDataEntryForListItem(FieldInfo field, SerializedObject serializedObject,
             bool isRuntimeGraph,
             BlackboardSection blackboardSection, int index){
-            var property =serializedObject.FindProperty("data").FindPropertyRelative(field.Name).GetArrayElementAtIndex(index);
+            var property = serializedObject.FindProperty("data");
+                property =  property.FindPropertyRelative(field.Name).GetArrayElementAtIndex(index);
             
             BlackboardDataEntry entry = new BlackboardDataEntry(field.FieldType){
                 propertyPath = field.Name+"."+index,
@@ -102,6 +102,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.GraphBlackboard{
            
         }
 
+        
         private static void CreateBlackboardDataEntry(FieldInfo field, SerializedObject serializedObject, bool isRuntimeGraph,
             BlackboardSection blackboardSection){
             BlackboardDataEntry entry = new BlackboardDataEntry(field.FieldType){

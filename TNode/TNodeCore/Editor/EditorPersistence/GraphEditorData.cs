@@ -23,8 +23,6 @@ namespace TNodeCore.Editor.EditorPersistence{
                     return (IDataGraphView<T>)GraphViewImplCreator.Invoke(typeof(T));
                     
                 }
-                    
-                
                 case GraphImplType.GraphToolsFoundationImpl:
                     throw new NotImplementedException();
                 default:

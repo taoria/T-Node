@@ -6,7 +6,19 @@
     border-width: 1px;
     border-color: rgba(201, 249, 116, 255);
 }
-.vector{
+.Int32{
     border-width: 1px;
-    border-color: rgba(0.788, 0.969, 0.455, 1.000);
+    border-color: rgba(148,130,230,255);
+}
+.Float{
+    border-width: 1px;
+    border-color: aquamarine;
+}
+.System32{
+    border-width: 1px;
+    border-color: aquamarine;
+}
+.String{
+    border-width: 1px;
+    border-color: crimson;
 }
