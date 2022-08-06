@@ -5,6 +5,7 @@ using UnityEngine;
 namespace TNodeCore.Runtime{
     [Serializable]
     public class DataWrapper<TWrapper,TData>:ScriptableObject where TWrapper:DataWrapper<TWrapper,TData>,new(){
+        public const string DataPath = "data";
         [SerializeReference]
         public TData data;
         protected static readonly Dictionary<TData,TWrapper> Cache = new ();

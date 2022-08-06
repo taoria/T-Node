@@ -8,8 +8,8 @@ using UnityEngine;
 namespace TNode.Samples{
     [GraphUsage(typeof(HelloGraph))]
     public class HelloBlackboard:BlackboardData{
-        public string HelloString = "Hello World";
-
+        public string HelloString;
+        public GameObject HelloGameObject;
         public List<Vector3> V3S;
         public List<Vector2> V2S;
 

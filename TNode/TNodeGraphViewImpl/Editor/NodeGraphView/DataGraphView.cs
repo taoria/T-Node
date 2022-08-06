@@ -161,7 +161,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
                 await Task.Delay(TimeSpan.FromSeconds(RefreshRate));
                 if(_runtimeGraph != null){
                     if (AutoUpdate){
-                        _runtimeGraph.ResolveDependency();
+                        _runtimeGraph.TraverseAll();
                         AfterGraphResolved?.Invoke();
                     }
                 }
@@ -171,7 +171,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
         //     if(_runtimeGraph != null){
         //         if (_runtimeGraphUpdate){
         //             _runtimeGraphUpdate = false;
-        //             _runtimeGraph.ResolveDependency();
+        //             _runtimeGraph.TraverseAll();
         //    
         //             AfterGraphResolved?.Invoke();
         //         }
@@ -203,6 +203,30 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
                     var searchWindow = ScriptableObject.CreateInstance<NodeSearchWindowProvider>();
                     searchWindow.Setup(typeof(T),this,Owner);
                     SearchWindow.Open(searchWindowContext, searchWindow);
+                });
+                evt.menu.AppendAction("Create Placemat",dma=> {
+                    //find placemat container 
+                    PlacematContainer placematContainer = this.Q<PlacematContainer>();
+                    if (placematContainer == null){
+                        placematContainer = new PlacematContainer(this);
+                        this.Add(placematContainer);
+                    }
+                    var dmaPos = dma.eventInfo.mousePosition+editorPosition;
+                    var dmaPosRect = new Rect(dmaPos,new Vector2(500,500));
+                    placematContainer.CreatePlacemat<Placemat>(dmaPosRect,1,"Title");
+             
+                    // Placemat placemat = new Placemat{
+                    //     Collapsed = false,
+                    //     title = "Placemat",
+                    //     visible = true
+                    // };
+                    // placemat.style.minWidth = 500;
+                    // placemat.style.minHeight = 500;
+                    // var dmaPos = dma.eventInfo.mousePosition+editorPosition;
+                    // placemat.SetPosition(new  Rect(dmaPos,new Vector2(500,500)));
+                    // AddElement(placemat);
+                    // Debug.Log(placemat);
+
                 });
             });
         }
@@ -274,7 +298,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
             };
             runButton.RegisterCallback<ClickEvent>(evt => {
                 if (IsRuntimeGraph){
-                    _runtimeGraph.ResolveDependency();
+                    _runtimeGraph.TraverseAll();
                     AfterGraphResolved?.Invoke();
                 }
             });

@@ -253,7 +253,7 @@ namespace TNodeCore.Runtime.Components{
             _graphTool.RunNodeDependently(Get(startNode));
             return true;
         }
-        public bool ResolveDependency(){
+        public bool TraverseAll(){
             if(!_build)
                 Build();
             if (_graphTool == null)
@@ -334,6 +334,16 @@ namespace TNodeCore.Runtime.Components{
         }
         public void RunNodesOfType(Type t,bool isCaching= false){
             var nodes = GetRuntimeNodesOfType(t);
+            if(isCaching)
+                _graphTool.StartCachingPort();
+            foreach (var runtimeNode in nodes){
+                RunOnDependency(runtimeNode.NodeData);
+            }
+            if(isCaching)
+                _graphTool.EndCachingPort();
+        }
+        public void RunNodesOfType<T>(bool isCaching= false){
+            var nodes = GetRuntimeNodesOfType<T>();
             if(isCaching)
                 _graphTool.StartCachingPort();
             foreach (var runtimeNode in nodes){

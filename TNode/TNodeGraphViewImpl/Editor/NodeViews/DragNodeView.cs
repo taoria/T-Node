@@ -25,10 +25,12 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeViews{
             SerializedProperty serializedProperty = null;
             if (arrayElement){
                 var part = obj.BlackDragData.Split('.');
-                serializedProperty = serializedData.FindProperty("data").FindPropertyRelative(part[0]).GetArrayElementAtIndex(int.Parse(part[1]));
+                serializedProperty = serializedData.FindProperty(BlackboardDataWrapper.DataPath)
+                    .FindPropertyRelative(part[0])
+                    .GetArrayElementAtIndex(int.Parse(part[1]));
             }
             else{
-                 serializedProperty = serializedData.FindProperty("data").FindPropertyRelative(obj.BlackDragData);
+                 serializedProperty = serializedData.FindProperty(BlackboardDataWrapper.DataPath).FindPropertyRelative(obj.BlackDragData);
             }
             label.text = ObjectNames.NicifyVariableName(obj.BlackDragData);
             //Get serialized property's icon
@@ -38,6 +40,9 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeViews{
                 icon = AssetPreview.GetMiniThumbnail(value);
             }
             else{
+                if (serializedProperty.boxedValue == null){
+                    return;
+                }
                 icon = AssetPreview.GetMiniTypeThumbnail(serializedProperty.boxedValue.GetType());
             }
 
