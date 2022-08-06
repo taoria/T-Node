@@ -15,7 +15,7 @@ the main goal of the repo is to make graph creation easier and more intuitive.
 
 # Some to-dos
 * Port connectivity of two types have implicit conversion 
-* Node placement
+* Node placemat
 * Vertical node
 * A universal merger handle multiple input 
 * Support static graph data traversal

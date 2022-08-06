@@ -209,12 +209,15 @@ namespace TNodeCore.Runtime.RuntimeCache{
                 //This inner cache method would only run once,so add a guard to prevent it run again,even though the function itself has a guard statement.
                 if(HasImplicitConversion(from,to)){
                     CachingImplicitConversion(from,to);
+                    return CachedPortConverters[from][to].Convert(value);
                 }
+                return value;
             }
             if(!CachedPortConverters[from].ContainsKey(to)){
                 //Just like above, this function should be checked in here too
                 if(HasImplicitConversion(from,to)){
                     CachingImplicitConversion(from,to);
+                    return CachedPortConverters[from][to].Convert(value);
                 }
                 return value;
             }
