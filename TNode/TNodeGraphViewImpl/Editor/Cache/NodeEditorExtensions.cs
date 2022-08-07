@@ -37,7 +37,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.Cache{
         private static NodeEditorSingleton _instance;
         public readonly Dictionary<Type,Type> FromGenericToSpecific = new NodeEditorTypeDictionary();
         public readonly Dictionary<Type, List<Type>> GraphDataUsage = new Dictionary<Type, List<Type>>();
-        public Dictionary<Type, Type> GraphBlackboard = new();
+        public Dictionary<Type, Type> GraphBlackboard = new Dictionary<Type, Type> ();
         public static NodeEditorSingleton Instance{
             get{ return _instance ??= new NodeEditorSingleton(); }
         }

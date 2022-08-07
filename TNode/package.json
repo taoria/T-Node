@@ -6,6 +6,7 @@
   "unity": "2022.1",
   "unityRelease": "0b5",
   "dependencies": {
+    "com.unity.graphtools.foundation": "0.11.2-preview"
   },
   "keywords": [
     "graph",

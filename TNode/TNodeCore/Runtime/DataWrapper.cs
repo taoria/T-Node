@@ -8,7 +8,7 @@ namespace TNodeCore.Runtime{
         public const string DataPath = "data";
         [SerializeReference]
         public TData data;
-        protected static readonly Dictionary<TData,TWrapper> Cache = new ();
+        protected static readonly Dictionary<TData,TWrapper> Cache = new Dictionary<TData,TWrapper> ();
         public static TWrapper Get(TData data){
             if (data.GetType().IsGenericType){
                 return CreateInstance<TWrapper>();

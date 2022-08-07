@@ -55,7 +55,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.Inspector{
                     serializedObject.ApplyModifiedProperties();
                     ((NodeDataWrapper)_data).ForceNotify();
                 });
-                if (_data is SceneNodeData and not BlackboardDragNodeData){
+                if (_data is SceneNodeData && _data is  BlackboardDragNodeData==false){
                     
                 }
                 else{

@@ -34,7 +34,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.GraphBlackboard{
             });
             this.RegisterCallback<MouseLeaveEvent>((evt) => {
                 style.borderBottomColor = style.borderRightColor =
-                    style.borderLeftColor = style.borderTopColor = _convertedColor==default?StyleKeyword.Null:_convertedColor;
+                    style.borderLeftColor = style.borderTopColor = _convertedColor==default?StyleKeyword.Null:new StyleColor(_convertedColor);
 
             });
         }

@@ -12,12 +12,12 @@ using TNodeCore.Editor;
 using TNodeCore.Editor.Blackboard;
 using TNodeCore.Editor.EditorPersistence;
 using TNodeCore.Editor.NodeGraphView;
-using TNodeCore.Editor.Serialization;
+
 using TNodeCore.Editor.Tools.NodeCreator;
 using TNodeCore.Runtime.Components;
 using TNodeCore.Runtime.Models;
 using TNodeCore.Runtime.RuntimeCache;
-using Unity.VisualScripting;
+
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
@@ -36,7 +36,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
         private bool _isInspectorOn;
         private NodeSearchWindowProvider _nodeSearchWindowProvider;
         private NodeInspector _nodeInspector;
-        private Dictionary<string,Node> _nodeDict = new();
+        private Dictionary<string,Node> _nodeDict = new Dictionary<string,Node>();
         private IBlackboardView _blackboard;
         private bool _loaded;
         public T Data{
@@ -214,19 +214,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
                     var dmaPos = dma.eventInfo.mousePosition+editorPosition;
                     var dmaPosRect = new Rect(dmaPos,new Vector2(500,500));
                     placematContainer.CreatePlacemat<Placemat>(dmaPosRect,1,"Title");
-             
-                    // Placemat placemat = new Placemat{
-                    //     Collapsed = false,
-                    //     title = "Placemat",
-                    //     visible = true
-                    // };
-                    // placemat.style.minWidth = 500;
-                    // placemat.style.minHeight = 500;
-                    // var dmaPos = dma.eventInfo.mousePosition+editorPosition;
-                    // placemat.SetPosition(new  Rect(dmaPos,new Vector2(500,500)));
-                    // AddElement(placemat);
-                    // Debug.Log(placemat);
-
+                    
                 });
             });
         }
@@ -326,7 +314,10 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
 
         private void OnDragPerform(DragPerformEvent evt){
         
-            if (DragAndDrop.GetGenericData("DragSelection") is List<ISelectable>{Count: > 0} data){
+            if (DragAndDrop.GetGenericData("DragSelection") is List<ISelectable> data){
+                if (data.Count == 0){
+                    return;
+                }
                 var blackboardFields = data.OfType<BlackboardField >();
                 foreach (var selectable in blackboardFields){
                     if(selectable is { } field) {
@@ -348,13 +339,15 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
                         AddTNode(dragNodeData,new Rect(evt.mousePosition,new Vector2(200,200)));
                     }
                 }
+                
 
             }
         }
 
         private void OnDragUpdated(DragUpdatedEvent evt){
             //check if the drag data is BlackboardField
-            if (DragAndDrop.GetGenericData("DragSelection") is List<ISelectable>{Count: > 0} data){
+            if (DragAndDrop.GetGenericData("DragSelection") is List<ISelectable> data){
+                if (data.Count <= 0) return;
                 DragAndDrop.visualMode = DragAndDropVisualMode.Move;
                 //high light the 
             }
@@ -365,10 +358,10 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
 
         public void ResetGraphView(){
             //Clear all nodes
-            foreach (var node in nodes){
+            foreach (var node in nodes.ToList()){
                 RemoveElement(node);
             }
-            foreach (var edge in edges){
+            foreach (var edge in edges.ToList()){
                 RemoveElement(edge);
             }
             if (_nodeDict == null) throw new ArgumentNullException(nameof(_nodeDict));
@@ -486,7 +479,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
 
         private void SaveNode(){
         
-            foreach (var node in nodes){
+            foreach (var node in nodes.ToList()){
                 if (node is IBaseNodeView nodeView){
                     var nodeData = nodeView.GetNodeData();
                     if (!_data.NodeDictionary.ContainsKey(nodeData.id)){
@@ -497,7 +490,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
         }
         private void SaveEdge(){
             var links = new List<NodeLink>();
-            foreach (var edge in edges){
+            foreach (var edge in edges.ToList()){
                 var inputNode = edge.input.node as IBaseNodeView;
                 var outputNode = edge.output.node as IBaseNodeView;
                 if (inputNode != null && outputNode != null){
@@ -545,13 +538,13 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter){
             
          
-            var compatiblePorts = ports.Where(x => startPort != x &&
+            var compatiblePorts = ports.ToList().Where(x => startPort != x &&
                                                    (x.portType == startPort.portType ||
                                                     x.portType.IsAssignableFrom(startPort.portType)
                                                    )).ToList();
             if(startPort.direction==Direction.Input){
                 //Search output to find ports with type that have implicit conversion or define converter that convert to type of the startPort
-                var outputPorts = ports.Where(x => x.direction == Direction.Output).ToList();
+                var outputPorts = ports.ToList().Where(x => x.direction == Direction.Output).ToList();
                 foreach (var outputPort in outputPorts){
                     //Want a port type that can convert to to the type of the startPort
                     if (HasImplicitConversion(outputPort.portType,startPort.portType)){
@@ -563,7 +556,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
                 }
             }
             else{
-                var inputPorts = ports.Where(x => x.direction == Direction.Input).ToList();
+                var inputPorts = ports.ToList().Where(x => x.direction == Direction.Input).ToList();
                 
                 foreach (var inputPort in inputPorts){
                     //check if start port could implicitly convert to input port type
@@ -651,7 +644,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
             var nodeView = _nodeDict[nodeData.id];
             _nodeDict.Remove(nodeData.id);
             //Break all edges connected to this node
-            foreach (var edge in edges){
+            foreach (var edge in edges.ToList()){
                 if (edge.input.node == nodeView || edge.output.node == nodeView){
                     RemoveElement(edge);
                 }

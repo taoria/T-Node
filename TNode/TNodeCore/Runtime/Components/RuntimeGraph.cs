@@ -275,7 +275,7 @@ namespace TNodeCore.Runtime.Components{
         }
 
         public void BuildSceneNode(){
-            var fetchedSceneNode = graphData.NodeDictionary.Values.Where(x => x is SceneNodeData and not BlackboardDragNodeData).ToArray();
+            var fetchedSceneNode = graphData.NodeDictionary.Values.Where(x => x is SceneNodeData && x is  BlackboardDragNodeData == false).ToArray();
             if (!fetchedSceneNode.Any()) return;
             var scenePersistent = transform.Find("PersistentData")?.GetComponent<SceneDataPersistent>();
             
@@ -303,7 +303,7 @@ namespace TNodeCore.Runtime.Components{
             if (persistentData == null) return;
             var fetchedSceneNode = 
                 RuntimeNodes
-                    .Where(x => x.Value.NodeData is SceneNodeData and not BlackboardDragNodeData)
+                    .Where(x => x.Value.NodeData is SceneNodeData  & x.Value.NodeData is BlackboardDragNodeData == false)
                     .Select(x=>x.Value.NodeData).ToArray();
  
             var dic = persistentData.SceneNodeDataDictionary;
@@ -412,10 +412,10 @@ namespace TNodeCore.Runtime.Components{
     public class SceneDataPersistent:MonoBehaviour,ISerializationCallbackReceiver{
         [NonSerialized]
         
-        public readonly Dictionary<string,SceneNodeData> SceneNodeDataDictionary = new();
+        public readonly Dictionary<string,SceneNodeData> SceneNodeDataDictionary = new Dictionary<string,SceneNodeData>();
         
         [SerializeReference]
-        public List<SceneNodeData> sceneNodeData=new ();
+        public List<SceneNodeData> sceneNodeData=new List<SceneNodeData>();
 
 
         public void OnBeforeSerialize(){
