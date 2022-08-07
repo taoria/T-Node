@@ -1,4 +1,5 @@
-﻿using TNodeCore.Editor.Serialization;
+﻿using TilemapGenerator.ThirdParty.Extensions;
+using TNodeCore.Editor.Serialization;
 using TNodeCore.Runtime.Attributes;
 using TNodeCore.Runtime.Models;
 using UnityEditor;
@@ -36,14 +37,14 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeViews{
             //Get serialized property's icon
             Texture2D icon = null;
             if (serializedProperty == null) return;
-            if (serializedProperty.boxedValue is Object value){
+            if (serializedProperty.BoxedValue() is Object value){
                 icon = AssetPreview.GetMiniThumbnail(value);
             }
             else{
-                if (serializedProperty.boxedValue == null){
+                if (serializedProperty.BoxedValue() == null){
                     return;
                 }
-                icon = AssetPreview.GetMiniTypeThumbnail(serializedProperty.boxedValue.GetType());
+                icon = AssetPreview.GetMiniTypeThumbnail(serializedProperty.BoxedValue().GetType());
             }
 
             label.parent.Add(new Image(){

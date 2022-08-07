@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace TNodeCore.Runtime{
     public static class NodeLogger{
-        public static Dictionary<string, INodeLoggerImpl> Loggers = new ();
+        public static Dictionary<string, INodeLoggerImpl> Loggers = new  Dictionary<string, INodeLoggerImpl>();
 
         public static void Log(this NodeData t,string message){
             if (!Loggers.ContainsKey(t.id)) return;

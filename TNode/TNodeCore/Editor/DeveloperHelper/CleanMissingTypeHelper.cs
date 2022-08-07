@@ -18,14 +18,15 @@ namespace TNodeCore.Editor.DeveloperHelper{
                 Object obj = AssetDatabase.LoadMainAssetAtPath(path);
                 if (obj != null)
                 {
-                    if (SerializationUtility.ClearAllManagedReferencesWithMissingTypes(obj))
-                    {
-                        report.Append("Cleared missing types from ").Append(path).AppendLine();
-                    }
-                    else
-                    {
-                        report.Append("No missing types to clear on ").Append(path).AppendLine();
-                    }
+                    // if (SerializationUtility.ClearAllManagedReferencesWithMissingTypes(obj))
+                    // {
+                    //    
+                    //     report.Append("Cleared missing types from ").Append(path).AppendLine();
+                    // }
+                    // else
+                    // {
+                    //     report.Append("No missing types to clear on ").Append(path).AppendLine();
+                    // }
                 }
             }
             Debug.Log(report.ToString());
@@ -38,25 +39,25 @@ namespace TNodeCore.Editor.DeveloperHelper{
             SceneManager.GetActiveScene().GetRootGameObjects();
             foreach (GameObject root in SceneManager.GetActiveScene().GetRootGameObjects()){
                 foreach (var o in root.transform){
-                    if (SerializationUtility.ClearAllManagedReferencesWithMissingTypes(o as Object))
-                    {
-                        report.Append("Cleared missing types from ").Append(root.name).AppendLine();
-                    }
-                    else
-                    {
-                        report.Append("No missing types to clear on ").Append(root.name).AppendLine();
-                    }
+                    // if (SerializationUtility.ClearAllManagedReferencesWithMissingTypes(o as Object))
+                    // {
+                    //     report.Append("Cleared missing types from ").Append(root.name).AppendLine();
+                    // }
+                    // else
+                    // {
+                    //     report.Append("No missing types to clear on ").Append(root.name).AppendLine();
+                    // }
                 }
 
 
-                if (SerializationUtility.ClearAllManagedReferencesWithMissingTypes(root))
-                {
-                    report.Append("Cleared missing types from ").Append(root.name).AppendLine();
-                }
-                else
-                {
-                    report.Append("No missing types to clear on ").Append(root.name).AppendLine();
-                }
+                // if (SerializationUtility.ClearAllManagedReferencesWithMissingTypes(root))
+                // {
+                //     report.Append("Cleared missing types from ").Append(root.name).AppendLine();
+                // }
+                // else
+                // {
+                //     report.Append("No missing types to clear on ").Append(root.name).AppendLine();
+                // }
             }
             Debug.Log(report.ToString());
             

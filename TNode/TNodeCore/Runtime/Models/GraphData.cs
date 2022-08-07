@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using TNodeCore.Editor.Models;
 using UnityEditor;
 using UnityEngine;
 
@@ -42,5 +43,12 @@ namespace TNodeCore.Runtime.Models{
             }
         }
         
+        #if UNITY_EDITOR
+        [SerializeReference] public List<EditorModel> EditorModels = new List<EditorModel>();
+
+#endif
+
     }
+
+ 
 }

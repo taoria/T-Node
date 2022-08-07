@@ -12,7 +12,7 @@ namespace TNodeCore.Runtime.Models{
             get => blackDragData;
             set{
                 blackDragData = value;
-                if (blackDragData.Contains('.')){
+                if (blackDragData.Contains(".")){
                     isListElement = true;
                 }
             }

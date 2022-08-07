@@ -26,7 +26,7 @@ namespace TNodeCore.Editor.Tools.GraphEditorCreator{
             GraphEditorCreator wnd = GetWindow<GraphEditorCreator>();
             wnd.titleContent = new GUIContent("GraphEditorCreator");
             //Set position to the center of the screen
-            wnd.position = new(Screen.width / 2.0f, Screen.height / 2.0f, 500, 300);
+            wnd.position = new Rect(Screen.width / 2.0f, Screen.height / 2.0f, 500, 300);
             //set this window non resizable
             wnd.minSize = new Vector2(500, 300);
             wnd.maxSize = new Vector2(500, 300);

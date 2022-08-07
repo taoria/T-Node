@@ -76,8 +76,8 @@ MonoBehaviour:
       data:
         positionInView:
           serializedVersion: 2
-          x: 1021.58136
-          y: 228.81656
+          x: 973.3707
+          y: 189.23111
           width: 0
           height: 0
         id: 6ceba867-fe0d-40c3-9d30-2d5d12803b52
@@ -89,8 +89,8 @@ MonoBehaviour:
       data:
         positionInView:
           serializedVersion: 2
-          x: 758.5814
-          y: 309.81662
+          x: 748.0001
+          y: 291
           width: 0
           height: 0
         id: b2ab4a52-e65d-4104-8891-dc316af217d9
@@ -104,8 +104,8 @@ MonoBehaviour:
       data:
         positionInView:
           serializedVersion: 2
-          x: 758.5814
-          y: 195.81656
+          x: 747
+          y: 179
           width: 0
           height: 0
         id: ac84573e-638d-45fa-b4e2-1a81c31fa9e7

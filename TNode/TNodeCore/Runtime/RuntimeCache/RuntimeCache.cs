@@ -82,16 +82,16 @@ namespace TNodeCore.Runtime.RuntimeCache{
 
 
         public readonly Dictionary<Type, Dictionary<string,GetValueDelegate>> CachedDelegatesForGettingValue =
-            new ();
+            new Dictionary<Type, Dictionary<string,GetValueDelegate>>();
         public readonly Dictionary<Type,Dictionary<string,SetValueDelegate>> CachedDelegatesForSettingValue =
-            new ();
+            new Dictionary<Type,Dictionary<string,SetValueDelegate>>();
         public readonly Dictionary<Type,Dictionary<string,IModelPropertyAccessor>> CachedPropertyAccessors =
-            new ();
+            new Dictionary<Type,Dictionary<string,IModelPropertyAccessor>> ();
         /// <summary>
         /// TODO: Converters now work globally, but it should be possible to specify a converter for a specific graph.but it will be too nested.so in current implementation, we will use a global converter.
         /// </summary>
         private readonly Dictionary<Type,Dictionary<Type,IPortConverterHelper>> CachedPortConverters =
-            new ();
+            new Dictionary<Type,Dictionary<Type,IPortConverterHelper>> ();
         
 
         private readonly Dictionary<Type, Type> _graphBlackboardDictionary = new Dictionary<Type, Type>();
@@ -174,7 +174,7 @@ namespace TNodeCore.Runtime.RuntimeCache{
                 CachedPortConverters[type2].Add(type1,instanceReverse);
             }
         }
-        private readonly Dictionary<Tuple<Type,Type>,bool> _possibleImplicitConversions = new ();
+        private readonly Dictionary<Tuple<Type,Type>,bool> _possibleImplicitConversions = new Dictionary<Tuple<Type,Type>,bool> ();
         public bool HasImplicitConversion(Type baseType, Type targetType){
             var tuple = new Tuple<Type, Type>(baseType, targetType);
             if (_possibleImplicitConversions.ContainsKey(tuple)){

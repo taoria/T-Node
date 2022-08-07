@@ -6,7 +6,7 @@ namespace TNodeCore.Runtime.Components{
     public class RuntimeDataSaver:MonoBehaviour{
         public string saveName;
         public string saveExtension = "tng";
-        public Dictionary<string, object> savedData = new();
+        public Dictionary<string, object> savedData = new Dictionary<string, object>();
         public void Load(){
             string path = Application.persistentDataPath + "/"+ saveName + "." + saveExtension;
             if(!File.Exists(path)){
