@@ -35,7 +35,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.Inspector{
 
 
         private void RefreshInspector(){
-            //iterate field of data and get name of every fields,create a new inspector item of appropriate type and add it to the inspector for each field
+            //iterate field of model and get name of every fields,create a new inspector item of appropriate type and add it to the inspector for each field
             var body = this.Q("InspectorBody");
             body.Clear();
             body.StretchToParentSize();

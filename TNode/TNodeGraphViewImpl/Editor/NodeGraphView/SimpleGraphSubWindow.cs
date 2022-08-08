@@ -1,11 +1,12 @@
 ﻿using System.Linq;
+using TNode.TNodeCore.Editor.EditorPersistence;
 using TNodeCore.Editor.EditorPersistence;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
 
 namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
-    public class SimpleGraphSubWindow:GraphElement,IGraphViewPersistence{
+    public class SimpleGraphSubWindow:GraphElement{
         private readonly Dragger _dragger = new Dragger();
 
         protected void ConstructWindowBasicSetting(){
@@ -39,17 +40,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
             throw new System.NotImplementedException();
         }
 
-        public void ResetPos(GraphEditorData editorData){
-            var res = editorData.graphElementsData.FirstOrDefault(x => x.guid == this.GetPersistenceId());
-        }
 
-        public void SavePos(GraphEditorData editorData){
-          
-        }
-
-        public void OnRemoveFromGraph(GraphEditorData editorData){
-            
-        }
     }
 
 

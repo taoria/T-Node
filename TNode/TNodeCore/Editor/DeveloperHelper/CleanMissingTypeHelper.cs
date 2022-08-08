@@ -3,8 +3,12 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace TNodeCore.Editor.DeveloperHelper{
-    public class CleanMissingTypeHelper
+namespace TNode.TNodeCore.Editor.DeveloperHelper{
+    /// <summary>
+    /// Helper options works on 2021.3 on newer unity versions only.call this in the early version may not work
+    /// </summary>
+    public static class CleanMissingTypeHelper
+    
     {
         [MenuItem("TNode/CleanMissingType/CleanScriptObjects")]
         public static void CleanMissingTypesOnScriptableObjects()
@@ -18,15 +22,17 @@ namespace TNodeCore.Editor.DeveloperHelper{
                 Object obj = AssetDatabase.LoadMainAssetAtPath(path);
                 if (obj != null)
                 {
-                    // if (SerializationUtility.ClearAllManagedReferencesWithMissingTypes(obj))
-                    // {
-                    //    
-                    //     report.Append("Cleared missing types from ").Append(path).AppendLine();
-                    // }
-                    // else
-                    // {
-                    //     report.Append("No missing types to clear on ").Append(path).AppendLine();
-                    // }
+                    #if UNITY_2021_3_OR_NEWER
+                    if (SerializationUtility.ClearAllManagedReferencesWithMissingTypes(obj))
+                    {
+                       
+                        report.Append("Cleared missing types from ").Append(path).AppendLine();
+                    }
+                    else
+                    {
+                        report.Append("No missing types to clear on ").Append(path).AppendLine();
+                    }
+                    #endif
                 }
             }
             Debug.Log(report.ToString());
@@ -39,25 +45,28 @@ namespace TNodeCore.Editor.DeveloperHelper{
             SceneManager.GetActiveScene().GetRootGameObjects();
             foreach (GameObject root in SceneManager.GetActiveScene().GetRootGameObjects()){
                 foreach (var o in root.transform){
-                    // if (SerializationUtility.ClearAllManagedReferencesWithMissingTypes(o as Object))
-                    // {
-                    //     report.Append("Cleared missing types from ").Append(root.name).AppendLine();
-                    // }
-                    // else
-                    // {
-                    //     report.Append("No missing types to clear on ").Append(root.name).AppendLine();
-                    // }
+                    #if UNITY_2021_3_OR_NEWER
+                    if (SerializationUtility.ClearAllManagedReferencesWithMissingTypes(o as Object))
+                    {
+                        report.Append("Cleared missing types from ").Append(root.name).AppendLine();
+                    }
+                    else
+                    {
+                        report.Append("No missing types to clear on ").Append(root.name).AppendLine();
+                    }
+                    #endif
                 }
 
-
-                // if (SerializationUtility.ClearAllManagedReferencesWithMissingTypes(root))
-                // {
-                //     report.Append("Cleared missing types from ").Append(root.name).AppendLine();
-                // }
-                // else
-                // {
-                //     report.Append("No missing types to clear on ").Append(root.name).AppendLine();
-                // }
+#if UNITY_2021_3_OR_NEWER
+                if (SerializationUtility.ClearAllManagedReferencesWithMissingTypes(root))
+                {
+                    report.Append("Cleared missing types from ").Append(root.name).AppendLine();
+                }
+                else
+                {
+                    report.Append("No missing types to clear on ").Append(root.name).AppendLine();
+                }
+#endif
             }
             Debug.Log(report.ToString());
             

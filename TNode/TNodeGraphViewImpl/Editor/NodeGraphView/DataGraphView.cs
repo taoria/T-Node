@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using TNode.TNodeCore.Editor.Blackboard;
+using TNode.TNodeCore.Editor.EditorPersistence;
 using TNode.TNodeCore.Editor.Models;
 using TNode.TNodeGraphViewImpl.Editor.Cache;
 using TNode.TNodeGraphViewImpl.Editor.GraphBlackboard;
@@ -11,9 +13,7 @@ using TNode.TNodeGraphViewImpl.Editor.NodeViews;
 using TNode.TNodeGraphViewImpl.Editor.Placemats;
 using TNode.TNodeGraphViewImpl.Editor.Search;
 using TNodeCore.Editor;
-using TNodeCore.Editor.Blackboard;
 using TNodeCore.Editor.EditorPersistence;
-using TNodeCore.Editor.Models;
 using TNodeCore.Editor.NodeGraphView;
 
 using TNodeCore.Editor.Tools.NodeCreator;
@@ -42,7 +42,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
         private Dictionary<string,Node> _nodeDict = new Dictionary<string,Node>();
         private IBlackboardView _blackboard;
         private bool _loaded;
-        private GraphViewData _graphViewData;
+        private GraphViewModel _graphViewModel;
         public T Data{
             get{ return _data; }
             set{
@@ -102,7 +102,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
                 name = "HintLabel"
             };
             visualElement.RegisterCallback<DragPerformEvent>((evt) => {
-                //check if the dragged object is a graph data or a Game Object contains a runtime graph
+                //check if the dragged object is a graph model or a Game Object contains a runtime graph
                 var res = DragAndDrop.objectReferences;
                 foreach (var obj in res){
                     if (obj is T graphData){
@@ -118,7 +118,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
                                     BuildRuntimeGraphBehaviour();
                                     Data = gameObject.GetComponent<RuntimeGraph>().graphData as T;
                                     if(Data==null){
-                                        Debug.LogError($"Dragged a wrong graph data to editor,expected {typeof(T)} but got {gameObject.GetComponent<RuntimeGraph>().graphData.GetType()}");
+                                        Debug.LogError($"Dragged a wrong graph model to editor,expected {typeof(T)} but got {gameObject.GetComponent<RuntimeGraph>().graphData.GetType()}");
                                     }
                                 }
                             }
@@ -127,7 +127,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
                 }
             });
             visualElement.RegisterCallback<DragUpdatedEvent>((evt) => {
-                //check if the dragged object is a graph data or a Game Object contains a runtime graph
+                //check if the dragged object is a graph model or a Game Object contains a runtime graph
                 var res = DragAndDrop.objectReferences;
                 foreach (var obj in res){
                     if (obj is GraphData graphData){
@@ -197,25 +197,25 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
                     Debug.Log(targetPos);
                     SearchWindow.Open(searchWindowContext, searchWindow);
                 });
-                evt.menu.AppendAction("Create PlacematData",dma=> {
+                evt.menu.AppendAction("Create PlacematModel",dma=> {
                     //find placemat container 
                     var placematContainer = GetPlacematContainer();
                     var targetPos = this.viewTransform.matrix.inverse.MultiplyPoint(dma.eventInfo.localMousePosition);
                     var dmaPosRect = new Rect(targetPos,new Vector2(500,500));
                     var placemat = placematContainer.CreatePlacemat<PlacematView>(dmaPosRect,1,"Title");
-                    var placematData = new PlacematData{
+                    var placematData = new PlacematModel{
                         title = "Title",
                         positionInView = dmaPosRect
                     };
-                    placemat.PlacematData = placematData;
+                    placemat.PlacematModel = placematData;
                     AddPlacemat(placematData);
 
                 });
             });
         }
 
-        private void AddPlacemat(PlacematData data){
-            _data.EditorModels.Add(data);
+        private void AddPlacemat(PlacematModel model){
+            _data.EditorModels.Add(model);
         }
 
         private PlacematContainer GetPlacematContainer(){
@@ -354,7 +354,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
         }
 
         private void OnDragUpdated(DragUpdatedEvent evt){
-            //check if the drag data is BlackboardField
+            //check if the drag model is BlackboardField
             if (DragAndDrop.GetGenericData("DragSelection") is List<ISelectable> data){
                 if (data.Count <= 0) return;
                 DragAndDrop.visualMode = DragAndDropVisualMode.Move;
@@ -417,18 +417,18 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
                 newEdge.output?.Connect(newEdge);
                 AddElement(newEdge);
             }
-            var placemats = _data.EditorModels.OfType<PlacematData>();
+            var placemats = _data.EditorModels.OfType<PlacematModel>();
             foreach (var placemat in placemats){
                 var container = GetPlacematContainer();
                 var res = container.CreatePlacemat<PlacematView>(placemat.positionInView, 0, placemat.title);
-                res.PlacematData = placemat;
+                res.PlacematModel = placemat;
 
             }
             _nodeDict.Clear();
         }
 
         private void LoadPersistentGraphViewData(){
-            var r= _data.GraphViewData;
+            var r= _data.GraphViewModel;
             this.viewTransformChanged-=OnViewTransformChanged;
             this.UpdateViewTransform(r.persistOffset,new Vector3(r.persistScale,r.persistScale,1));
             this.viewTransformChanged+=OnViewTransformChanged;
@@ -437,8 +437,8 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
 
         private void OnViewTransformChanged(GraphView graphview){
             if (_data == null) return;
-            _data.GraphViewData.persistOffset = graphview.viewTransform.position;
-            _data.GraphViewData.persistScale = graphview.viewTransform.scale.x;
+            _data.GraphViewModel.persistOffset = graphview.viewTransform.position;
+            _data.GraphViewModel.persistScale = graphview.viewTransform.scale.x;
         }
 
         private void AddPersistentNode(NodeData dataNode){
@@ -551,7 +551,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
             Debug.Log(placemats.Count);
             foreach (var placemat in placemats){
                 if (placemat is PlacematView placematView){
-                    _data.EditorModels.Add(placematView.PlacematData);
+                    _data.EditorModels.Add(placematView.PlacematModel);
                 }
             }
         }
@@ -628,7 +628,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
 
         #region implement interfaces
         /// <summary>
-        /// Simultaneously add the node to the graph data and add the node to the graph view
+        /// Simultaneously add the node to the graph model and add the node to the graph view
         /// </summary>
         /// <param name="nodeData"></param>
         /// <param name="rect">The give rect is the actual position in the graph view</param>
@@ -693,8 +693,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
                     RemoveElement(edge);
                 }
             }
-            //TODO: rect x,y move to node region
-            Owner.graphEditorData.graphElementsData.RemoveAll(x => x.guid == nodeData.id);
+           
         }
 
         public void AddLink(NodeLink nodeLink){
@@ -730,7 +729,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
             UpdateBlackboardData();
             OnDataChanged+= (sender, e) => { UpdateBlackboardData(); };
             if(_data.blackboardData!=null){
-                _data.GraphViewData.isBlackboardOn = true;
+                _data.GraphViewModel.isBlackboardOn = true;
             }
         }
 
