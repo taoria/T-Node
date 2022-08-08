@@ -3,6 +3,6 @@
 
 
 
-        public void OnBindingDataUpdate();
+        void OnBindingDataUpdate();
     }
 }

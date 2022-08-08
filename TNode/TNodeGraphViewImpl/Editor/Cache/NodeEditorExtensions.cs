@@ -10,7 +10,6 @@ using TNodeCore.Editor.EditorPersistence;
 using TNodeCore.Editor.NodeGraphView;
 using TNodeCore.Runtime.Attributes;
 using TNodeCore.Runtime.Models;
-using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 
@@ -278,7 +277,6 @@ namespace TNode.TNodeGraphViewImpl.Editor.Cache{
 
     public class Launcher{
         static Launcher(){
-            Debug.Log("NES Launched");
             NodeEditorSingleton.Instance.Initialize();
         }
     }

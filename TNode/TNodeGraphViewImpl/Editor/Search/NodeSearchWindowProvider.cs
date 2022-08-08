@@ -16,10 +16,13 @@ namespace TNode.TNodeGraphViewImpl.Editor.Search{
         private Type _graphType;
         private GraphView _graphView;
         private EditorWindow _editor;
-        public void Setup(Type graph,GraphView graphView,EditorWindow editor){
+        private Vector2 _createLocation;
+
+        public void Setup(Type graph,GraphView graphView,EditorWindow editor,Vector2 createLocation=default){
             _graphType = graph;
             _graphView = graphView;
             _editor = editor;
+            _createLocation = createLocation;
         }
         public List<SearchTreeEntry> CreateSearchTree(SearchWindowContext context){
             var nodeDataTypes = NodeEditorExtensions.GetGraphDataUsage(_graphType);
@@ -46,17 +49,23 @@ namespace TNode.TNodeGraphViewImpl.Editor.Search{
             }
             return list;
         }
+
+        public Vector2 FromScreenToViewPos(VisualElement visualElement,Vector2 screenPos){
+            var vector = visualElement.worldTransform.inverse.MultiplyVector(screenPos);
+            return vector;
+        }
         public bool OnSelectEntry(SearchTreeEntry SearchTreeEntry, SearchWindowContext context){
             var userData = SearchTreeEntry.userData;
-            var relativePos = context.screenMousePosition - _editor.position.position;
-            var localPos = _graphView.WorldToLocal(relativePos);
+ 
+
+
             if (userData is Type type){
                 //Check if type is derived from NodeData
                 if (typeof(NodeData).IsAssignableFrom(type)){
                     //Make an instance of the type
                     if (NodeCreator.InstantiateNodeData(type) is { } nodeData){
                         nodeData.nodeName = $"{type.Name}";
-                        ((IBaseDataGraphView) _graphView).AddTNode(nodeData, new Rect(localPos.x, localPos.y, 100, 100));
+                        ((IBaseDataGraphView) _graphView).AddTNode(nodeData, new Rect(_createLocation.x, _createLocation.y, 100, 100));
                     }
                 }
                 return true;

@@ -1,8 +1,9 @@
 ﻿using System;
 using TNodeCore.Runtime.Attributes;
+using TNodeCore.Runtime.Models;
 
 namespace TNode.GraphCreator.Runtime.Nodes{
-    using TNodeCore.Runtime.Models;
+  
 
     namespace TNode.GraphCreator.Runtime{
         [GraphUsage(typeof(MetaGraph))]

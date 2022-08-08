@@ -5,8 +5,11 @@ using UnityEngine;
 
 namespace TNodeCore.Editor.Models{
     [Serializable]
-    public class Placemat:EditorModel{
+    public class PlacematData:EditorModel{
         [SerializeReference]
         public List<Model> hostModels = new List<Model>();
+
+        public int zOrder;
+        public string title;
     }
 }

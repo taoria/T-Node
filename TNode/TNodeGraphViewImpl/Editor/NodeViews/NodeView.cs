@@ -37,7 +37,11 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeViews{
                 }
 
                 loggerArea.multiline = true;
-                loggerArea.value = message;
+                loggerArea.value += message;
+            }
+
+            public void LogTexture(Texture2D texture2D){
+                
             }
         }
 

@@ -17,5 +17,6 @@ namespace TNodeCore.Runtime{
 
     public interface INodeLoggerImpl{
         public void Log(string message);
+        void LogTexture(Texture2D texture2D);
     }
 }
