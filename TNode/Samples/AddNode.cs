@@ -17,6 +17,7 @@ namespace Samples{
 
         public override void Process(){
             Res = A + (Vector3)B;
+            Debug.Log(Res);
             this.Log(Res.ToString());
         }
     }

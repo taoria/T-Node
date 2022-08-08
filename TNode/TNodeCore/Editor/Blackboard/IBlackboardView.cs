@@ -4,16 +4,16 @@ using UnityEditor;
 
 namespace TNodeCore.Editor.Blackboard{
     public interface IBlackboardView{
-        public BlackboardData GetBlackboardData();
-        public void SetBlackboardData(BlackboardData data);
+        BlackboardData GetBlackboardData();
+        void SetBlackboardData(BlackboardData data);
         
-        public void AddItem();
+        void AddItem();
 
         void Setup(IBaseDataGraphView graphView,EditorWindow ownerWindow);
         void NotifyUpdate();
     }
     public interface IBlackboardView<T> : IBlackboardView where T : BlackboardData{
         
-        public  T Data{ get; set; }
+        T Data{ get; set; }
     }
 }

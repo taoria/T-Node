@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections;
+using System.Linq;
 using System.Reflection;
 using TNode.TNodeGraphViewImpl.Editor.Search;
 using TNodeCore.Editor.NodeGraphView;
 using TNodeCore.Editor.Serialization;
 using TNodeCore.Runtime.Attributes;
 using TNodeCore.Runtime.Models;
-using Unity.VisualScripting;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;
@@ -34,7 +34,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.GraphBlackboard{
             Add(blackboardGlobalSection);
             foreach (var field in data.GetType()
                          .GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)){
-                if(field.HasAttribute(typeof(HideInBlackboard))) continue;
+                if(field.GetCustomAttributes(typeof(HideInBlackboard)).Count()!=0) continue;
                 //if the field is MonoBehaviour,add a property field for blackboard 
                 //skip if the field is a list or Ilist
                 if (!typeof(IList).IsAssignableFrom(field.FieldType)&&!field.FieldType.IsArray){
