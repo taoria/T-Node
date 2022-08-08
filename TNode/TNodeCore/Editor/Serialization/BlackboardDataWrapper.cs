@@ -1,7 +1,7 @@
 ﻿using TNodeCore.Runtime;
 using TNodeCore.Runtime.Models;
 
-namespace TNodeCore.Editor.Serialization{
+namespace TNode.TNodeCore.Editor.Serialization{
     public class BlackboardDataWrapper:DataWrapper<BlackboardDataWrapper,BlackboardData>{
     }
 }

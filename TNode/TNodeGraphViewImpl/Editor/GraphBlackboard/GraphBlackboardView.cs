@@ -1,4 +1,4 @@
-﻿using TNodeCore.Editor.Blackboard;
+﻿using TNode.TNodeCore.Editor.Blackboard;
 using TNodeCore.Editor.NodeGraphView;
 using TNodeCore.Runtime.Models;
 using UnityEditor;

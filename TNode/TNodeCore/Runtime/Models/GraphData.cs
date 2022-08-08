@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using TNode.TNodeCore.Editor.Models;
-using TNodeCore.Editor.Models;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace TNodeCore.Runtime.Models{
     [Serializable]
@@ -47,8 +47,8 @@ namespace TNodeCore.Runtime.Models{
         #if UNITY_EDITOR
         [SerializeReference] 
         protected List<EditorModel> editorModels ;
-        [SerializeReference]
-        protected GraphViewData graphViewData;
+        [FormerlySerializedAs("graphViewData")] [SerializeReference]
+        protected GraphViewModel graphViewModel;
         
         
         public List<EditorModel> EditorModels{
@@ -58,12 +58,12 @@ namespace TNodeCore.Runtime.Models{
             }
             set => editorModels = value;
         }
-        public GraphViewData GraphViewData{
+        public GraphViewModel GraphViewModel{
             get{
-                return graphViewData ??= new GraphViewData();
+                return graphViewModel ??= new GraphViewModel();
                 
             }
-            set => graphViewData = value;
+            set => graphViewModel = value;
         }
         #endif
 

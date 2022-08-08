@@ -1,5 +1,5 @@
 ﻿using TilemapGenerator.ThirdParty.Extensions;
-using TNodeCore.Editor.Serialization;
+using TNode.TNodeCore.Editor.Serialization;
 using TNodeCore.Runtime.Attributes;
 using TNodeCore.Runtime.Models;
 using UnityEditor;

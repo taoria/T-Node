@@ -1,9 +1,10 @@
 ﻿using System;
 using TNodeCore.Runtime.Models;
-using UnityEngine;
 
-namespace TNodeCore.Editor.Models{
-    //This models are editor only
+namespace TNode.TNodeCore.Editor.Models{
+    /// <summary>
+    /// Editor model that holds the editor only model.
+    /// </summary>
     [Serializable]
     public abstract class EditorModel:Model{
 

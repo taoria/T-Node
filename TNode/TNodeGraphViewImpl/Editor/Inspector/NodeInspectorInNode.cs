@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
+using TNode.TNodeCore.Editor.Serialization;
 using TNodeCore.Editor.NodeGraphView;
-using TNodeCore.Editor.Serialization;
 using TNodeCore.Runtime.Attributes;
 using TNodeCore.Runtime.Models;
 using UnityEditor;
@@ -38,7 +38,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.Inspector{
 
   
         private void RefreshPropertyDrawer(){
-            //Check if the data's type is a generic type of  BlackboardDragNodeData<>
+            //Check if the model's type is a generic type of  BlackboardDragNodeData<>
             if (_data.GetType().IsSubclassOf(typeof(BlackboardDragNodeData))){
                 return;
             }
@@ -49,7 +49,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.Inspector{
                 var showInNodeViewAttribute = field.GetCustomAttribute<ShowInNode>() != null;
                 if (!showInNodeViewAttribute)
                     continue;
-                var drawer = new PropertyField(serializedObject.FindProperty("data").FindPropertyRelative(field.Name));
+                var drawer = new PropertyField(serializedObject.FindProperty("model").FindPropertyRelative(field.Name));
                 drawer.RegisterValueChangeCallback((evt) => {
                     serializedObject.Update();
                     serializedObject.ApplyModifiedProperties();
