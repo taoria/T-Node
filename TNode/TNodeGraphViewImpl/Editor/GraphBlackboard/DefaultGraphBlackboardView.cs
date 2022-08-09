@@ -86,7 +86,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.GraphBlackboard{
         private static void CreateBlackboardDataEntryForListItem(FieldInfo field, SerializedObject serializedObject,
             bool isRuntimeGraph,
             BlackboardSection blackboardSection, int index){
-            var property = serializedObject.FindProperty("model");
+            var property = serializedObject.FindProperty("data");
                 property =  property.FindPropertyRelative(field.Name).GetArrayElementAtIndex(index);
             
             BlackboardDataEntry entry = new BlackboardDataEntry(field.FieldType){
@@ -112,7 +112,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.GraphBlackboard{
             var foldoutData = new Foldout{
             };
             var drawer =
-                new GraphBlackboardPropertyField(serializedObject.FindProperty("model").FindPropertyRelative(field.Name),
+                new GraphBlackboardPropertyField(serializedObject.FindProperty("data").FindPropertyRelative(field.Name),
                     isRuntimeGraph);
             drawer.Bind(serializedObject);
             foldoutData.Add(drawer);

@@ -211,7 +211,24 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
                     AddPlacemat(placematData);
 
                 });
+                if (this.selection.Any()){
+                    evt.menu.AppendAction("Comment", dma => {
+                        BuildCommentForSelected();
+                    });
+                    evt.menu.AppendAction("Delete", dma => {
+                        DeleteSelected();
+                    });
+                    
+                }
             });
+        }
+
+        private void BuildCommentForSelected(){
+            throw new NotImplementedException();
+        }
+
+        private void DeleteSelected(){
+            throw new NotImplementedException();
         }
 
         private void AddPlacemat(PlacematModel model){
@@ -294,7 +311,9 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
                 text = "Run Once"
             };
             runButton.RegisterCallback<ClickEvent>(evt => {
+                Debug.Log(IsRuntimeGraph);
                 if (IsRuntimeGraph){
+                
                     _runtimeGraph.TraverseAll();
                     AfterGraphResolved?.Invoke();
                 }
@@ -379,10 +398,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
             ClearAll();
 
             LoadPersistentGraphViewData();
-            
-            
             if (_nodeDict == null) throw new ArgumentNullException(nameof(_nodeDict));
-            
             foreach (var dataNode in _data.NodeDictionary.Values){
                 if(dataNode==null)
                     continue;

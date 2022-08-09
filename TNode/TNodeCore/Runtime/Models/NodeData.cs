@@ -18,8 +18,7 @@ namespace TNodeCore.Runtime.Models{
             //Object Registration
            
         }
-        [DisableOnInspector]
-        public string id;
+
         public string nodeName;
         public bool entryPoint;
 
