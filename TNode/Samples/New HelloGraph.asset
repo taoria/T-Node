@@ -32,9 +32,10 @@ MonoBehaviour:
   blackboardData:
     id: 3
   sceneReference: 
-  editorModels: []
+  editorModels:
+  - id: 4
   graphViewModel:
-    id: 4
+    id: 5
   references:
     version: 1
     00000000:
@@ -53,19 +54,6 @@ MonoBehaviour:
         blackDragData: V3S.0
         isListElement: 1
     00000001:
-      type: {class: AddNode, ns: Samples, asm: Assembly-CSharp}
-      data:
-        positionInView:
-          serializedVersion: 2
-          x: 454
-          y: 280
-          width: 0
-          height: 0
-        id: 3e72627f-af97-4056-b89c-04d4f2f127f5
-        nodeName: AddNode
-        entryPoint: 0
-        isTest: 0
-    00000002:
       type: {class: BlackboardDragNodeData, ns: TNodeCore.Runtime.Models, asm: NewAssembly}
       data:
         positionInView:
@@ -80,6 +68,19 @@ MonoBehaviour:
         isTest: 0
         blackDragData: V2S.0
         isListElement: 1
+    00000002:
+      type: {class: AddNode, ns: Samples, asm: Assembly-CSharp}
+      data:
+        positionInView:
+          serializedVersion: 2
+          x: 488
+          y: 280
+          width: 0
+          height: 0
+        id: 3e72627f-af97-4056-b89c-04d4f2f127f5
+        nodeName: AddNode
+        entryPoint: 0
+        isTest: 0
     00000003:
       type: {class: HelloBlackboard, ns: TNode.Samples, asm: Assembly-CSharp}
       data:
@@ -89,6 +90,7 @@ MonoBehaviour:
           y: 0
           width: 0
           height: 0
+        id: 
         HelloString: 
         HelloGameObject: {fileID: 0}
         V3S:
@@ -96,6 +98,17 @@ MonoBehaviour:
         V2S:
         - {x: 0, y: 0}
     00000004:
+      type: {class: Comment, ns: TNode.TNodeCore.Editor.Models, asm: NewAssembly}
+      data:
+        positionInView:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        id: 
+        CommentText: 
+    00000005:
       type: {class: GraphViewModel, ns: TNode.TNodeCore.Editor.Models, asm: NewAssembly}
       data:
         positionInView:
@@ -104,6 +117,7 @@ MonoBehaviour:
           y: 0
           width: 0
           height: 0
-        persistScale: 0.57175326
-        persistOffset: {x: 343, y: 15}
+        id: 
+        persistScale: 1
+        persistOffset: {x: 114, y: -155}
         isBlackboardOn: 1

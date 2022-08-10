@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using TNode.TNodeCore.Editor.Blackboard;
+using TNode.TNodeCore.Editor.CommentView;
 using TNode.TNodeCore.Editor.EditorPersistence;
 using TNode.TNodeCore.Editor.Models;
 using TNode.TNodeGraphViewImpl.Editor.Cache;
@@ -23,6 +24,7 @@ using TNodeCore.Runtime.RuntimeCache;
 
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 using BlackboardField = TNode.TNodeGraphViewImpl.Editor.GraphBlackboard.BlackboardField;
@@ -43,6 +45,8 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
         private IBlackboardView _blackboard;
         private bool _loaded;
         private GraphViewModel _graphViewModel;
+        private List<Comment> _comments;
+
         public T Data{
             get{ return _data; }
             set{
@@ -224,7 +228,16 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
         }
 
         private void BuildCommentForSelected(){
-            throw new NotImplementedException();
+            var selection  = this.selection.OfType<IBaseNodeView>().ToList();
+            foreach (var baseNodeView in selection){
+                var comment = new CommentView();
+                comment.Bind(new Comment(){
+                    
+                });
+                ((GraphElement)baseNodeView).Add(comment);
+                comment.Data.CommentedModel = baseNodeView.GetNodeData();
+                this._data.EditorModels.Add(comment.Data);
+            }
         }
 
         private void DeleteSelected(){
@@ -440,6 +453,16 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
                 res.PlacematModel = placemat;
 
             }
+
+            var comments = _data.EditorModels.OfType<Comment>();
+            foreach (var comment in comments){
+                var res = new CommentView();
+                res.Bind(comment);
+                var node = _nodeDict[comment.CommentedModel.id];
+                if (node != null){
+                    node.Add(res);
+                }
+            }
             _nodeDict.Clear();
         }
 
@@ -564,12 +587,21 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
 
         private void SaveEditorModels(){
             var placemats = placematContainer.Placemats.ToList();
+            var comments = this.Query<CommentView>().ToList();
             Debug.Log(placemats.Count);
             foreach (var placemat in placemats){
                 if (placemat is PlacematView placematView){
                     _data.EditorModels.Add(placematView.PlacematModel);
                 }
             }
+            foreach (var commentView in comments){
+                _data.EditorModels.Add(commentView.Data);
+            }
+        }
+
+        public List<Comment> Comments{
+            get => _comments;
+            set => _comments = value;
         }
 
         private void SaveBlackboard(){
@@ -779,6 +811,8 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
 
         #endregion
     }
+
+
 
 
     public class DataChangedEventArgs<T>{

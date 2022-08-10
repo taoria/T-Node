@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using TNodeCore.Runtime.Attributes;
 using UnityEngine;
 
@@ -39,4 +40,6 @@ namespace TNodeCore.Runtime.Models{
 
         
     }
+
+
 }
