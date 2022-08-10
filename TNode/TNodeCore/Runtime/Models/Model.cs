@@ -11,6 +11,7 @@ namespace TNodeCore.Runtime.Models{
         public Rect positionInView;
         #endif
         [DisableOnInspector]
+        [HideInBlackboard]
         public string id;
         [NonSerialized]
         private int _fastAccessId=0;

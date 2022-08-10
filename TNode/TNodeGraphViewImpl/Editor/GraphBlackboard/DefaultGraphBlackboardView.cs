@@ -35,6 +35,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.GraphBlackboard{
             foreach (var field in data.GetType()
                          .GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)){
                 if(field.GetCustomAttributes(typeof(HideInBlackboard)).Count()!=0) continue;
+        
                 //if the field is MonoBehaviour,add a property field for blackboard 
                 //skip if the field is a list or Ilist
                 if (!typeof(IList).IsAssignableFrom(field.FieldType)&&!field.FieldType.IsArray){

@@ -14,11 +14,10 @@ the main goal of the repo is to make graph creation easier and more intuitive.
 * Scene object nodes hold scene objects like blackboard
 
 # Some to-dos
-* Port connectivity of two types have implicit conversion 
-* Node placemat
 * Vertical node
 * A universal merger handle multiple input 
-* Support static graph data traversal
+* Support graph data traversal like FSM
+* Conditional edge
 
 # Install & Usage
 Right now this lib is still under development.

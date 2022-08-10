@@ -43,8 +43,8 @@ MonoBehaviour:
       data:
         positionInView:
           serializedVersion: 2
-          x: 297
-          y: 280
+          x: 519
+          y: 361
           width: 0
           height: 0
         id: 4414d05b-da96-465e-a593-2e3dcfceaf23
@@ -58,8 +58,8 @@ MonoBehaviour:
       data:
         positionInView:
           serializedVersion: 2
-          x: 225
-          y: 382
+          x: 519
+          y: 443
           width: 0
           height: 0
         id: 1a4fd419-5584-4d43-a8c3-bebcad63a337
@@ -73,8 +73,8 @@ MonoBehaviour:
       data:
         positionInView:
           serializedVersion: 2
-          x: 488
-          y: 280
+          x: 630
+          y: 361
           width: 0
           height: 0
         id: 3e72627f-af97-4056-b89c-04d4f2f127f5
@@ -107,6 +107,8 @@ MonoBehaviour:
           width: 0
           height: 0
         id: 
+        CommentedModel:
+          id: 2
         CommentText: 
     00000005:
       type: {class: GraphViewModel, ns: TNode.TNodeCore.Editor.Models, asm: NewAssembly}
@@ -119,5 +121,5 @@ MonoBehaviour:
           height: 0
         id: 
         persistScale: 1
-        persistOffset: {x: 114, y: -155}
+        persistOffset: {x: -302, y: -93}
         isBlackboardOn: 1
