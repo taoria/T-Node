@@ -6,9 +6,5 @@ namespace TNodeCore.Runtime.Attributes.Ports{
 
         public OutputAttribute(string name="", PortNameHandling nameHandling = PortNameHandling.Auto,TypeHandling typeHandling = TypeHandling.Declared) : base(name, nameHandling,typeHandling){
         }
-        public OutputAttribute(Color color):base(color){
-        }
-
- 
     }
 }

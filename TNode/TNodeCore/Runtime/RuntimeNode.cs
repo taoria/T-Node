@@ -2,10 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using Codice.Client.Common.TreeGrouper;
+using TNodeCore.Runtime.Attributes.Ports;
 using TNodeCore.Runtime.Models;
 using TNodeCore.Runtime.RuntimeCache;
-using UnityEngine;
 
 namespace TNodeCore.Runtime{
     public class RuntimeNode{
@@ -30,10 +29,30 @@ namespace TNodeCore.Runtime{
             }
         }
         public object GetOutput(string portName){
-            
             return _portAccessors[portName].GetValue(NodeData);
         }
+        public string[] GetPortsOfType<T> (){
+            var ports = new List<string>();
+            foreach (var port in _portAccessors.Keys){
+                if(_portAccessors[port].Type==typeof(T)){
+                    ports.Add(port);
+                }
+            }
+            return ports.ToArray();
+        }
+        /// <summary>
+        /// Call it carefully to cache
+        /// </summary>
+        /// <param name="portName"></param>
+        /// <returns></returns>
+        public  Direction GetPortDirection(string portName){
+            var attribute = NodeData.GetType().GetField(portName).GetCustomAttribute<PortAttribute>();
+            if (attribute is InputAttribute){
+                return Direction.Input;
+            }
 
+            return Direction.Output;
+        }
 
         private readonly Dictionary<string, IModelPropertyAccessor> _portAccessors;
         public Action Process;
@@ -43,10 +62,7 @@ namespace TNodeCore.Runtime{
             //Caching the type of the node
             _type = nodeData.GetType();
             var info = nodeData.GetType().GetProperties();
-
             _portAccessors = RuntimeCache.RuntimeCache.Instance.CachedPropertyAccessors[_type];
-            
-      
         }
         public List<string> GetInputNodesId(){
             List<string> dependencies = new List<string>();
@@ -57,5 +73,9 @@ namespace TNodeCore.Runtime{
             return dependencies;
         }
         
+    }
+    public enum Direction{
+        Input,
+        Output
     }
 }

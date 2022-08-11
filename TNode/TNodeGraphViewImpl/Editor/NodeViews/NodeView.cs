@@ -13,6 +13,7 @@ using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Direction = UnityEditor.Experimental.GraphView.Direction;
 
 namespace TNode.TNodeGraphViewImpl.Editor.NodeViews{
     

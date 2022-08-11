@@ -38,8 +38,8 @@ namespace TNode.TNodeGraphViewImpl.Editor.Inspector{
 
   
         private void RefreshPropertyDrawer(){
-            //Check if the model's type is a generic type of  BlackboardDragNodeData<>
-            if (_data.GetType().IsSubclassOf(typeof(BlackboardDragNodeData))){
+            //Check if the model's type is a generic type of  BlackboardDragNode<>
+            if (_data.GetType().IsSubclassOf(typeof(BlackboardDragNode))){
                 return;
             }
             var serializedObject = new SerializedObject((NodeDataWrapper)_data);
@@ -55,7 +55,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.Inspector{
                     serializedObject.ApplyModifiedProperties();
                     ((NodeDataWrapper)_data).ForceNotify();
                 });
-                if (_data is SceneNodeData && _data is  BlackboardDragNodeData==false){
+                if (_data is SceneNode && _data is  BlackboardDragNode==false){
                     
                 }
                 else{

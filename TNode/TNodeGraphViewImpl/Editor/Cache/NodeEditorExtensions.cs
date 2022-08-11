@@ -234,13 +234,13 @@ namespace TNode.TNodeGraphViewImpl.Editor.Cache{
             //Check the generic type of BaseNodeView by t
            
             if (t.IsGenericType){
-                //AKA if BlackboardDragNodeData<Camera> is pulled 
-                //Get BlackboardDragNodeData<T> as generic type 
+                //AKA if BlackboardDragNode<Camera> is pulled 
+                //Get BlackboardDragNode<T> as generic type 
                 
           
                 var genericTypeDefinition = t.GetGenericTypeDefinition();
                 
-                //What you want is a BaseNodeView<BlackboardDragNodeData<T>> to be created
+                //What you want is a BaseNodeView<BlackboardDragNode<T>> to be created
                 var genericViewType = typeof(BaseNodeView<>).MakeGenericType(genericTypeDefinition);
              
                 //search for the specific type of genericViewType in the dictionary

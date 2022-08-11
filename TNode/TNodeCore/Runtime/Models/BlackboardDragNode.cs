@@ -7,7 +7,7 @@ using UnityEngine;
 namespace TNodeCore.Runtime.Models{
     [Serializable]
     [InternalUsage]
-    public class BlackboardDragNodeData:SceneNodeData{
+    public class BlackboardDragNode:SceneNode{
         public string BlackDragData{
             get => blackDragData;
             set{
@@ -40,16 +40,9 @@ namespace TNodeCore.Runtime.Models{
         }
 
         public bool isListElement=false;
-        public BlackboardDragNodeData(){
+        public BlackboardDragNode(){
             
         }
-        
-    }
-    [Serializable]
-    public class SceneNodeData:NodeData{
-       
-   
-        public BlackboardData BlackboardData{ get; set; }
         
     }
 }

@@ -324,7 +324,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
                 text = "Run Once"
             };
             runButton.RegisterCallback<ClickEvent>(evt => {
-                Debug.Log(IsRuntimeGraph);
+         
                 if (IsRuntimeGraph){
                 
                     _runtimeGraph.TraverseAll();
@@ -363,8 +363,8 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
                 var blackboardFields = data.OfType<BlackboardField >();
                 foreach (var selectable in blackboardFields){
                     if(selectable is { } field) {
-                        //Make a constructor of  BlackboardDragNodeData<field.PropertyType > by reflection
-                        var dragNodeData = NodeCreator.InstantiateNodeData<BlackboardDragNodeData>();
+                        //Make a constructor of  BlackboardDragNode<field.PropertyType > by reflection
+                        var dragNodeData = NodeCreator.InstantiateNodeData<BlackboardDragNode>();
                         dragNodeData.BlackboardData = GetBlackboardData();
                         dragNodeData.BlackDragData = field.BlackboardProperty.PropertyName;
                         AddTNode(dragNodeData,new Rect(realPos,new Vector2(200,200)));
@@ -374,8 +374,8 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
                 var blackboardEntries = data.OfType<BlackboardDataEntry>();
                 foreach (var selectable in blackboardEntries){
                     if(selectable is { } entry) {
-                        //Make a constructor of  BlackboardDragNodeData<field.PropertyType > by reflection
-                        var dragNodeData = NodeCreator.InstantiateNodeData<BlackboardDragNodeData>();
+                        //Make a constructor of  BlackboardDragNode<field.PropertyType > by reflection
+                        var dragNodeData = NodeCreator.InstantiateNodeData<BlackboardDragNode>();
                         dragNodeData.BlackboardData = GetBlackboardData();
                         dragNodeData.BlackDragData = entry.propertyPath;
                         AddTNode(dragNodeData,new Rect(realPos,new Vector2(200,200)));
@@ -416,14 +416,14 @@ namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
                 if(dataNode==null)
                     continue;
                 //Get the derived type of NodeAttribute View from the node type
-                if (dataNode is SceneNodeData runtimeNodeData){
-                    if (runtimeNodeData is  BlackboardDragNodeData){
+                if (dataNode is SceneNode runtimeNodeData){
+                    if (runtimeNodeData is  BlackboardDragNode){
                         runtimeNodeData.BlackboardData = GetBlackboardData();
                         AddPersistentNode(runtimeNodeData);
                     }
                     else{
             
-                        var node = _runtimeGraph.Get(runtimeNodeData.id).NodeData as SceneNodeData;
+                        var node = _runtimeGraph.Get(runtimeNodeData.id).NodeData as SceneNode;
                         AddPersistentNode(node);
                     }
                 }

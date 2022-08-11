@@ -9,14 +9,14 @@ using UnityEngine.UIElements;
 
 namespace TNode.TNodeGraphViewImpl.Editor.NodeViews{
     [ViewComponent]
-    public class DragBaseNodeView:BaseNodeView<BlackboardDragNodeData>{
+    public class DragBaseNodeView:BaseNodeView<BlackboardDragNode>{
         public DragBaseNodeView() : base(){
             this.titleContainer.visible = false;
            this.titleContainer.RemoveFromHierarchy();
            this.OnDataChanged += OnDataChangedHandler;
         }
 
-        private void OnDataChangedHandler(BlackboardDragNodeData obj){
+        private void OnDataChangedHandler(BlackboardDragNode obj){
             var port = this.Q<Port>();
             var label = port.Q<Label>();
             var blackboard = obj.BlackboardData;

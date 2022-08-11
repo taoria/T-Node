@@ -8,7 +8,6 @@ namespace TNodeCore.Runtime.Attributes.Ports{
     public class InputAttribute : PortAttribute{
         public InputAttribute(string name="", PortNameHandling nameHandling = PortNameHandling.Auto,TypeHandling typeHandling=TypeHandling.Declared) : base(name, nameHandling,typeHandling){
         }
-        public InputAttribute(Color color):base(color){
-        }
+  
     }
 }

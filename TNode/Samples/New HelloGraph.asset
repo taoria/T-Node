@@ -14,74 +14,31 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nodeList:
   - id: 0
-  - id: 1
-  - id: 2
-  nodeLinks:
-  - inPort:
-      portEntryName: A
-      nodeDataId: 3e72627f-af97-4056-b89c-04d4f2f127f5
-    outPort:
-      portEntryName: Value
-      nodeDataId: 4414d05b-da96-465e-a593-2e3dcfceaf23
-  - inPort:
-      portEntryName: B
-      nodeDataId: 3e72627f-af97-4056-b89c-04d4f2f127f5
-    outPort:
-      portEntryName: Value
-      nodeDataId: 1a4fd419-5584-4d43-a8c3-bebcad63a337
+  nodeLinks: []
   blackboardData:
-    id: 3
+    id: 1
   sceneReference: 
   editorModels:
-  - id: 4
+  - id: 2
+  - id: 3
   graphViewModel:
-    id: 5
+    id: 4
   references:
     version: 1
     00000000:
-      type: {class: BlackboardDragNodeData, ns: TNodeCore.Runtime.Models, asm: NewAssembly}
-      data:
-        positionInView:
-          serializedVersion: 2
-          x: 519
-          y: 361
-          width: 0
-          height: 0
-        id: 4414d05b-da96-465e-a593-2e3dcfceaf23
-        nodeName: 
-        entryPoint: 0
-        isTest: 0
-        blackDragData: V3S.0
-        isListElement: 1
-    00000001:
-      type: {class: BlackboardDragNodeData, ns: TNodeCore.Runtime.Models, asm: NewAssembly}
-      data:
-        positionInView:
-          serializedVersion: 2
-          x: 519
-          y: 443
-          width: 0
-          height: 0
-        id: 1a4fd419-5584-4d43-a8c3-bebcad63a337
-        nodeName: 
-        entryPoint: 0
-        isTest: 0
-        blackDragData: V2S.0
-        isListElement: 1
-    00000002:
       type: {class: AddNode, ns: Samples, asm: Assembly-CSharp}
       data:
         positionInView:
           serializedVersion: 2
-          x: 630
-          y: 361
+          x: 595
+          y: 315
           width: 0
           height: 0
-        id: 3e72627f-af97-4056-b89c-04d4f2f127f5
+        id: b2634d94-1655-4674-9b1c-b1c2e9ab3f6b
         nodeName: AddNode
         entryPoint: 0
         isTest: 0
-    00000003:
+    00000001:
       type: {class: HelloBlackboard, ns: TNode.Samples, asm: Assembly-CSharp}
       data:
         positionInView:
@@ -93,11 +50,22 @@ MonoBehaviour:
         id: 
         HelloString: 
         HelloGameObject: {fileID: 0}
-        V3S:
-        - {x: 0, y: 0, z: 0}
-        V2S:
-        - {x: 0, y: 0}
-    00000004:
+        V3S: []
+        V2S: []
+    00000002:
+      type: {class: PlacematModel, ns: TNode.TNodeCore.Editor.Models, asm: NewAssembly}
+      data:
+        positionInView:
+          serializedVersion: 2
+          x: 559
+          y: 197
+          width: 500
+          height: 500
+        id: 
+        hostModels: []
+        zOrder: 0
+        title: Title
+    00000003:
       type: {class: Comment, ns: TNode.TNodeCore.Editor.Models, asm: NewAssembly}
       data:
         positionInView:
@@ -108,9 +76,9 @@ MonoBehaviour:
           height: 0
         id: 
         CommentedModel:
-          id: 2
-        CommentText: 
-    00000005:
+          id: 0
+        CommentText: ddd
+    00000004:
       type: {class: GraphViewModel, ns: TNode.TNodeCore.Editor.Models, asm: NewAssembly}
       data:
         positionInView:
@@ -121,5 +89,5 @@ MonoBehaviour:
           height: 0
         id: 
         persistScale: 1
-        persistOffset: {x: -302, y: -93}
-        isBlackboardOn: 1
+        persistOffset: {x: 0, y: 0}
+        isBlackboardOn: 0
