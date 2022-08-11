@@ -146,7 +146,6 @@ namespace TNodeCore.Editor.Tools.GraphEditorCreator{
             //Create an NodeAttribute Editor Data Instance for the new graph editor
             var graphEditorData = ScriptableObject.CreateInstance<GraphEditorData>();
             graphEditorData.name = editorName;
-
             VisualTreeAsset defaultEditorTree = Resources.Load<VisualTreeAsset>("GraphEditor");
             EditorUtility.SetDirty(graphEditorData);
 

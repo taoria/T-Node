@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using TNodeCore.Runtime.Attributes;
 using UnityEngine;
 
@@ -18,8 +19,7 @@ namespace TNodeCore.Runtime.Models{
             //Object Registration
            
         }
-        [DisableOnInspector]
-        public string id;
+
         public string nodeName;
         public bool entryPoint;
 
@@ -40,4 +40,6 @@ namespace TNodeCore.Runtime.Models{
 
         
     }
+
+
 }

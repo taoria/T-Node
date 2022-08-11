@@ -35,6 +35,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.GraphBlackboard{
             foreach (var field in data.GetType()
                          .GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)){
                 if(field.GetCustomAttributes(typeof(HideInBlackboard)).Count()!=0) continue;
+        
                 //if the field is MonoBehaviour,add a property field for blackboard 
                 //skip if the field is a list or Ilist
                 if (!typeof(IList).IsAssignableFrom(field.FieldType)&&!field.FieldType.IsArray){
@@ -86,7 +87,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.GraphBlackboard{
         private static void CreateBlackboardDataEntryForListItem(FieldInfo field, SerializedObject serializedObject,
             bool isRuntimeGraph,
             BlackboardSection blackboardSection, int index){
-            var property = serializedObject.FindProperty("model");
+            var property = serializedObject.FindProperty("data");
                 property =  property.FindPropertyRelative(field.Name).GetArrayElementAtIndex(index);
             
             BlackboardDataEntry entry = new BlackboardDataEntry(field.FieldType){
@@ -112,7 +113,7 @@ namespace TNode.TNodeGraphViewImpl.Editor.GraphBlackboard{
             var foldoutData = new Foldout{
             };
             var drawer =
-                new GraphBlackboardPropertyField(serializedObject.FindProperty("model").FindPropertyRelative(field.Name),
+                new GraphBlackboardPropertyField(serializedObject.FindProperty("data").FindPropertyRelative(field.Name),
                     isRuntimeGraph);
             drawer.Bind(serializedObject);
             foldoutData.Add(drawer);
