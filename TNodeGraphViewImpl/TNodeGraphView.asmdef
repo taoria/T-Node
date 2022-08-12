@@ -1,0 +1,16 @@
+{
+    "name": "TNodeGraphView",
+    "rootNamespace": "",
+    "references": [
+        "GUID:d9d6b4f0cdce23345bf2e956f8041ca2"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
