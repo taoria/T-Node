@@ -20,14 +20,12 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    # Runs a single command using the runners shell
-    - name: Up merge
-      # You may pin to the exact commit or the version.
-      # uses: bambamboole/gha-upmerge@de87b212278009f9ace0ba024701890b9eb3281b
-      uses: bambamboole/gha-upmerge@v1.0.1
-      with:
-        # Name of the branch to merge from
-        from_branch: work-in-progress
+      - uses: actions/checkout@master
 
-        to_branch: main
+      - name: Merge work-in-progress -> main
+        uses: devmasx/merge-branch@master
+        with:
+          type: now
+          target_branch: main
+          github_token: ${{ github.token }}
 
