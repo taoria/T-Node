@@ -11,7 +11,7 @@ namespace TNode.TNodeCore.Editor.EditorPersistence{
     /// Graph Editor Data hold the config of a type of graph.
     /// it's used by a graph editor to determine which implementation to use and some other config may be stored in here some days later.
     /// </summary>
-    [CreateAssetMenu(fileName = "Graph Editor Data", menuName = "TNode/Graph Editor Data")]
+    [CreateAssetMenu(fileName = "Graph Editor Data", menuName = "TNodeCore/Graph Editor Data")]
     public class GraphEditorData:ScriptableObject{
         /// <summary>
         /// The implementation of a graph view.experimental graphview or GTF.

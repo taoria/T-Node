@@ -15,7 +15,7 @@ using UnityEngine;
 
 namespace TNodeGraphViewImpl.Editor.Cache{
     /// <summary>
-    /// Internal singleton class for caching TNode reflection Data.
+    /// Internal singleton class for caching TNodeCore reflection Data.
     /// </summary>
     internal class NodeEditorTypeDictionary:Dictionary<Type, Type>{
         private class NodeEditorTypeDictionaryComparer : IEqualityComparer<Type>{
@@ -138,8 +138,8 @@ namespace TNodeGraphViewImpl.Editor.Cache{
                 //fetch this type 's parent class
                 var parent = type.BaseType;
                 //Check if this type is a generic type and is a generic type of BaseNodeView or BaseDataGraphView,
-                //Two level generic definition is now supported by TNode
-                //Deeper nested generic definition is not supported by TNode
+                //Two level generic definition is now supported by TNodeCore
+                //Deeper nested generic definition is not supported by TNodeCore
                 if (parent is{IsGenericType: true} && 
                     (_acceptedTypesForGenericToSpecific.Contains(parent.GetGenericTypeDefinition()) ||
                      (parent.GetGenericTypeDefinition().IsGenericType && _acceptedTypesForGenericToSpecific.Contains(parent.GetGenericTypeDefinition().GetGenericTypeDefinition()))
@@ -278,7 +278,7 @@ namespace TNodeGraphViewImpl.Editor.Cache{
     public class Launcher{
         static Launcher(){
             //Get version of the package
-            Debug.Log("TNode v0.01 is launched");
+            Debug.Log("TNodeCore v0.01 is launched");
             NodeEditorSingleton.Instance.Initialize();
         }
     }
