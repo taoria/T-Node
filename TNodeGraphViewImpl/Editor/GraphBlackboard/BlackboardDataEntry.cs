@@ -5,7 +5,7 @@ using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace TNode.TNodeGraphViewImpl.Editor.GraphBlackboard{
+namespace TNodeGraphViewImpl.Editor.GraphBlackboard{
     public class BlackboardDataEntry:GraphElement{
         public Type propertyType;
         public string propertyPath;

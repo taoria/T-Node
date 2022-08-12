@@ -1,8 +1,9 @@
 ﻿using System;
+using TNode.GraphCreator.Runtime;
 using TNodeCore.Runtime.Attributes;
 using TNodeCore.Runtime.Models;
 
-namespace TNode.GraphCreator.Runtime.Nodes{
+namespace TNodeCore.GraphCreator.Runtime.Nodes{
   
 
     namespace TNode.GraphCreator.Runtime{

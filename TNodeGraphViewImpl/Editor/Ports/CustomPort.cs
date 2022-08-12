@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using TNode.TNodeGraphViewImpl.Editor.NodeViews;
 using TNodeCore.Editor.NodeGraphView;
 using TNodeCore.Runtime.Models;
+using TNodeGraphViewImpl.Editor.NodeViews;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
 
-namespace TNode.TNodeGraphViewImpl.Editor.Ports{
+namespace TNodeGraphViewImpl.Editor.Ports{
     public class CustomPort:UnityEditor.Experimental.GraphView.Port{
         public CustomPort(Orientation portOrientation, Direction portDirection, Capacity portCapacity, Type type) : base(portOrientation, portDirection, portCapacity, type){
           m_EdgeConnector = new EdgeConnector<Edge>(new CustomEdgeConnectorListener());

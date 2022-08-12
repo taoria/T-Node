@@ -3,7 +3,7 @@ using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace TNode.TNodeGraphViewImpl.Editor.Placemats{
+namespace TNodeGraphViewImpl.Editor.Placemats{
     public class PlacematView:Placemat{
         public PlacematModel PlacematModel{
             get => _placematModel;

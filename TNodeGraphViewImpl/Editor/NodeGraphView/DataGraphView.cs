@@ -7,30 +7,26 @@ using TNode.TNodeCore.Editor.Blackboard;
 using TNode.TNodeCore.Editor.CommentView;
 using TNode.TNodeCore.Editor.EditorPersistence;
 using TNode.TNodeCore.Editor.Models;
-using TNode.TNodeGraphViewImpl.Editor.Cache;
-using TNode.TNodeGraphViewImpl.Editor.GraphBlackboard;
-using TNode.TNodeGraphViewImpl.Editor.Inspector;
-using TNode.TNodeGraphViewImpl.Editor.NodeViews;
-using TNode.TNodeGraphViewImpl.Editor.Placemats;
-using TNode.TNodeGraphViewImpl.Editor.Search;
 using TNodeCore.Editor;
-using TNodeCore.Editor.EditorPersistence;
 using TNodeCore.Editor.NodeGraphView;
-
 using TNodeCore.Editor.Tools.NodeCreator;
 using TNodeCore.Runtime.Components;
 using TNodeCore.Runtime.Models;
 using TNodeCore.Runtime.RuntimeCache;
-
+using TNodeGraphViewImpl.Editor.Cache;
+using TNodeGraphViewImpl.Editor.GraphBlackboard;
+using TNodeGraphViewImpl.Editor.Inspector;
+using TNodeGraphViewImpl.Editor.NodeViews;
+using TNodeGraphViewImpl.Editor.Placemats;
+using TNodeGraphViewImpl.Editor.Search;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
-using BlackboardField = TNode.TNodeGraphViewImpl.Editor.GraphBlackboard.BlackboardField;
+using BlackboardField = TNodeGraphViewImpl.Editor.GraphBlackboard.BlackboardField;
 using Edge = UnityEditor.Experimental.GraphView.Edge;
 
-namespace TNode.TNodeGraphViewImpl.Editor.NodeGraphView{
+namespace TNodeGraphViewImpl.Editor.NodeGraphView{
     public   class BaseDataGraphView<T>:GraphView,IDataGraphView<T> where T:GraphData{
         #region const 
         public const float RefreshRate = 1f;

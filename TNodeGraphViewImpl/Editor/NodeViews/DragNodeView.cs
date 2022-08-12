@@ -7,7 +7,7 @@ using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace TNode.TNodeGraphViewImpl.Editor.NodeViews{
+namespace TNodeGraphViewImpl.Editor.NodeViews{
     [ViewComponent]
     public class DragBaseNodeView:BaseNodeView<BlackboardDragNode>{
         public DragBaseNodeView() : base(){

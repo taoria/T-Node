@@ -1,6 +1,6 @@
 ﻿using TNodeCore.Runtime.Models;
 
-namespace TNode.TNodeGraphViewImpl.Editor.NodeViews{
+namespace TNodeGraphViewImpl.Editor.NodeViews{
 
     
     public class DefaultBaseNodeView:BaseNodeView<NodeData>{

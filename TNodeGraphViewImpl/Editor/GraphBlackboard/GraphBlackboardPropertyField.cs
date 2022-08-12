@@ -2,7 +2,7 @@
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
-namespace TNode.TNodeGraphViewImpl.Editor.GraphBlackboard{
+namespace TNodeGraphViewImpl.Editor.GraphBlackboard{
     public class GraphBlackboardPropertyField:PropertyField{
         private readonly bool _runtime;
 
