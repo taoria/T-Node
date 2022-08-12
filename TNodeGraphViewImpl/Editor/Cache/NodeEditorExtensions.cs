@@ -11,6 +11,7 @@ using TNodeGraphViewImpl.Editor.GraphBlackboard;
 using TNodeGraphViewImpl.Editor.NodeGraphView;
 using TNodeGraphViewImpl.Editor.NodeViews;
 using UnityEditor;
+using UnityEngine;
 
 namespace TNodeGraphViewImpl.Editor.Cache{
     /// <summary>
@@ -276,6 +277,8 @@ namespace TNodeGraphViewImpl.Editor.Cache{
 
     public class Launcher{
         static Launcher(){
+            //Get version of the package
+            Debug.Log("TNode v0.01 is launched");
             NodeEditorSingleton.Instance.Initialize();
         }
     }
