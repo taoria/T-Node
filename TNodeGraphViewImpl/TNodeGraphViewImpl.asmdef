@@ -1,7 +1,8 @@
 {
     "name": "TNodeGraphViewImpl",
+    "rootNamespace": "",
     "references": [
-        "GUID:d9d6b4f0cdce23345bf2e956f8041ca2"
+        "GUID:940af72691767fa47be979e5dbcf6ba0"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
