@@ -59,6 +59,11 @@ namespace TNodeCore.Editor{
             
             // Instantiate UXML
             VisualElement labelFromUXML = mVisualTreeAsset.Instantiate();
+            if(mVisualTreeAsset==null){
+                Debug.LogWarning("No visual tree asset found ,enable the default visual tree asset ");
+                labelFromUXML = Resources.Load<VisualTreeAsset>("GraphEditor").Instantiate();
+               
+            }
             root.Add(labelFromUXML);
             
             BuildGraphView();
