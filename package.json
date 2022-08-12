@@ -2,7 +2,7 @@
   "name": "com.taoria.t-node",
   "version": "0.0.1",
   "displayName": "T-Node",
-  "description": "A graph edtiro tool for unity",
+  "description": "A graph editor tool for unity",
   "unity": "2020.3",
   "unityRelease": "0b5",
   "dependencies": {
