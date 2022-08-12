@@ -6,7 +6,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-//add an attribute right click asset panel and select "TNode/Create/Create New Graph Editor" to call this editor
+//add an attribute right click asset panel and select "TNodeCore/Create/Create New Graph Editor" to call this editor
 
 
 namespace TNodeCore.Editor.Tools.GraphEditorCreator{
@@ -20,8 +20,8 @@ namespace TNodeCore.Editor.Tools.GraphEditorCreator{
         private TextField _graphClassNameTextField;
         private Button _createButton;
         private readonly SourceGeneratorForGraphEditor _sourceGeneratorForGraphEditor = new SourceGeneratorForGraphEditor();
-        [MenuItem("Assets/Create/TNode/Create New Graph Editor")]
-        [MenuItem("TNode/Create New Graph Editor")]
+        [MenuItem("Assets/Create/TNodeCore/Create New Graph Editor")]
+        [MenuItem("TNodeCore/Create New Graph Editor")]
         public static void ShowExample()
         {
             GraphEditorCreator wnd = GetWindow<GraphEditorCreator>();

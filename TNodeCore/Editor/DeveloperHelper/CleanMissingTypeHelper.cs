@@ -10,7 +10,7 @@ namespace TNode.TNodeCore.Editor.DeveloperHelper{
     public static class CleanMissingTypeHelper
     
     {
-        [MenuItem("TNode/CleanMissingType/CleanScriptObjects")]
+        [MenuItem("TNodeCore/CleanMissingType/CleanScriptObjects")]
         public static void CleanMissingTypesOnScriptableObjects()
         {
             var report = new StringBuilder();
@@ -38,7 +38,7 @@ namespace TNode.TNodeCore.Editor.DeveloperHelper{
             Debug.Log(report.ToString());
         }
 
-        [MenuItem("TNode/CleanMissingType/CleanSceneGameObjects")]
+        [MenuItem("TNodeCore/CleanMissingType/CleanSceneGameObjects")]
         public static void CleanMissingTypesOnGameObjects(){
             var report = new StringBuilder();
 
