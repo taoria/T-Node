@@ -2,11 +2,11 @@
   "name": "com.taoria.t-node",
   "version": "0.0.1",
   "displayName": "T-Node",
-  "description": "A graph edition tool for unity",
-  "unity": "2022.1",
+  "description": "A graph edtiro tool for unity",
+  "unity": "2020.3",
   "unityRelease": "0b5",
   "dependencies": {
-    "com.unity.graphtools.foundation": "0.11.2-preview"
+    
   },
   "keywords": [
     "graph",

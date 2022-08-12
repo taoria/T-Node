@@ -30,8 +30,8 @@ MonoBehaviour:
       data:
         positionInView:
           serializedVersion: 2
-          x: 595
-          y: 315
+          x: 479
+          y: 295
           width: 0
           height: 0
         id: b2634d94-1655-4674-9b1c-b1c2e9ab3f6b
@@ -57,8 +57,8 @@ MonoBehaviour:
       data:
         positionInView:
           serializedVersion: 2
-          x: 559
-          y: 197
+          x: 443
+          y: 177
           width: 500
           height: 500
         id: 
@@ -89,5 +89,5 @@ MonoBehaviour:
           height: 0
         id: 
         persistScale: 1
-        persistOffset: {x: 0, y: 0}
+        persistOffset: {x: 0, y: -5}
         isBlackboardOn: 0
