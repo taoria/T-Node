@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
-namespace TNode.TNodeGraphViewImpl.Editor.GraphBlackboard{
+namespace TNodeGraphViewImpl.Editor.GraphBlackboard{
     /// <summary>
     /// Implement this class to create graph black board for specified graph
     /// </summary>

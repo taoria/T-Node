@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using TNode.TNodeGraphViewImpl.Editor.Cache;
 using TNodeCore.Editor.NodeGraphView;
 using TNodeCore.Editor.Tools.NodeCreator;
 using TNodeCore.Runtime.Models;
+using TNodeGraphViewImpl.Editor.Cache;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace TNode.TNodeGraphViewImpl.Editor.Search{
+namespace TNodeGraphViewImpl.Editor.Search{
     public class NodeSearchWindowProvider:ScriptableObject,ISearchWindowProvider{
         private Type _graphType;
         private GraphView _graphView;

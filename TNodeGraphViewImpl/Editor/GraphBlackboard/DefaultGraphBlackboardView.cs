@@ -3,17 +3,17 @@ using System.Collections;
 using System.Linq;
 using System.Reflection;
 using TNode.TNodeCore.Editor.Serialization;
-using TNode.TNodeGraphViewImpl.Editor.Search;
 using TNodeCore.Editor.NodeGraphView;
 using TNodeCore.Runtime.Attributes;
 using TNodeCore.Runtime.Models;
+using TNodeGraphViewImpl.Editor.Search;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace TNode.TNodeGraphViewImpl.Editor.GraphBlackboard{
+namespace TNodeGraphViewImpl.Editor.GraphBlackboard{
     [ViewComponent]
     public class DefaultGraphBlackboardView:GraphBlackboardView<BlackboardData>{
 

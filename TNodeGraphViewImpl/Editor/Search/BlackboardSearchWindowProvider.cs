@@ -2,14 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using TNode.TNodeCore.Editor.Blackboard;
-using TNode.TNodeGraphViewImpl.Editor.GraphBlackboard;
 using TNodeCore.Editor.NodeGraphView;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace TNode.TNodeGraphViewImpl.Editor.Search{
+namespace TNodeGraphViewImpl.Editor.Search{
     public class BlackboardSearchWindowProvider:ScriptableObject,ISearchWindowProvider{
         private Type _graphType;
         private IBaseDataGraphView _graphView;

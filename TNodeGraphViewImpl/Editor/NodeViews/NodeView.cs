@@ -2,20 +2,20 @@
 using System.Linq;
 using System.Reflection;
 using TNode.TNodeCore.Editor.Serialization;
-using TNode.TNodeGraphViewImpl.Editor.Inspector;
-using TNode.TNodeGraphViewImpl.Editor.Ports;
 using TNodeCore.Editor.NodeGraphView;
 using TNodeCore.Runtime;
 using TNodeCore.Runtime.Attributes;
 using TNodeCore.Runtime.Attributes.Ports;
 using TNodeCore.Runtime.Models;
+using TNodeGraphViewImpl.Editor.Inspector;
+using TNodeGraphViewImpl.Editor.Ports;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Direction = UnityEditor.Experimental.GraphView.Direction;
 
-namespace TNode.TNodeGraphViewImpl.Editor.NodeViews{
+namespace TNodeGraphViewImpl.Editor.NodeViews{
     
     public abstract class BaseNodeView<T> : Node,INodeView<T> where T:NodeData,new(){
         protected T _data;

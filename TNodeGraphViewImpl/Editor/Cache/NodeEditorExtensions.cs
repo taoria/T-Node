@@ -4,17 +4,15 @@ using System.Linq;
 using System.Reflection;
 using TNode.TNodeCore.Editor.Blackboard;
 using TNode.TNodeCore.Editor.EditorPersistence;
-using TNode.TNodeGraphViewImpl.Editor.GraphBlackboard;
-using TNode.TNodeGraphViewImpl.Editor.NodeGraphView;
-using TNode.TNodeGraphViewImpl.Editor.NodeViews;
-using TNodeCore.Editor.EditorPersistence;
 using TNodeCore.Editor.NodeGraphView;
 using TNodeCore.Runtime.Attributes;
 using TNodeCore.Runtime.Models;
+using TNodeGraphViewImpl.Editor.GraphBlackboard;
+using TNodeGraphViewImpl.Editor.NodeGraphView;
+using TNodeGraphViewImpl.Editor.NodeViews;
 using UnityEditor;
-using UnityEngine;
 
-namespace TNode.TNodeGraphViewImpl.Editor.Cache{
+namespace TNodeGraphViewImpl.Editor.Cache{
     /// <summary>
     /// Internal singleton class for caching TNode reflection Data.
     /// </summary>

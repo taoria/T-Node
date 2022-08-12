@@ -7,7 +7,7 @@ using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
-namespace TNode.TNodeGraphViewImpl.Editor.Inspector{
+namespace TNodeGraphViewImpl.Editor.Inspector{
     public class NodeInspectorInNode:VisualElement{
         private NodeData _data;
         public NodeData Data{
