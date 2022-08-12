@@ -56,15 +56,19 @@ namespace TNodeCore.Editor{
             
             // Each editor window contains a root VisualElement object
             VisualElement root = rootVisualElement;
-            
-            // Instantiate UXML
-            VisualElement labelFromUXML = mVisualTreeAsset.Instantiate();
+            VisualElement labelFromUxml = null;
             if(mVisualTreeAsset==null){
                 Debug.LogWarning("No visual tree asset found ,enable the default visual tree asset ");
-                labelFromUXML = Resources.Load<VisualTreeAsset>("GraphEditor").Instantiate();
+                 labelFromUxml = Resources.Load<VisualTreeAsset>("GraphEditor").Instantiate();
                
             }
-            root.Add(labelFromUXML);
+            else{
+                labelFromUxml = mVisualTreeAsset.Instantiate();
+            }
+            // Instantiate UXML
+         
+   
+            root.Add(labelFromUxml);
             
             BuildGraphView();
             DefineGraphEditorActions();
