@@ -49,7 +49,7 @@ namespace TNodeGraphViewImpl.Editor.Inspector{
                 var showInNodeViewAttribute = field.GetCustomAttribute<ShowInNode>() != null;
                 if (!showInNodeViewAttribute)
                     continue;
-                var drawer = new PropertyField(serializedObject.FindProperty("model").FindPropertyRelative(field.Name));
+                var drawer = new PropertyField(serializedObject.FindProperty("data").FindPropertyRelative(field.Name));
                 drawer.RegisterValueChangeCallback((evt) => {
                     serializedObject.Update();
                     serializedObject.ApplyModifiedProperties();
