@@ -2,11 +2,13 @@
 using TNodeCore.Runtime.Attributes;
 using TNodeCore.Runtime.Attributes.Ports;
 using TNodeCore.Runtime.RuntimeCache;
+using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace TNodeCore.Runtime.Models{
     [Serializable]
     [InternalUsage]
-    public class BlackboardDragNode:SceneNode{
+    public class BlackboardDragNode:SceneNode,ISerializationCallbackReceiver{
         public string BlackDragData{
             get => blackDragData;
             set{
@@ -16,11 +18,16 @@ namespace TNodeCore.Runtime.Models{
                 }
             }
         }
+
         /// <summary>
         /// 
         /// </summary>
-        public Type BlackboardDragType{ get; set; }
-
+        
+        public Type BlackboardDragType;
+    
+        [SerializeField]
+        private string blackboardDragTypeString;
+            
         public string blackDragData;
         
         /// TODO : The type handling in a safer way in the future
@@ -40,5 +47,18 @@ namespace TNodeCore.Runtime.Models{
         }
 
         public bool isListElement=false;
+        public void OnBeforeSerialize(){
+            if (BlackboardDragType != null){
+                blackboardDragTypeString = BlackboardDragType.AssemblyQualifiedName;
+            }
+           
+        }
+
+        public void OnAfterDeserialize(){
+            if(blackboardDragTypeString != null){
+                BlackboardDragType = Type.GetType(blackboardDragTypeString);
+            }
+        
+        }
     }
 }
