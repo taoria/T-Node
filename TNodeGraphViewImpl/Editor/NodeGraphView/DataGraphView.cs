@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -373,7 +374,24 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
                         //Make a constructor of  BlackboardDragNode<field.PropertyType > by reflection
                         var dragNodeData = NodeCreator.InstantiateNodeData<BlackboardDragNode>();
                         dragNodeData.BlackboardData = GetBlackboardData();
-                        dragNodeData.BlackboardDragType = entry.propertyType;
+                        //Check if the entry's property type is a IList
+                      
+                        if (typeof(IList).IsAssignableFrom(entry.propertyType)){
+                            //Check if it's a array
+                            if (entry.propertyType.IsArray){
+                                dragNodeData.BlackboardDragType = entry.propertyType.GetElementType();
+                            }
+                            else{
+                                dragNodeData.BlackboardDragType = entry.propertyType.GetGenericArguments()[0];
+                            }
+                            Debug.Log(dragNodeData.BlackboardDragType);
+                        }
+                        else{
+                            dragNodeData.BlackboardDragType = entry.propertyType;
+                        }
+                        
+                     
+                        
                         Debug.Log(entry.propertyType);
                         dragNodeData.BlackDragData = entry.propertyPath;
                         AddTNode(dragNodeData,new Rect(realPos,new Vector2(200,200)));
@@ -466,9 +484,9 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
 
         private void LoadPersistentGraphViewData(){
             var r= _data.GraphViewModel;
-            this.viewTransformChanged-=OnViewTransformChanged;
-            this.UpdateViewTransform(r.persistOffset,new Vector3(r.persistScale,r.persistScale,1));
-            this.viewTransformChanged+=OnViewTransformChanged;
+            viewTransformChanged-=OnViewTransformChanged;
+            UpdateViewTransform(r.persistOffset,new Vector3(r.persistScale,r.persistScale,1));
+            viewTransformChanged+=OnViewTransformChanged;
 
         }
 

@@ -153,7 +153,9 @@ namespace TNodeGraphViewImpl.Editor.NodeViews{
                 case TypeHandling.Specified:
                     return portAttribute.HandledType??typeof(object);
                 case TypeHandling.Path:
-                    return GetDataType(portAttribute.TypePath);
+                    var type = GetDataType(portAttribute.TypePath);
+                    Debug.Log(type);
+                    return type;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
