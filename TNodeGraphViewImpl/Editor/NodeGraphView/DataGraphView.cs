@@ -373,6 +373,8 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
                         //Make a constructor of  BlackboardDragNode<field.PropertyType > by reflection
                         var dragNodeData = NodeCreator.InstantiateNodeData<BlackboardDragNode>();
                         dragNodeData.BlackboardData = GetBlackboardData();
+                        dragNodeData.BlackboardDragType = entry.propertyType;
+                        Debug.Log(entry.propertyType);
                         dragNodeData.BlackDragData = entry.propertyPath;
                         AddTNode(dragNodeData,new Rect(realPos,new Vector2(200,200)));
                     }

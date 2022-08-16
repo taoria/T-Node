@@ -5,8 +5,8 @@ MonoImporter:
   serializedVersion: 2
   defaultReferences:
   - m_ViewDataDictionary: {instanceID: 0}
-  - mVisualTreeAsset: {fileID: 9197481963319205126, guid: b67f6dcbe2361b649ad2b7845207321b, type: 3}
-  - graphEditorData: {fileID: 11400000, guid: 060ae44fcac9b534f9bdca3c3e5f1484, type: 2}
+  - mVisualTreeAsset: {instanceID: 0}
+  - graphEditorData: {fileID: 11400000, guid: 26c77e8bb72228e4d81789ee852ada41, type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

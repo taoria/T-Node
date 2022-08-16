@@ -124,6 +124,26 @@ namespace TNodeGraphViewImpl.Editor.NodeViews{
                     throw new ArgumentOutOfRangeException();
             }
         }
+
+        private Type GetDataType(string path){
+            //Access the member by given path
+            var memberInfo =  _data.GetType().GetMember(path).FirstOrDefault();
+       
+            if (memberInfo == null){
+                return null;
+            }
+            if (memberInfo is PropertyInfo propertyInfo){
+             
+                return propertyInfo.GetValue(_data) as Type;
+            }
+        
+            //Check if the member is a field
+            if (memberInfo is FieldInfo fieldInfo){
+                return _data.GetType().GetField(path)?.GetValue(_data) as Type;
+            }
+      
+            throw new Exception("Member is not a property or field");
+        }
         protected virtual Type BuildPortType(PortAttribute portAttribute,PropertyInfo propertyInfo){
             switch (portAttribute.TypeHandling){
                 case TypeHandling.Declared :
@@ -132,6 +152,8 @@ namespace TNodeGraphViewImpl.Editor.NodeViews{
                     return propertyInfo.GetValue(_data)?.GetType();
                 case TypeHandling.Specified:
                     return portAttribute.HandledType??typeof(object);
+                case TypeHandling.Path:
+                    return GetDataType(portAttribute.TypePath);
                 default:
                     throw new ArgumentOutOfRangeException();
             }
