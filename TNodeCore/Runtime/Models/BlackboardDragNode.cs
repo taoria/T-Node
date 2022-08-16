@@ -2,7 +2,6 @@
 using TNodeCore.Runtime.Attributes;
 using TNodeCore.Runtime.Attributes.Ports;
 using TNodeCore.Runtime.RuntimeCache;
-using UnityEngine;
 
 namespace TNodeCore.Runtime.Models{
     [Serializable]
@@ -17,13 +16,15 @@ namespace TNodeCore.Runtime.Models{
                 }
             }
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        public Type BlackboardDragType{ get; set; }
 
         public string blackDragData;
-        /// <summary>
-        /// it's very hacky way to get blackboard data ,even when the value is null,type info is not null!
-        /// </summary>
+        
         /// TODO : The type handling in a safer way in the future
-        [Output("",PortNameHandling.MemberType,TypeHandling.Implemented)]
+        [Output("",PortNameHandling.MemberType,TypeHandling.Path,TypePath = "BlackboardDragType")]
         public object Value{
             get{
                 if (!isListElement){
@@ -32,7 +33,6 @@ namespace TNodeCore.Runtime.Models{
                 else{
                     var split = BlackDragData.Split('.');
                     var index = int.Parse(split[1]);
-              
                     return BlackboardData.GetListValue(split[0],index);
                 }
                
@@ -40,9 +40,5 @@ namespace TNodeCore.Runtime.Models{
         }
 
         public bool isListElement=false;
-        public BlackboardDragNode(){
-            
-        }
-        
     }
 }

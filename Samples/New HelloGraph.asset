@@ -18,26 +18,26 @@ MonoBehaviour:
   blackboardData:
     id: 1
   sceneReference: 
-  editorModels:
-  - id: 2
-  - id: 3
+  editorModels: []
   graphViewModel:
-    id: 4
+    id: 2
   references:
     version: 1
     00000000:
-      type: {class: AddNode, ns: Samples, asm: Assembly-CSharp}
+      type: {class: BlackboardDragNode, ns: TNodeCore.Runtime.Models, asm: TNodeCore}
       data:
         positionInView:
           serializedVersion: 2
-          x: 479
-          y: 295
+          x: 54.89991
+          y: 86.95003
           width: 0
           height: 0
-        id: b2634d94-1655-4674-9b1c-b1c2e9ab3f6b
-        nodeName: AddNode
+        id: 2c26caec-abd2-4034-b68e-28a2843d347e
+        nodeName: 
         entryPoint: 0
         isTest: 0
+        blackDragData: HelloGameObject
+        isListElement: 0
     00000001:
       type: {class: HelloBlackboard, ns: TNode.Samples, asm: Assembly-CSharp}
       data:
@@ -53,33 +53,7 @@ MonoBehaviour:
         V3S: []
         V2S: []
     00000002:
-      type: {class: PlacematModel, ns: TNode.TNodeCore.Editor.Models, asm: NewAssembly}
-      data:
-        positionInView:
-          serializedVersion: 2
-          x: 443
-          y: 177
-          width: 500
-          height: 500
-        id: 
-        hostModels: []
-        zOrder: 0
-        title: Title
-    00000003:
-      type: {class: Comment, ns: TNode.TNodeCore.Editor.Models, asm: NewAssembly}
-      data:
-        positionInView:
-          serializedVersion: 2
-          x: 0
-          y: 0
-          width: 0
-          height: 0
-        id: 
-        CommentedModel:
-          id: 0
-        CommentText: ddd
-    00000004:
-      type: {class: GraphViewModel, ns: TNode.TNodeCore.Editor.Models, asm: NewAssembly}
+      type: {class: GraphViewModel, ns: TNode.TNodeCore.Editor.Models, asm: TNodeCore}
       data:
         positionInView:
           serializedVersion: 2
@@ -89,5 +63,5 @@ MonoBehaviour:
           height: 0
         id: 
         persistScale: 1
-        persistOffset: {x: 0, y: -5}
-        isBlackboardOn: 0
+        persistOffset: {x: 441, y: 254}
+        isBlackboardOn: 1
