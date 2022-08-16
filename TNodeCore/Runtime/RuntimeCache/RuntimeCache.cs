@@ -6,6 +6,7 @@ using System.Reflection;
 using TNodeCore.Runtime.Attributes;
 using TNodeCore.Runtime.Interfaces;
 using TNodeCore.Runtime.Models;
+using UnityEngine;
 
 namespace TNodeCore.Runtime.RuntimeCache{
     public class PropAccessor<T1, T2>:IModelPropertyAccessor{
@@ -134,20 +135,23 @@ namespace TNodeCore.Runtime.RuntimeCache{
             if(type.BaseType is{IsGenericType: true} && type.BaseType.GetGenericTypeDefinition()==typeof(PortTypeConversion<,>)){
                 //if it is, add it to the cache
                 CacheRuntimePortTypeConversion(type);
-            }
-            else{
+               
             }
         }
         
         private void CacheRuntimePortTypeConversion(Type type){
+   
+        
             if (type.BaseType == null) return;
             if (type.BaseType != null){
+         
                 var genericType = type.BaseType.GetGenericTypeDefinition();
-                if (genericType != typeof(PortTypeConversion<,>)|| genericType != typeof(TwoWayPortTypeConversion<,>)){
+                if (genericType != typeof(PortTypeConversion<,>) && genericType != typeof(TwoWayPortTypeConversion<,>)){
+                 
                     return;
                 }
             }
-            
+         
             //Forward direction
             var type1 = type.BaseType.GetGenericArguments()[0];
             var type2 = type.BaseType.GetGenericArguments()[1];
@@ -229,9 +233,11 @@ namespace TNodeCore.Runtime.RuntimeCache{
         }
 
         public List<Type> GetSupportedTypes(Type type){
+          
             if(!CachedPortConverters.ContainsKey(type)){
                 return new List<Type>();
             }
+     
             return CachedPortConverters[type].Keys.ToList();
         }
 
