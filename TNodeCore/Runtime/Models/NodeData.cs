@@ -26,6 +26,9 @@ namespace TNodeCore.Runtime.Models{
         public virtual void Process(){
             
         }
+
+  
+        
         public virtual IEnumerator AfterProcess(){
             yield return null;
         }

@@ -17,6 +17,17 @@ namespace TNode.TNodeCore.Runtime.Components{
             }
             EntryNode = entry.FirstOrDefault() as ConditionalRuntimeNode;
         }
+
+ 
+        
+        public void Run(){
+            var res = StepForward();
+            while (StepForward().MoveNext()){
+                
+            }
+            
+
+        }
         
         public IEnumerator StepForward(){
             CurrentNode = EntryNode;
@@ -24,7 +35,7 @@ namespace TNode.TNodeCore.Runtime.Components{
                 //First let's process the node
                 CurrentNode.NodeData.Process();
                 //Then check if there are conditional transitions
-                var conditionalTransitions = CurrentNode.GetNextNodesId();
+                var conditionalTransitions = CurrentNode.GetConditionalNextIds();
                 var transitionNode = new List<RuntimeNode>();
                 
                 foreach (var conditionalTransition in conditionalTransitions){

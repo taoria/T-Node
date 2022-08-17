@@ -34,6 +34,7 @@ namespace TNodeCore.Runtime{
         public string[] GetPortsOfType<T> (){
             var ports = new List<string>();
             foreach (var port in _portAccessors.Keys){
+
                 if(_portAccessors[port].Type==typeof(T)){
                     ports.Add(port);
                 }
