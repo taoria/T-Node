@@ -32,7 +32,7 @@ namespace TNodeCore.Runtime.Attributes.Ports{
         Path
     }
     [MeansImplicitUse]
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Method, AllowMultiple = true)]
     public class PortAttribute:System.Attribute{
         public readonly string Name;
         public readonly PortNameHandling NameHandling;

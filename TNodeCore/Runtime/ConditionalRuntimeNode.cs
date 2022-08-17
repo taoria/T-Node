@@ -22,7 +22,7 @@ namespace TNodeCore.Runtime{
             }
         }
 
-        public string[] GetNextNodesId(){
+        public string[] GetConditionalNextIds(){
             var ports = PossibleTransition.Where(x => x.Item2());
             var portNames = ports.Select(x => x.Item1);
             //Search output links to found the link contains portNames as outport's name
