@@ -1,7 +1,8 @@
-﻿using TNodeCore.Runtime.Models;
+﻿using TNode.TNodeCore.Editor.Models;
+using TNodeCore.Runtime.Models;
 using UnityEngine;
 
-namespace TNode.TNodeCore.Editor.Models{
+namespace TNodeCore.Editor.Models{
     public class Comment:EditorModel{
         [SerializeReference]
         public Model CommentedModel;

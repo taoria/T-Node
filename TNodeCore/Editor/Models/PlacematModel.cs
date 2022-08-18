@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using TNode.TNodeCore.Editor.Models;
 using TNodeCore.Runtime.Models;
 using UnityEngine;
 
-namespace TNode.TNodeCore.Editor.Models{
+namespace TNodeCore.Editor.Models{
     /// <summary>
     /// Placemats hold the nodes
     /// </summary>

@@ -2,7 +2,7 @@
 using TNodeCore.Runtime.Models;
 using UnityEditor;
 
-namespace TNode.TNodeCore.Editor.Blackboard{
+namespace TNodeCore.Editor.Blackboard{
     /// <summary>
     /// View of the blackboard,different in each implementation,but the same in the interface.
     /// </summary>

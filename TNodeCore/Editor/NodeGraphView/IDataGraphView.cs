@@ -1,5 +1,4 @@
-﻿using TNode.TNodeCore.Editor.EditorPersistence;
-using TNodeCore.Editor.EditorPersistence;
+﻿using TNodeCore.Editor.EditorPersistence;
 using TNodeCore.Runtime.Models;
 
 namespace TNodeCore.Editor.NodeGraphView{

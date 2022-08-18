@@ -37,7 +37,16 @@ namespace TNodeCore.Runtime.Attributes.Ports{
         public readonly string Name;
         public readonly PortNameHandling NameHandling;
         public Type HandledType;
+        /// <summary>
+        /// Allow multiple input or output to or from this node
+        /// </summary>
         public bool Multiple = true;
+        /// <summary>
+        /// Treat the according as Group Port,making each element inside the collection a port.
+        /// </summary>
+    
+        public bool Group = false;
+
         public string TypePath;
       
         public TypeHandling TypeHandling{ get; set; }

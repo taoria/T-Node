@@ -3,7 +3,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace TNode.TNodeCore.Editor.DeveloperHelper{
+namespace TNodeCore.Editor.DeveloperHelper{
     /// <summary>
     /// Helper options works on 2021.3 on newer unity versions only.call this in the early version may not work
     /// </summary>

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using TNode.TNodeCore.Editor.Blackboard;
+using TNodeCore.Editor.Blackboard;
 using TNodeCore.Editor.NodeGraphView;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;

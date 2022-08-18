@@ -1,12 +1,10 @@
-﻿using System;
-using TNode.TNodeCore.Editor.Binding;
-using TNode.TNodeCore.Editor.Models;
-using TNodeCore.Editor.NodeGraphView;
+﻿using TNodeCore.Editor.Binding;
+using TNodeCore.Editor.Models;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace TNode.TNodeCore.Editor.CommentView{
+namespace TNodeCore.Editor.CommentView{
     public class CommentView:GraphElement,IModelBinding<Comment>{
         public Comment Data => _data;
         private Comment _data;

@@ -1,12 +1,15 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using TNode.TNodeCore.Editor.Serialization;
 using TNodeCore.Editor.NodeGraphView;
+using TNodeCore.Editor.Serialization;
 using TNodeCore.Runtime;
 using TNodeCore.Runtime.Attributes;
 using TNodeCore.Runtime.Attributes.Ports;
 using TNodeCore.Runtime.Models;
+using TNodeCore.Runtime.RuntimeCache;
 using TNodeGraphViewImpl.Editor.Inspector;
 using TNodeGraphViewImpl.Editor.Ports;
 using UnityEditor;
@@ -145,21 +148,61 @@ namespace TNodeGraphViewImpl.Editor.NodeViews{
             throw new Exception("Member is not a property or field");
         }
         protected virtual Type BuildPortType(PortAttribute portAttribute,PropertyInfo propertyInfo){
-            switch (portAttribute.TypeHandling){
-                case TypeHandling.Declared :
-                    return propertyInfo.PropertyType;
-                case TypeHandling.Implemented:
-                    return propertyInfo.GetValue(_data)?.GetType();
-                case TypeHandling.Specified:
-                    return portAttribute.HandledType??typeof(object);
-                case TypeHandling.Path:
-                    var type = GetDataType(portAttribute.TypePath);
-                    Debug.Log(type);
-                    return type;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+      
+        
+                switch (portAttribute.TypeHandling){
+                    case TypeHandling.Declared :
+                        return propertyInfo.PropertyType;
+                    case TypeHandling.Implemented:
+                        return propertyInfo.GetValue(_data)?.GetType();
+                    case TypeHandling.Specified:
+                        return portAttribute.HandledType??typeof(object);
+                    case TypeHandling.Path:
+                        var type = GetDataType(portAttribute.TypePath);
+                
+                        return type;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            
         }
+        public virtual Type BuildGroupPortType(PortAttribute portAttribute,PropertyInfo propertyInfo,int index){
+            var iList = propertyInfo.GetValue(_data) as IList;
+            if (iList is Array array){
+                switch (portAttribute.TypeHandling){
+                    case TypeHandling.Declared:
+                        return array.GetType().GetElementType();
+                    case TypeHandling.Implemented:
+                        return array.GetValue(index).GetType();
+                    case TypeHandling.Specified:
+                        return portAttribute.HandledType??typeof(object);
+                    case TypeHandling.Path:
+                        return GetDataType(portAttribute.TypePath);
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+
+            if (iList != null && iList.GetType().IsGenericType){
+                var genericType = iList.GetType().GetGenericArguments()[0];
+                switch (portAttribute.TypeHandling){
+                    case TypeHandling.Declared:
+                        return genericType;
+                    case TypeHandling.Implemented:
+                        return iList[index].GetType();
+                    case TypeHandling.Specified:
+                        return portAttribute.HandledType??typeof(object);
+                    case TypeHandling.Path:
+                        return GetDataType(portAttribute.TypePath);
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+
+            return null;
+
+        }
+        
         /// <summary>
         /// of course you can override this method to build your own port builder
         /// </summary>
@@ -168,18 +211,37 @@ namespace TNodeGraphViewImpl.Editor.NodeViews{
    
             foreach (var propertyInfo in propertyInfos){
                 if (propertyInfo.GetCustomAttributes(typeof(OutputAttribute),true).FirstOrDefault() is OutputAttribute attribute){
-                    Port port = new CustomPort(Orientation.Horizontal, Direction.Output,
-                        attribute.Multiple ? Port.Capacity.Multi : Port.Capacity.Single,
-                        BuildPortType(attribute, propertyInfo));
-                    BuildPort(port, attribute, propertyInfo,outputContainer);
+                    if (attribute.Group == false){
+                        Port port = new CustomPort(Orientation.Horizontal, Direction.Output,
+                            attribute.Multiple ? Port.Capacity.Multi : Port.Capacity.Single,
+                            BuildPortType(attribute, propertyInfo));
+                        BuildPort(port, attribute, propertyInfo,outputContainer);
+                    }
+                    else{
+                        var propertyValue = _data.GetValue(propertyInfo.Name);
+                        if (propertyValue is IList list){
+                            for (var i = 0; i < list.Count; i++){
+                                var port = new CustomPort(Orientation.Horizontal, Direction.Output,
+                                    Port.Capacity.Single,
+                                    BuildGroupPortType(attribute, propertyInfo,i));
+                                BuildPort(port, attribute, propertyInfo,outputContainer);
+                            }
+                        }
+                    }
+
                 }
             }
             foreach (var propertyInfo in propertyInfos){
                 if(propertyInfo.GetCustomAttributes(typeof(InputAttribute),true).FirstOrDefault() is InputAttribute attribute){
-                    Port port = new CustomPort
+                    if (attribute.Group == false){
+                        Port port = new CustomPort
                         (Orientation.Horizontal, 
                             Direction.Input,attribute.Multiple?Port.Capacity.Multi: Port.Capacity.Single,BuildPortType(attribute,propertyInfo));
-                    BuildPort(port,attribute,propertyInfo,inputContainer);
+                        BuildPort(port,attribute,propertyInfo,inputContainer);
+                    }
+                    else{
+                        
+                    }
                 }
             }
         }
@@ -193,6 +255,37 @@ namespace TNodeGraphViewImpl.Editor.NodeViews{
             if (colorAtt != null){
                 var color = colorAtt.Color;
                 port.portColor = color;
+            }
+        }
+
+        private void BuildGroupPort(Port port, PortAttribute attribute, PropertyInfo propertyInfo,
+            VisualElement portContainer,object currentElement,int index = 0){
+            portContainer.Add(port);
+            if (currentElement is string str){
+                if (attribute.NameHandling == PortNameHandling.Auto){
+                    port.portName = str;
+                }
+                else{
+                    port.portName = ObjectNames.NicifyVariableName(BuildGroupPortName(attribute, propertyInfo, index));
+                }
+            }
+            
+        }
+
+        private string BuildGroupPortName(PortAttribute attribute, PropertyInfo propertyInfo, int index){
+            switch (attribute.NameHandling){
+                case PortNameHandling.Auto:
+                    return (attribute.Name.Trim(' ').Length>0?attribute.Name:propertyInfo.Name)+":"+index;
+                case PortNameHandling.Manual:
+                    return attribute.Name+":"+index;;
+                case PortNameHandling.MemberName:
+                    return propertyInfo.Name+":"+index;
+                case PortNameHandling.Format:
+                    throw new NotImplementedException();
+                case PortNameHandling.MemberType:
+                    return propertyInfo.PropertyType.Name+":"+index;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
         }
 

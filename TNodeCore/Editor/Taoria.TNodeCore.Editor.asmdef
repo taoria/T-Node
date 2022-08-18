@@ -1,9 +1,8 @@
 {
-    "name": "TNodeGraphViewImpl",
+    "name": "Taoria.TNodeCore.Editor",
     "rootNamespace": "",
     "references": [
-        "GUID:940af72691767fa47be979e5dbcf6ba0",
-        "GUID:646fd469059c44c3b9215226d5e1e13c"
+        "GUID:940af72691767fa47be979e5dbcf6ba0"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
