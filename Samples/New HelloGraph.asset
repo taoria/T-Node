@@ -12,142 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2051a0adbd1ba974084a535dd06ab7d7, type: 3}
   m_Name: New HelloGraph
   m_EditorClassIdentifier: 
-  nodeList:
-  - id: 0
-  - id: 1
-  - id: 2
-  - id: 3
-  nodeLinks:
-  - inPort:
-      portEntryName: A
-      nodeDataId: f33d73da-40c5-4b3a-ace7-40105e3489b6
-    outPort:
-      portEntryName: Value
-      nodeDataId: ae519ad8-4bc8-46c5-a98a-dc95bc85b58a
-  - inPort:
-      portEntryName: A
-      nodeDataId: f33d73da-40c5-4b3a-ace7-40105e3489b6
-    outPort:
-      portEntryName: Value
-      nodeDataId: 23526615-f15c-4bdf-96c2-38a57d30b10d
-  - inPort:
-      portEntryName: A
-      nodeDataId: f33d73da-40c5-4b3a-ace7-40105e3489b6
-    outPort:
-      portEntryName: Value
-      nodeDataId: 06f5acb9-58d5-41b3-b7f5-bd90f7f9ab94
+  nodeList: []
+  nodeLinks: []
   blackboardData:
-    id: 4
+    id: 0
   sceneReference: 
-  editorModels:
-  - id: 5
+  editorModels: []
   graphViewModel:
-    id: 6
+    id: 0
   references:
     version: 1
     00000000:
-      type: {class: BlackboardDragNode, ns: TNodeCore.Runtime.Models, asm: TNodeCore}
-      data:
-        positionInView:
-          serializedVersion: 2
-          x: -345
-          y: -42
-          width: 0
-          height: 0
-        id: 23526615-f15c-4bdf-96c2-38a57d30b10d
-        nodeName: 
-        entryPoint: 0
-        isTest: 0
-        blackboardDragTypeString: UnityEngine.GameObject, UnityEngine.CoreModule,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        blackDragData: HelloGameObject
-        isListElement: 0
-    00000001:
-      type: {class: BlackboardDragNode, ns: TNodeCore.Runtime.Models, asm: TNodeCore}
-      data:
-        positionInView:
-          serializedVersion: 2
-          x: -345
-          y: -84
-          width: 0
-          height: 0
-        id: ae519ad8-4bc8-46c5-a98a-dc95bc85b58a
-        nodeName: 
-        entryPoint: 0
-        isTest: 0
-        blackboardDragTypeString: UnityEngine.GameObject, UnityEngine.CoreModule,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        blackDragData: HelloGameObject
-        isListElement: 0
-    00000002:
-      type: {class: BlackboardDragNode, ns: TNodeCore.Runtime.Models, asm: TNodeCore}
-      data:
-        positionInView:
-          serializedVersion: 2
-          x: -345
-          y: -126
-          width: 0
-          height: 0
-        id: 06f5acb9-58d5-41b3-b7f5-bd90f7f9ab94
-        nodeName: 
-        entryPoint: 0
-        isTest: 0
-        blackboardDragTypeString: UnityEngine.GameObject, UnityEngine.CoreModule,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        blackDragData: HelloGameObject
-        isListElement: 0
-    00000003:
-      type: {class: AddNode, ns: Samples, asm: Assembly-CSharp}
-      data:
-        positionInView:
-          serializedVersion: 2
-          x: -17
-          y: -18
-          width: 0
-          height: 0
-        id: f33d73da-40c5-4b3a-ace7-40105e3489b6
-        nodeName: AddNode
-        entryPoint: 0
-        isTest: 0
-    00000004:
-      type: {class: HelloBlackboard, ns: TNode.Samples, asm: Assembly-CSharp}
-      data:
-        positionInView:
-          serializedVersion: 2
-          x: 0
-          y: 0
-          width: 0
-          height: 0
-        id: 
-        HelloString: 
-        HelloGameObject: {fileID: 0}
-        V3S:
-        - {x: 0, y: 0, z: 0}
-        V2S:
-        - {x: 0, y: 0}
-    00000005:
-      type: {class: PlacematModel, ns: TNode.TNodeCore.Editor.Models, asm: TNodeCore}
-      data:
-        positionInView:
-          serializedVersion: 2
-          x: 465
-          y: -21
-          width: 500
-          height: 500
-        id: 
-        hostModels: []
-        zOrder: 0
-        title: Title
-    00000006:
-      type: {class: GraphViewModel, ns: TNode.TNodeCore.Editor.Models, asm: TNodeCore}
-      data:
-        positionInView:
-          serializedVersion: 2
-          x: 0
-          y: 0
-          width: 0
-          height: 0
-        id: 
-        persistScale: 1
-        persistOffset: {x: 519, y: 347}
-        isBlackboardOn: 1
+      type: {class: , ns: , asm: }
