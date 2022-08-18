@@ -43,8 +43,7 @@ namespace TNodeCore.Runtime.Models{
                 NodeDictionary.Add(node.id,node);
             }
         }
-        
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         [SerializeReference] 
         protected List<EditorModel> editorModels ;
         [FormerlySerializedAs("graphViewData")] [SerializeReference]
@@ -65,7 +64,8 @@ namespace TNodeCore.Runtime.Models{
             }
             set => graphViewModel = value;
         }
-        #endif
+#endif
+        
 
     }
 

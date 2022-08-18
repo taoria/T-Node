@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using TNodeCore.Editor.EditorPersistence;
 using TNodeCore.Editor.NodeGraphView;
 using TNodeCore.Runtime.Models;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace TNode.TNodeCore.Editor.EditorPersistence{
+namespace TNodeCore.Editor.EditorPersistence{
     /// <summary>
     /// Graph Editor Data hold the config of a type of graph.
     /// it's used by a graph editor to determine which implementation to use and some other config may be stored in here some days later.
