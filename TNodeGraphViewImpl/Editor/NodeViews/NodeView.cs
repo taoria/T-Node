@@ -224,7 +224,7 @@ namespace TNodeGraphViewImpl.Editor.NodeViews{
                         BuildPort(port, attribute, propertyInfo,outputContainer);
                     }
                     else{
-                        var propertyValue = _data.GetValue(propertyInfo.Name);
+                        var propertyValue = propertyInfo.GetValue(_data);
                         if (propertyValue is IList list){
                             for (var i = 0; i < list.Count; i++){
                                 var port = new CustomPort(Orientation.Horizontal, Direction.Output,

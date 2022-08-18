@@ -17,18 +17,38 @@ namespace TNodeCore.Runtime{
         private readonly Type _type;
         public Type NodeType => _type;
 
+        public Type GetElementTypeOfPort(string portName,bool multi = false){
+            var type = _portAccessors[portName].Type;
+            if (multi == false)
+                return type;
+            if (type.IsArray){
+                return type.GetElementType();
+            }
+
+            if (type.IsGenericType){
+                return type.GetGenericArguments()[0];
+            } 
+            return type;
+        }
+            
+        
         public void SetInput(string portName,object value){
             var valueType = value.GetType();
+          
             var portPath = portName.Split(':');
             if (portPath.Length ==2){
                 portName = portPath[0];
                 int index = int.Parse(portPath[1]);
-                if(_portAccessors[portName].Type.IsArray){
-                    if (_portAccessors[portName].GetValue(NodeData) is Array array)
-                        array.SetValue(value, index);
+                var realPortType = GetElementTypeOfPort(portName, true);
+                if (realPortType != valueType){
+                    value = RuntimeCache.RuntimeCache.Instance.GetConvertedValue(valueType,realPortType,value);
                 }
-
-                if (_portAccessors[portName].Type.IsGenericType){
+                if(realPortType.IsArray){
+                    if (_portAccessors[portName].GetValue(NodeData) is Array array){
+                        array.SetValue(value, index);
+                    }
+                }
+                if (realPortType.IsGenericType){
                     if (_portAccessors[portName].GetValue(NodeData) is IList list)
                         list[index] = value;
                 }

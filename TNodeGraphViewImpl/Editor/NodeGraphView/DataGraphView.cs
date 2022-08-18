@@ -604,7 +604,6 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
         private void SaveEditorModels(){
             var placemats = placematContainer.Placemats.ToList();
             var comments = this.Query<CommentView>().ToList();
-            Debug.Log(placemats.Count);
             foreach (var placemat in placemats){
                 if (placemat is PlacematView placematView){
                     _data.EditorModels.Add(placematView.PlacematModel);
