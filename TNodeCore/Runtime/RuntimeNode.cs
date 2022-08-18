@@ -19,16 +19,48 @@ namespace TNodeCore.Runtime{
 
         public void SetInput(string portName,object value){
             var valueType = value.GetType();
-            var portType = _portAccessors[portName].Type;
-            if(portType!=valueType && !portType.IsAssignableFrom(valueType)){
-                var res =RuntimeCache.RuntimeCache.Instance.GetConvertedValue(valueType, portType, value);
-                _portAccessors[portName].SetValue(NodeData, res);
+            var portPath = portName.Split(':');
+            if (portPath.Length ==2){
+                portName = portPath[0];
+                int index = int.Parse(portPath[1]);
+                if(_portAccessors[portName].Type.IsArray){
+                    if (_portAccessors[portName].GetValue(NodeData) is Array array)
+                        array.SetValue(value, index);
+                }
+
+                if (_portAccessors[portName].Type.IsGenericType){
+                    if (_portAccessors[portName].GetValue(NodeData) is IList list)
+                        list[index] = value;
+                }
+      
             }
             else{
-                _portAccessors[portName].SetValue(NodeData,value);
+                var portType = _portAccessors[portName].Type;
+                if(portType!=valueType && !portType.IsAssignableFrom(valueType)){
+                    var res =RuntimeCache.RuntimeCache.Instance.GetConvertedValue(valueType, portType, value);
+                    _portAccessors[portName].SetValue(NodeData, res);
+                }
+                else{
+                    _portAccessors[portName].SetValue(NodeData,value);
+                }
             }
+
         }
         public object GetOutput(string portName){
+            var portPath = portName.Split(':');
+            if (portPath.Length == 2){
+                portName = portPath[0];
+                int index = int.Parse(portPath[1]);
+                if(_portAccessors[portName].Type.IsArray){
+                    if (_portAccessors[portName].GetValue(NodeData) is Array array)
+                        return array.GetValue(index);
+                }
+
+                if (_portAccessors[portName].Type.IsGenericType){
+                    if (_portAccessors[portName].GetValue(NodeData) is IList list)
+                        return list[index];
+                }
+            }
             return _portAccessors[portName].GetValue(NodeData);
         }
         public string[] GetPortsOfType<T> (){

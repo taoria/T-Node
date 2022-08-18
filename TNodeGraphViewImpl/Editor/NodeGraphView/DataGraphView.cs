@@ -426,9 +426,9 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
         }
         public void ResetGraphView(){
             ClearAll();
-
             LoadPersistentGraphViewData();
             if (_nodeDict == null) throw new ArgumentNullException(nameof(_nodeDict));
+            if (_data == null) return;
             foreach (var dataNode in _data.NodeDictionary.Values){
                 if(dataNode==null)
                     continue;
@@ -484,6 +484,7 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
         }
 
         private void LoadPersistentGraphViewData(){
+            if (_data == null) return;
             var r= _data.GraphViewModel;
             viewTransformChanged-=OnViewTransformChanged;
             UpdateViewTransform(r.persistOffset,new Vector3(r.persistScale,r.persistScale,1));
@@ -586,9 +587,7 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
                     });
                     links.Add(newNodeLink);
                 }
-                
             }
-            
             _data.NodeLinks = links;
         }
         private void SaveGraphData(){
@@ -698,6 +697,9 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
         /// <param name="nodeData"></param>
         /// <param name="rect">The give rect is the actual position in the graph view</param>
         public void AddTNode(NodeData nodeData, Rect rect){
+            if (nodeData==null||nodeData.id == null){
+                return;
+            }
             if (NodeEditorExtensions.CreateNodeViewFromNodeType(nodeData.GetType()) is Node nodeView){
                 //convert rect at graph space
         
@@ -716,12 +718,9 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
                         }
                     }
                 });
-                
-                
-
                 if(_nodeDict.ContainsKey(nodeData.id)==false) 
                     _nodeDict.Add(nodeData.id, nodeView);
-                if (_data.NodeDictionary.ContainsKey(nodeData.id) == false){
+                if (_data!=null&&_data.NodeDictionary.ContainsKey(nodeData.id) == false){
                     Undo.RegisterCompleteObjectUndo(_data,"Node Creation");
                     _data.NodeDictionary.Add(nodeData.id,nodeData);
                 }

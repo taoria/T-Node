@@ -278,7 +278,7 @@ namespace TNodeGraphViewImpl.Editor.Cache{
     public class Launcher{
         static Launcher(){
             //Get version of the package
-            Debug.Log("TNodeCore v0.01 is launched");
+        
             NodeEditorSingleton.Instance.Initialize();
         }
     }

@@ -95,10 +95,15 @@ namespace TNodeGraphViewImpl.Editor.NodeViews{
             BuildDoubleClickRename();
         }
         private void OnDataChangedHandler(T obj){
+            if(obj.id==null||obj.id.Trim(' ').Length==0){
+                Debug.LogWarning("You should not use a node data without id");
+                return;
+            }
             this.title = _data.nodeName;
             if (_nodeInspectorInNode != null){
                 _nodeInspectorInNode.Data = obj;
             }
+
             _viewLogger ??= new NodeViewLogger{NodeView = this};
             if (NodeLogger.Loggers.ContainsKey(obj.id)){
                 NodeLogger.Loggers[obj.id] = _viewLogger;
@@ -166,7 +171,8 @@ namespace TNodeGraphViewImpl.Editor.NodeViews{
                 }
             
         }
-        public virtual Type BuildGroupPortType(PortAttribute portAttribute,PropertyInfo propertyInfo,int index){
+
+        protected virtual Type BuildGroupPortType(PortAttribute portAttribute,PropertyInfo propertyInfo,int index){
             var iList = propertyInfo.GetValue(_data) as IList;
             if (iList is Array array){
                 switch (portAttribute.TypeHandling){
@@ -224,7 +230,7 @@ namespace TNodeGraphViewImpl.Editor.NodeViews{
                                 var port = new CustomPort(Orientation.Horizontal, Direction.Output,
                                     Port.Capacity.Single,
                                     BuildGroupPortType(attribute, propertyInfo,i));
-                                BuildPort(port, attribute, propertyInfo,outputContainer);
+                                BuildGroupPort(port, attribute, propertyInfo,outputContainer,list[i],i);
                             }
                         }
                     }
@@ -240,7 +246,17 @@ namespace TNodeGraphViewImpl.Editor.NodeViews{
                         BuildPort(port,attribute,propertyInfo,inputContainer);
                     }
                     else{
-                        
+                        var propertyValue = propertyInfo.GetValue(_data);
+                        if (propertyValue is IList list){
+                           
+                            for (var i = 0; i < list.Count; i++){
+                                var port = new CustomPort(Orientation.Horizontal, Direction.Input,
+                                    Port.Capacity.Single,
+                                    BuildGroupPortType(attribute, propertyInfo,i));
+                                BuildGroupPort(port, attribute, propertyInfo,inputContainer,list[i],i);
+                               
+                            }
+                        }
                     }
                 }
             }
@@ -261,6 +277,7 @@ namespace TNodeGraphViewImpl.Editor.NodeViews{
         private void BuildGroupPort(Port port, PortAttribute attribute, PropertyInfo propertyInfo,
             VisualElement portContainer,object currentElement,int index = 0){
             portContainer.Add(port);
+            port.name = propertyInfo.Name + ":" + index;
             if (currentElement is string str){
                 if (attribute.NameHandling == PortNameHandling.Auto){
                     port.portName = str;
