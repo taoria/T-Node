@@ -42,7 +42,7 @@ namespace TNodeCore.Editor.NodeGraphView{
         public bool AutoUpdate{ get; set; }
         
         /// <summary>
-        /// Create the blackboard view for the graph view.
+        /// CreateProp the blackboard view for the graph view.
         /// </summary>
         public void CreateBlackboard();
         /// <summary>

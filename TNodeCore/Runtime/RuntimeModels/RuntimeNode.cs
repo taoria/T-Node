@@ -1,18 +1,20 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using TNodeCore.Runtime.Attributes.Ports;
 using TNodeCore.Runtime.Models;
 using TNodeCore.Runtime.RuntimeCache;
+using UnityEngine;
 
 namespace TNodeCore.Runtime{
     public class RuntimeNode{
         public NodeData NodeData { get; set; }
         //the link connect to node's in port
-        public List<NodeLink> InputLink = new List<NodeLink>();
+        public List<NodeLink> InputLinks = new List<NodeLink>();
         //the link connect to node's out port
-        public List<NodeLink> OutputLink = new List<NodeLink>();
+        public List<NodeLink> OutputLinks = new List<NodeLink>();
         //Cache node data type for fast access
         private readonly Type _type;
         public Type NodeType => _type;
@@ -34,21 +36,21 @@ namespace TNodeCore.Runtime{
         
         public void SetInput(string portName,object value){
             var valueType = value.GetType();
-          
             var portPath = portName.Split(':');
             if (portPath.Length ==2){
                 portName = portPath[0];
                 int index = int.Parse(portPath[1]);
                 var realPortType = GetElementTypeOfPort(portName, true);
+
                 if (realPortType != valueType){
                     value = RuntimeCache.RuntimeCache.Instance.GetConvertedValue(valueType,realPortType,value);
                 }
-                if(realPortType.IsArray){
+                if(_portAccessors[portName].Type.IsArray){
                     if (_portAccessors[portName].GetValue(NodeData) is Array array){
                         array.SetValue(value, index);
                     }
                 }
-                if (realPortType.IsGenericType){
+                if (_portAccessors[portName].Type.IsGenericType){
                     if (_portAccessors[portName].GetValue(NodeData) is IList list)
                         list[index] = value;
                 }
@@ -86,8 +88,7 @@ namespace TNodeCore.Runtime{
         public string[] GetPortsOfType<T> (){
             var ports = new List<string>();
             foreach (var port in _portAccessors.Keys){
-
-                if(_portAccessors[port].Type==typeof(T)){
+                if(_portAccessors[port].Type==typeof(T)||typeof(T).IsAssignableFrom(_portAccessors[port].Type)){
                     ports.Add(port);
                 }
             }
@@ -99,7 +100,7 @@ namespace TNodeCore.Runtime{
         /// <param name="portName"></param>
         /// <returns></returns>
         public  Direction GetPortDirection(string portName){
-            var attribute = NodeData.GetType().GetField(portName).GetCustomAttribute<PortAttribute>();
+            var attribute = NodeData.GetType().GetMember(portName)[0].GetCustomAttribute<PortAttribute>();
             if (attribute is InputAttribute){
                 return Direction.Input;
             }
@@ -107,7 +108,8 @@ namespace TNodeCore.Runtime{
             return Direction.Output;
         }
 
-        private readonly Dictionary<string, IModelPropertyAccessor> _portAccessors;
+        private readonly Dictionary<string, IModelPortAccessor> _portAccessors;
+        
         public Action Process;
    
         public RuntimeNode(NodeData nodeData){
@@ -115,11 +117,12 @@ namespace TNodeCore.Runtime{
             //Caching the type of the node
             _type = nodeData.GetType();
             var info = nodeData.GetType().GetProperties();
-            _portAccessors = RuntimeCache.RuntimeCache.Instance.CachedPropertyAccessors[_type];
+            _portAccessors = RuntimeCache.RuntimeCache.Instance.CachedPortAccessors[_type];
+            
         }
         public List<string> GetInputNodesId(){
             List<string> dependencies = new List<string>();
-            foreach (NodeLink link in InputLink)
+            foreach (NodeLink link in InputLinks)
             {
                 dependencies.Add(link.outPort.nodeDataId);
             }

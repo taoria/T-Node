@@ -11,17 +11,17 @@ namespace TNodeCore.Editor{
     // public class SelectGraphWindow : EditorWindow{
     //     public EditorWindow parent;
     //     public Type graphType;
-    //     public static void ShowWindow<T> (GraphEditor<T> parent) where T:GraphData{
+    //     public static void ShowWindow<type> (GraphEditor<type> parent) where type:GraphData{
     //         var window = GetWindow<SelectGraphWindow>();
-    //         window.graphType = typeof(T);
+    //         window.graphType = typeof(type);
     //         window.Show();
     //         window.parent = parent;
     //     }
     //     private void OnGUI(){
     //             
-    //         if(GUILayout.Button("Create An Graph")){
+    //         if(GUILayout.Button("CreateProp An Graph")){
     //             //Add a save file dialog to save the graph
-    //             //Create the graph
+    //             //CreateProp the graph
     //             var graphAsset = ScriptableObject.CreateInstance(graphType);
     //             var path = EditorUtility.SaveFilePanel("Save Graph", "", "", "asset");
     //             //Save the graph
@@ -116,7 +116,7 @@ namespace TNodeCore.Editor{
             {
                 string path = EditorUtility.SaveFilePanel("Save Graph", "", "", "asset");
                 if (path.Length != 0){
-                    //Create a new asset file with type of GraphDataType
+                    //CreateProp a new asset file with type of GraphDataType
                     T asset = ScriptableObject.CreateInstance<T>();
                     AssetDatabase.CreateAsset(asset, path);
                     AssetDatabase.SaveAssets();
