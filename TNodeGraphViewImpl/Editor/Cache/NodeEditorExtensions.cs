@@ -160,7 +160,7 @@ namespace TNodeGraphViewImpl.Editor.Cache{
     //Outer wrapper for the singleton class
     public static class NodeEditorExtensions{
         /// <summary>
-        ///  by given a generic type T,return the implementation instance  of the generic type
+        ///  by given a generic type type,return the implementation instance  of the generic type
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
@@ -234,12 +234,12 @@ namespace TNodeGraphViewImpl.Editor.Cache{
            
             if (t.IsGenericType){
                 //AKA if BlackboardDragNode<Camera> is pulled 
-                //Get BlackboardDragNode<T> as generic type 
+                //Get BlackboardDragNode<type> as generic type 
                 
           
                 var genericTypeDefinition = t.GetGenericTypeDefinition();
                 
-                //What you want is a BaseNodeView<BlackboardDragNode<T>> to be created
+                //What you want is a BaseNodeView<BlackboardDragNode<type>> to be created
                 var genericViewType = typeof(BaseNodeView<>).MakeGenericType(genericTypeDefinition);
              
                 //search for the specific type of genericViewType in the dictionary

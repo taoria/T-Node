@@ -10,23 +10,40 @@ using TNodeCore.Runtime.Models;
 using UnityEngine;
 
 namespace TNodeCore.Runtime.RuntimeCache{
-    public class PropAccessor<T1, T2>:IModelPropertyAccessor{
+    public class PortAccessor<T1, T2>:IModelPortAccessor{
         public readonly Func<T1, T2> Get;
         public readonly Action<T1, T2> Set;
-        public PropAccessor(string propName){
-            Type t = typeof(T1);
+        public PortAccessor(string name,bool property){
+            if (property){
+                Type t = typeof(T1);
      
-            MethodInfo getter = t.GetMethod("get_" + propName);
-            MethodInfo setter = t.GetMethod("set_" + propName);
-            Type = getter?.ReturnType??setter?.GetParameters()[0].ParameterType;
-            if(getter!=null)
-                Get = (Func<T1, T2>)Delegate.CreateDelegate(typeof(Func<T1, T2>), null, getter);
-            if(setter!=null)
-                Set = (Action<T1, T2>)Delegate.CreateDelegate(typeof(Action<T1, T2>), null, setter);
+                MethodInfo getter = t.GetMethod("get_" + name);
+                MethodInfo setter = t.GetMethod("set_" + name);
+                Type = getter?.ReturnType??setter?.GetParameters()[0].ParameterType;
+                if(getter!=null)
+                    Get = (Func<T1, T2>)Delegate.CreateDelegate(typeof(Func<T1, T2>), null, getter);
+                if(setter!=null)
+                    Set = (Action<T1, T2>)Delegate.CreateDelegate(typeof(Action<T1, T2>), null, setter);
+            }
+            else{
+                Type t = typeof(T1);
+                MethodInfo method = t.GetMethod(name);
+                if (method == null){
+                    throw new Exception("Method not found for name " + name);
+                }
+                if (method.ReturnType != typeof(void)){
+                    Type = method.ReturnType;
+                    Get = (Func<T1, T2>)Delegate.CreateDelegate(typeof(Func<T1, T2>), null, method);
+                }
+                else{
+                    Type = method.GetParameters()[0].ParameterType;
+                    Set = (Action<T1, T2>)Delegate.CreateDelegate(typeof(Action<T1, T2>), null, method);
+                }
+            }
+
         }
-        public static PropAccessor<T1, T2> Create(string propName){
-            return new PropAccessor<T1, T2>(propName);
-        }
+
+
 
         public object GetValue(object model){
             return Get((T1)model);
@@ -38,39 +55,9 @@ namespace TNodeCore.Runtime.RuntimeCache{
         public Type Type{ get; set; }
     }
 
-    public class MethodAccessorInput<T1, T2>:IMethodAccessorInput{
-        public readonly Action<T1, T2> Set;
 
-        public MethodAccessorInput(string methodName){
-            Type t = typeof(T1);
-            MethodInfo setter = t.GetMethod(methodName);
-            if (setter != null)
-                Set = (Action<T1, T2>) Delegate.CreateDelegate(typeof(Action<T1, T2>), null, setter);
-        }
 
-        public void SetValue(object model,object value){
-            Set((T1)model,(T2)value);
-        }
-    }
-
-    public class MethodAccessorOutput<T1, T2> : IMethodAccessorOutput{
-        public readonly Func<T1, T2> Get;
-
-        public MethodAccessorOutput(string methodName){
-            Type t = typeof(T1);
-            MethodInfo getter = t.GetMethod(methodName);
-            if(getter!=null)
-                Get = (Func<T1, T2>)Delegate.CreateDelegate(typeof(Func<T1, T2>), null, getter);
-            
-            
-        }
-        public object GetValue(object model){
-            return Get((T1)model);
-        }
-    }
-    public interface IMethodAccessorInput{
-        public void SetValue(object model,object o);
-    }
+    
 
     internal class PortConverterHelper<T1,T2> : IPortConverterHelper{
         private readonly PortTypeConversion<T1, T2> _converter;
@@ -122,13 +109,9 @@ namespace TNodeCore.Runtime.RuntimeCache{
             new Dictionary<Type, Dictionary<string,GetValueDelegate>>();
         public readonly Dictionary<Type,Dictionary<string,SetValueDelegate>> CachedDelegatesForSettingValue =
             new Dictionary<Type,Dictionary<string,SetValueDelegate>>();
-        public readonly Dictionary<Type,Dictionary<string,IModelPropertyAccessor>> CachedPropertyAccessors =
-            new Dictionary<Type,Dictionary<string,IModelPropertyAccessor>> ();
-        public readonly Dictionary<Type,Dictionary<string,IMethodAccessorInput>> InputMethodPorts = new Dictionary<Type, Dictionary<string,IMethodAccessorInput>>();
-
-        public readonly Dictionary<Type, Dictionary<string, IMethodAccessorOutput>> OutputMethodPorts =
-            new Dictionary<Type, Dictionary<string, IMethodAccessorOutput>>();
-
+        public readonly Dictionary<Type,Dictionary<string,IModelPortAccessor>> CachedPortAccessors =
+            new Dictionary<Type,Dictionary<string,IModelPortAccessor>> ();
+        
         /// <summary>
         /// TODO: Converters now work globally, but it should be possible to specify a converter for a specific graph.but it will be too nested.so in current implementation, we will use a global converter.
         /// </summary>
@@ -320,44 +303,35 @@ namespace TNodeCore.Runtime.RuntimeCache{
             }
         }
         //TODO: CACHE IT AS FUNCTION
-        private static IModelPropertyAccessor CreatePropertyCache(string propName,Type targetType,Type valueType){
-            var makeGenericType = typeof (PropAccessor<,>).MakeGenericType(targetType,valueType);
-            var constructor = makeGenericType.GetConstructor(new Type[]{typeof(string)});
-            var instance = constructor?.Invoke(new object[]{propName});
-            return (IModelPropertyAccessor) instance;
+        private static IModelPortAccessor CreatePortCacheForProperty(string propName,Type targetType,Type valueType){
+            var makeGenericType = typeof (PortAccessor<,>).MakeGenericType(targetType,valueType);
+            var constructor = makeGenericType.GetConstructor(new Type[]{typeof(string),typeof(bool)});
+            var instance = constructor?.Invoke(new object[]{propName,true});
+            return (IModelPortAccessor) instance;
         }
-        public static IMethodAccessorInput CreateMethodInputCache(string methodName,Type targetType,Type inputTypes){
-            var makeGenericType = typeof (MethodAccessorInput<,>).MakeGenericType(targetType,inputTypes);
-            var constructor = makeGenericType.GetConstructor(new Type[]{typeof(string)});
-            var instance = constructor?.Invoke(new object[]{methodName});
-            return (IMethodAccessorInput) instance;
-        }
-        public static IMethodAccessorOutput CreateMethodOutputCache(string methodName,Type targetType,Type outputTypes){
-            var makeGenericType = typeof (MethodAccessorOutput<,>).MakeGenericType(targetType,outputTypes);
-            var constructor = makeGenericType.GetConstructor(new Type[]{typeof(string)});
-            var instance = constructor?.Invoke(new object[]{methodName});
-            return (IMethodAccessorOutput) instance;
+        private static IModelPortAccessor CreatePortCacheForMethod(string methodName,Type targetType,Type valueType){
+            var makeGenericType = typeof (PortAccessor<,>).MakeGenericType(targetType,valueType);
+            var constructor = makeGenericType.GetConstructor(new Type[]{typeof(string),typeof(bool)});
+            var instance = constructor?.Invoke(new object[]{methodName,false});
+            return (IModelPortAccessor) instance;
         }
         public void CacheRuntimeNodeData(Type type){
             if (type == null) return;
             if(!CachedDelegatesForGettingValue.ContainsKey(type)){
                 CachedDelegatesForGettingValue.Add(type, new Dictionary<string, GetValueDelegate>());
                 CachedDelegatesForSettingValue.Add(type,new Dictionary<string, SetValueDelegate>());
-                CachedPropertyAccessors.Add(type,new Dictionary<string, IModelPropertyAccessor>());
-                InputMethodPorts.Add(type,new Dictionary<string,IMethodAccessorInput>());
-                OutputMethodPorts.Add(type,new Dictionary<string,IMethodAccessorOutput>());
-            
-
+                CachedPortAccessors.Add(type,new Dictionary<string, IModelPortAccessor>());
                 var properties = type.GetProperties();
                 foreach(var property in properties){
-                    
-                    var propertyAccessor = CreatePropertyCache(property.Name,type,property.PropertyType);
-                    CachedPropertyAccessors[type].Add(property.Name,propertyAccessor);
+                    var portAttribute =  property.GetCustomAttribute<PortAttribute>();
+                    if (portAttribute == null) continue;
+                    var propertyAccessor = CreatePortCacheForProperty(property.Name,type,property.PropertyType);
+                    CachedPortAccessors[type].Add(property.Name,propertyAccessor);
                 }
                 //register the fields
                 var fields = type.GetFields();
                 foreach(var field in fields){
-                    
+                
                     var getValueDelegate = GetValueDelegateForField(field);
                     CachedDelegatesForGettingValue[type].Add(field.Name,getValueDelegate);
                     if (field.IsPublic){
@@ -368,24 +342,12 @@ namespace TNodeCore.Runtime.RuntimeCache{
                 }
                 var methods = type.GetMethods();
                 foreach(var method in methods){
+                    
                     //Check if the method has an [Port] attribute
                     var portAttribute = method.GetCustomAttribute<PortAttribute>();
                     if(portAttribute != null){
-                    
-                        //if the port is an input port. cached it as an function of setting value
-                        
-                        if(portAttribute is InputAttribute){
-                            var inputMethodAccessor = CreateMethodInputCache(method.Name, type,
-                                method.GetParameters()[0].ParameterType);
-                            InputMethodPorts[type].Add(method.Name,inputMethodAccessor);
-                            
-                        }
-
-                        if (portAttribute is OutputAttribute){
-                            var outputMethodAccessor = CreateMethodOutputCache(method.Name, type,
-                                method.ReturnType);
-                            OutputMethodPorts[type].Add(method.Name,outputMethodAccessor);
-                        }
+                        var propertyAccessor = CreatePortCacheForMethod(method.Name,type,method.ReturnType==typeof(void)?method.GetParameters()[0].ParameterType:method.ReturnType);
+                        CachedPortAccessors[type].Add(method.Name,propertyAccessor);
                     }
        
                 }
@@ -418,9 +380,7 @@ namespace TNodeCore.Runtime.RuntimeCache{
   
     }
 
-    public interface IMethodAccessorOutput{
-        object GetValue(object model);
-    }
+
 
 
     public class ImplicitConversionHelper<T1,T2> : IPortConverterHelper{

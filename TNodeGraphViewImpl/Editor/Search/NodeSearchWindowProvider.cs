@@ -30,7 +30,7 @@ namespace TNodeGraphViewImpl.Editor.Search{
             var list = new List<SearchTreeEntry>{
                
             };
-            var root = new SearchTreeGroupEntry(new GUIContent("Create"),0);
+            var root = new SearchTreeGroupEntry(new GUIContent("CreateProp"),0);
             list.Add(root);
             Texture2D icon = new Texture2D(2,2);
             foreach (var category in categories){

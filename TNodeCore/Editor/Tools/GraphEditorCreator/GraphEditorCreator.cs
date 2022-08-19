@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-//add an attribute right click asset panel and select "TNodeCore/Create/Create New Graph Editor" to call this editor
+//add an attribute right click asset panel and select "TNodeCore/CreateProp/CreateProp New Graph Editor" to call this editor
 
 
 namespace TNodeCore.Editor.Tools.GraphEditorCreator{
@@ -19,8 +19,8 @@ namespace TNodeCore.Editor.Tools.GraphEditorCreator{
         private TextField _graphClassNameTextField;
         private Button _createButton;
         private readonly SourceGeneratorForGraphEditor _sourceGeneratorForGraphEditor = new SourceGeneratorForGraphEditor();
-        [MenuItem("Assets/Create/TNodeCore/Create New Graph Editor")]
-        [MenuItem("TNodeCore/Create New Graph Editor")]
+        [MenuItem("Assets/CreateProp/TNodeCore/CreateProp New Graph Editor")]
+        [MenuItem("TNodeCore/CreateProp New Graph Editor")]
         public static void ShowExample()
         {
             GraphEditorCreator wnd = GetWindow<GraphEditorCreator>();
@@ -46,7 +46,7 @@ namespace TNodeCore.Editor.Tools.GraphEditorCreator{
             VisualElement labelFromUXML = m_VisualTreeAsset.Instantiate();
             root.Add(labelFromUXML);
             
-            //Register a callback when Create Button is clicked
+            //Register a callback when CreateProp Button is clicked
             _createButton = root.Q<Button>("CreateButton");
             _createButton.clickable.clicked += OnCreateButtonClicked;
 
@@ -90,7 +90,7 @@ namespace TNodeCore.Editor.Tools.GraphEditorCreator{
         }
         
         private void OnCreateButtonClicked(){
-            //Create a new .cs file at current opened asset folder
+            //CreateProp a new .cs file at current opened asset folder
             string path = AssetDatabase.GetAssetPath(Selection.activeObject);
             if (path == ""){
                 path = "Assets";
@@ -142,7 +142,7 @@ namespace TNodeCore.Editor.Tools.GraphEditorCreator{
                 EditorApplication.update();
             }
 
-            //Create an NodeAttribute Editor Data Instance for the new graph editor
+            //CreateProp an NodeAttribute Editor Data Instance for the new graph editor
             var graphEditorData = ScriptableObject.CreateInstance<GraphEditorData>();
             graphEditorData.name = editorName;
             VisualTreeAsset defaultEditorTree = Resources.Load<VisualTreeAsset>("GraphEditor");

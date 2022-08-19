@@ -12,15 +12,74 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2051a0adbd1ba974084a535dd06ab7d7, type: 3}
   m_Name: New HelloGraph
   m_EditorClassIdentifier: 
-  nodeList: []
-  nodeLinks: []
+  nodeList:
+  - id: 0
+  - id: 1
+  nodeLinks:
+  - inPort:
+      portEntryName: A
+      nodeDataId: 94327133-34e1-47bb-a365-0782120c581e
+    outPort:
+      portEntryName: OutputList:1
+      nodeDataId: 8289b5d6-f55f-480e-8c16-ae3af7a282dd
   blackboardData:
-    id: 0
+    id: 2
   sceneReference: 
   editorModels: []
   graphViewModel:
-    id: 0
+    id: 3
   references:
     version: 1
     00000000:
-      type: {class: , ns: , asm: }
+      type: {class: AddNode, ns: Samples, asm: Assembly-CSharp}
+      data:
+        positionInView:
+          serializedVersion: 2
+          x: 396
+          y: 215
+          width: 0
+          height: 0
+        id: 8289b5d6-f55f-480e-8c16-ae3af7a282dd
+        nodeName: AddNode
+        entryPoint: 0
+        isTest: 0
+    00000001:
+      type: {class: AddNode, ns: Samples, asm: Assembly-CSharp}
+      data:
+        positionInView:
+          serializedVersion: 2
+          x: 569
+          y: 215
+          width: 0
+          height: 0
+        id: 94327133-34e1-47bb-a365-0782120c581e
+        nodeName: AddNode
+        entryPoint: 0
+        isTest: 0
+    00000002:
+      type: {class: HelloBlackboard, ns: TNode.Samples, asm: Assembly-CSharp}
+      data:
+        positionInView:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        id: 
+        HelloString: 
+        HelloGameObject: {fileID: 0}
+        V3S: []
+        V2S: []
+    00000003:
+      type: {class: GraphViewModel, ns: TNode.TNodeCore.Editor.Models, asm: Taoria.TNodeCore.Runtime}
+      data:
+        positionInView:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        id: 
+        persistScale: 1
+        persistOffset: {x: 0, y: 0}
+        isBlackboardOn: 1

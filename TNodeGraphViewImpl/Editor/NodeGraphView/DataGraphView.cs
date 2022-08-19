@@ -189,7 +189,7 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
                 Vector2 editorPosition = Owner==null?Vector2.zero:Owner.position.position;
                 //Remove all the previous menu items
                 evt.menu.MenuItems().Clear();
-                evt.menu.AppendAction("Create Node", dma => {
+                evt.menu.AppendAction("CreateProp Node", dma => {
                     var dmaPos = dma.eventInfo.mousePosition+editorPosition;
                     SearchWindowContext searchWindowContext = new SearchWindowContext(dmaPos,200,200);
                     var searchWindow = ScriptableObject.CreateInstance<NodeSearchWindowProvider>();
@@ -199,7 +199,7 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
                     Debug.Log(targetPos);
                     SearchWindow.Open(searchWindowContext, searchWindow);
                 });
-                evt.menu.AppendAction("Create PlacematModel",dma=> {
+                evt.menu.AppendAction("CreateProp PlacematModel",dma=> {
                     //find placemat container 
                     var placematContainer = GetPlacematContainer();
                     var targetPos = this.viewTransform.matrix.inverse.MultiplyPoint(dma.eventInfo.localMousePosition);
@@ -440,7 +440,7 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
                     }
                     else{
             
-                        var node = _runtimeGraph.Get(runtimeNodeData.id).NodeData as SceneNode;
+                        var node = _runtimeGraph.GetRuntimeNode(runtimeNodeData.id).NodeData as SceneNode;
                         AddPersistentNode(node);
                     }
                 }

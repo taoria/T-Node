@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using TNode.TNodeCore.Runtime.Tools;
 using TNodeCore.Runtime.Models;
+using TNodeCore.Runtime.RuntimeModels;
 using UnityEditor;
 using UnityEngine;
 
 namespace TNodeCore.Runtime.Components{
-    public class RuntimeGraph:MonoBehaviour{
+    public class RuntimeGraph:MonoBehaviour,IRuntimeNodeGraph{
         /// <summary>
         /// Graph data reference to be used in runtime
         /// </summary>
@@ -40,10 +41,13 @@ namespace TNodeCore.Runtime.Components{
         /// </summary>
         [NonSerialized]
         private bool _build = false;
-        
+
+        [NonSerialized] private IEnumerator<RuntimeNode> _runtimeNodeEnumerator;
+
         /// <summary>
         /// Build the graph tool and other dependencies for the runtime graph
         /// </summary>
+ 
         public virtual void Build(){
             if (_build) return;
             
@@ -58,7 +62,7 @@ namespace TNodeCore.Runtime.Components{
                 CreateRuntimeNodeIfNone(nodeData);
             }
             var nodeList = RuntimeNodes.Values;
-            _graphTool = new GraphTool(nodeList.ToList(),RuntimeNodes,this);
+            _graphTool = new GraphTool(this);
             var sceneNodes = RuntimeNodes.Values.Where(x => x.NodeData is SceneNode).Select(x => x.NodeData as SceneNode);
             foreach (var sceneNode in sceneNodes){
                 if (sceneNode != null) sceneNode.BlackboardData = runtimeBlackboardData;
@@ -66,6 +70,7 @@ namespace TNodeCore.Runtime.Components{
 #if UNITY_EDITOR
             BuildSceneNode();
 #endif
+            _runtimeNodeEnumerator = _graphTool.BreathFirstSearch();
             _build = true;
         }
 
@@ -80,34 +85,13 @@ namespace TNodeCore.Runtime.Components{
         /// </summary>
         /// <param name="nodeData">Node data you provided</param>
         /// <returns></returns>
-        public RuntimeNode Get(NodeData nodeData){
-            if(!_build)
-                Build();
-            if(RuntimeNodes.ContainsKey(nodeData.id)){
-                return RuntimeNodes[nodeData.id];
-            }
-            return null;
-        }
-        /// <summary>
-        /// Get the runtime node from an id
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public RuntimeNode Get(string id){
-            if(!_build)
-                Build();
-            if (RuntimeNodes.ContainsKey(id)){
-                return RuntimeNodes[id];
-            }
-            return null;
-        }
         //DFS search to run a node.
         public bool RunOnDependency(NodeData startNode){
             if(!_build)
                 Build();
             if (_graphTool == null)
                 return false;
-            _graphTool.RunNodeDependently(Get(startNode));
+            _graphTool.RunNodeDependently(GetRuntimeNode(startNode));
             return true;
         }
         public bool TraverseAll(){
@@ -180,12 +164,29 @@ namespace TNodeCore.Runtime.Components{
                 var runtimeInNode = new RuntimeNode(inNode);
                 RuntimeNodes.Add(inNode.id,runtimeInNode);
             }
-            RuntimeNodes[inNode.id].InputLink.Add(linkData);
-            
+            RuntimeNodes[inNode.id].InputLinks.Add(linkData);
         }
         public List<RuntimeNode> GetRuntimeNodesOfType<T>(){
             return RuntimeNodes.Values.Where(x => typeof(T).IsAssignableFrom(x.NodeType)).ToList();
         }
+
+        public void ResetState(){
+            _runtimeNodeEnumerator = _graphTool.BreathFirstSearch();
+        }
+
+        public NodeData CurrentNode(){
+            return _runtimeNodeEnumerator.Current?.NodeData;
+        }
+
+        public RuntimeNode MoveNext(){
+            _runtimeNodeEnumerator.MoveNext();
+            return _runtimeNodeEnumerator.Current;
+        }
+
+        public RuntimeNode CurrentRuntimeNode(){
+            return _runtimeNodeEnumerator.Current;
+        }
+
         public  List<RuntimeNode> GetRuntimeNodesOfType(Type type){
             return RuntimeNodes.Values.Where(x => type.IsAssignableFrom(type)).ToList();
         }
@@ -236,7 +237,7 @@ namespace TNodeCore.Runtime.Components{
                 var runtimeOutNode = new RuntimeNode(outNode);
                 RuntimeNodes.Add(outNode.id,runtimeOutNode);
             }
-            RuntimeNodes[outNode.id].OutputLink.Add(linkData);
+            RuntimeNodes[outNode.id].OutputLinks.Add(linkData);
         }
         
         public void OnValidate(){
@@ -263,7 +264,42 @@ namespace TNodeCore.Runtime.Components{
         public virtual void RuntimeExecute(){
             _graphTool.DirectlyTraversal();
         }
-       
+
+        public RuntimeNode GetRuntimeNode(NodeData nodeData){
+            if(!_build)
+                Build();
+            if(RuntimeNodes.ContainsKey(nodeData.id)){
+                return RuntimeNodes[nodeData.id];
+            }
+            return null;
+        }
+
+        public RuntimeNode GetRuntimeNode(string id){
+            if(!_build)
+                Build();
+            if(RuntimeNodes.ContainsKey(id)){
+                return RuntimeNodes[id];
+            }
+            return null;
+        }
+
+        public List<RuntimeNode> GetRuntimeNodes(){
+            return RuntimeNodes.Values.ToList();
+        }
+
+        public Dictionary<string, RuntimeNode> GetRuntimeNodesDictionary(){
+            return RuntimeNodes;
+        }
+
+
+        public NodeData GetNode(string id){
+            if(!_build)
+                Build();
+            if(RuntimeNodes.ContainsKey(id)){
+                return RuntimeNodes[id].NodeData;
+            }
+            return null;
+        }
     }
 
     public class SceneDataPersistent:MonoBehaviour,ISerializationCallbackReceiver{

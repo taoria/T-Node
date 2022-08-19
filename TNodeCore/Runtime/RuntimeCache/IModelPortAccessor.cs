@@ -2,7 +2,7 @@
 using UnityEditor.Experimental.GraphView;
 
 namespace TNodeCore.Runtime.RuntimeCache{
-    public interface IModelPropertyAccessor{
+    public interface IModelPortAccessor{
         object GetValue(object model);
         void SetValue(object model, object value);
 

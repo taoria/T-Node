@@ -39,7 +39,7 @@ namespace TNode.TNodeCore.Runtime.Components{
                 var transitionNode = new List<RuntimeNode>();
                 
                 foreach (var conditionalTransition in conditionalTransitions){
-                    transitionNode.Add(Get(conditionalTransition));
+                    transitionNode.Add(GetRuntimeNode(conditionalTransition));
                 }
                 foreach (var runtimeNode in transitionNode){
                     if (runtimeNode is ConditionalRuntimeNode == false){
