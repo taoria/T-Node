@@ -16,15 +16,10 @@ namespace Samples{
         public Vector2 B{ get; set; }
         [Output]
         public Vector3 Res{ get; set; }
-
-        [Output(Group = true)] public List<Vector3> OutputList => new List<Vector3>{new Vector3(),new Vector3()};
         
-    
-
         public override void Process(){
             Res = A + (Vector3)B;
-            Debug.Log(Res);
-            this.Log(Res.ToString());
+            this.Log($"{Res}");
         }
     }
 }

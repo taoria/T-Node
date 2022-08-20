@@ -1,0 +1,3 @@
+﻿#GraphOptions{
+    flex-direction: row;
+}

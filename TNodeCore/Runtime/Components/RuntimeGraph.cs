@@ -175,7 +175,7 @@ namespace TNodeCore.Runtime.Components{
         }
 
         public NodeData CurrentNode(){
-            return _runtimeNodeEnumerator.Current?.NodeData;
+            return CurrentRuntimeNode().NodeData;
         }
 
         public RuntimeNode MoveNext(){
@@ -184,6 +184,9 @@ namespace TNodeCore.Runtime.Components{
         }
 
         public RuntimeNode CurrentRuntimeNode(){
+            if (_runtimeNodeEnumerator.Current == null){
+                _runtimeNodeEnumerator.MoveNext();
+            }
             return _runtimeNodeEnumerator.Current;
         }
 
@@ -281,6 +284,10 @@ namespace TNodeCore.Runtime.Components{
                 return RuntimeNodes[id];
             }
             return null;
+        }
+
+        public BlackboardData GetBlackboardData(){
+            return runtimeBlackboardData;
         }
 
         public List<RuntimeNode> GetRuntimeNodes(){

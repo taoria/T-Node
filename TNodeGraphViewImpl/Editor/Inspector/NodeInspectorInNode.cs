@@ -2,6 +2,7 @@
 using TNodeCore.Editor.NodeGraphView;
 using TNodeCore.Editor.Serialization;
 using TNodeCore.Runtime.Attributes;
+using TNodeCore.Runtime.Components;
 using TNodeCore.Runtime.Models;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -66,34 +67,6 @@ namespace TNodeGraphViewImpl.Editor.Inspector{
                 drawer.Bind(serializedObject);
                 Add(drawer);
             }
-
-            var globalTest = GetFirstAncestorOfType<IBaseDataGraphView>()?.AutoUpdate;
-            if(globalTest??false){
-                CreateTestButton();
-            }
-            else if (_data.isTest){
-                //Add a test button for the node
-                CreateTestButton();
-            }
-        }
-
-        private void CreateTestButton(){
-            var testButton = new Button(() => {
-                var test = GetFirstAncestorOfType<IBaseDataGraphView>();
-                if (test != null){
-                    if(!test.IsRuntimeGraph) return;
-                    var runtimeGraph = test.GetRuntimeGraph();
-                    if (runtimeGraph != null){
-                       var res = runtimeGraph.RunOnDependency(_data);
-                    }
-                    _data.OnTest();
-                }
-            }){
-                text = "Test"
-            };
-
-            Add(testButton);
-     
         }
     }
 }

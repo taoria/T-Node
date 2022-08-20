@@ -1,0 +1,4 @@
+﻿.highlightNode{
+    border-color: lightseagreen;
+    border-width: 2;
+}

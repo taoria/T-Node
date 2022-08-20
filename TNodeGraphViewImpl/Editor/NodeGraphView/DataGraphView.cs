@@ -15,6 +15,7 @@ using TNodeCore.Editor.Tools.NodeCreator;
 using TNodeCore.Runtime.Components;
 using TNodeCore.Runtime.Models;
 using TNodeCore.Runtime.RuntimeCache;
+using TNodeCore.Runtime.RuntimeModels;
 using TNodeGraphViewImpl.Editor.Cache;
 using TNodeGraphViewImpl.Editor.GraphBlackboard;
 using TNodeGraphViewImpl.Editor.Inspector;
@@ -35,15 +36,16 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
         #endregion
         #region variables and properties
         private T _data;
-        private RuntimeGraph _runtimeGraph;
+        private bool _loaded;
         private bool _isInspectorOn;
+        private IRuntimeNodeGraph _runtimeNodeGraph;
         private NodeSearchWindowProvider _nodeSearchWindowProvider;
         private NodeInspector _nodeInspector;
         private Dictionary<string,Node> _nodeDict = new Dictionary<string,Node>();
         private IBlackboardView _blackboard;
-        private bool _loaded;
         private GraphViewModel _graphViewModel;
         private List<Comment> _comments;
+        private GraphWatcherView.GraphWatcherView _graphWatcher;
 
         public T Data{
             get{ return _data; }
@@ -70,6 +72,7 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
         #region construct default behaviour
         public BaseDataGraphView(){
             styleSheets.Add(Resources.Load<StyleSheet>("GraphViewBackground"));
+            styleSheets.Add(Resources.Load<StyleSheet>("NodeViewHighlight"));
             var grid = new GridBackground();
             Insert(0,grid);
             grid.StretchToParentSize();
@@ -85,13 +88,13 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
         /// <summary>
         /// Probably reusable in later GTFs version
         /// </summary>
-        private void WaitingForAGraph(){
+        private void WaitingForAGraphDragOnView(){
             VisualElement visualElement = new VisualElement();
             //Set background color to white
             visualElement.style.backgroundColor = new StyleColor(new Color(0.1f, 0.1f, 0.1f, 1));
             
             visualElement.StretchToParentSize();
-            visualElement.name = "WaitingForAGraph";
+            visualElement.name = "WaitingForAGraphDragOnView";
             Add(visualElement);
             visualElement.BringToFront();
         
@@ -110,19 +113,18 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
                     if (obj is T graphData){
                         IsRuntimeGraph = false;
                         Data = graphData;
+                        _runtimeNodeGraph = new StaticGraph(Data);
                     }
                     else{
-                        if (obj is GameObject gameObject){
-                            if (gameObject.GetComponent<RuntimeGraph>() != null){
-                                if (gameObject.GetComponent<RuntimeGraph>().graphData != null){
-                                    _runtimeGraph = gameObject.GetComponent<RuntimeGraph>();
-                                    IsRuntimeGraph = true;
-                                    BuildRuntimeGraphBehaviour();
-                                    Data = gameObject.GetComponent<RuntimeGraph>().graphData as T;
-                                    if(Data==null){
-                                        Debug.LogError($"Dragged a wrong graph model to editor,expected {typeof(T)} but got {gameObject.GetComponent<RuntimeGraph>().graphData.GetType()}");
-                                    }
-                                }
+                        if (obj is GameObject gameObject 
+                            && gameObject.GetComponent<RuntimeGraph>() != null
+                            && gameObject.GetComponent<RuntimeGraph>().graphData != null){
+                            _runtimeNodeGraph = gameObject.GetComponent<RuntimeGraph>();
+                            IsRuntimeGraph = true;
+                            BuildRuntimeGraphBehaviour();
+                            Data = gameObject.GetComponent<RuntimeGraph>().graphData as T;
+                            if(Data==null){
+                                Debug.LogError($"Dragged a wrong graph model to editor,expected {typeof(T)} but got {gameObject.GetComponent<RuntimeGraph>().graphData.GetType()}");
                             }
                         }
                     }
@@ -164,9 +166,9 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
             
             while (_loaded){
                 await Task.Delay(TimeSpan.FromSeconds(RefreshRate));
-                if(_runtimeGraph != null){
-                    if (AutoUpdate){
-                        _runtimeGraph.TraverseAll();
+                if(_runtimeNodeGraph != null){
+                    if (AutoUpdate && _runtimeNodeGraph is RuntimeGraph runtimeGraph){
+                        runtimeGraph.TraverseAll();
                         AfterGraphResolved?.Invoke();
                     }
                 }
@@ -175,25 +177,27 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
  
         private void CheckDataAfterInit(){
             if(Data == null){
-                WaitingForAGraph();
+                WaitingForAGraphDragOnView();
             }
         }
 
-        private void ConstructDefaultBehaviour(){
+        private void ConstructView(){
             //Register a right click context menu
-            ConstructViewContextualMenu();
+            ConstructContextMenu();
         }
 
-        public void ConstructViewContextualMenu(){
+        public void ConstructContextMenu(){
             RegisterCallback<ContextualMenuPopulateEvent>(evt => {
                 Vector2 editorPosition = Owner==null?Vector2.zero:Owner.position.position;
                 //Remove all the previous menu items
                 evt.menu.MenuItems().Clear();
                 evt.menu.AppendAction("CreateProp Node", dma => {
                     var dmaPos = dma.eventInfo.mousePosition+editorPosition;
-                    SearchWindowContext searchWindowContext = new SearchWindowContext(dmaPos,200,200);
                     var searchWindow = ScriptableObject.CreateInstance<NodeSearchWindowProvider>();
                     var targetPos = this.viewTransform.matrix.inverse.MultiplyPoint(dma.eventInfo.localMousePosition);
+                    
+                    SearchWindowContext searchWindowContext = new SearchWindowContext(dmaPos,200,200);
+
                     searchWindow.Setup(typeof(T),this,Owner,targetPos);
              
                     Debug.Log(targetPos);
@@ -201,10 +205,10 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
                 });
                 evt.menu.AppendAction("CreateProp PlacematModel",dma=> {
                     //find placemat container 
-                    var placematContainer = GetPlacematContainer();
+                    var container = GetPlacematContainer();
                     var targetPos = this.viewTransform.matrix.inverse.MultiplyPoint(dma.eventInfo.localMousePosition);
                     var dmaPosRect = new Rect(targetPos,new Vector2(500,500));
-                    var placemat = placematContainer.CreatePlacemat<PlacematView>(dmaPosRect,1,"Title");
+                    var placemat = container.CreatePlacemat<PlacematView>(dmaPosRect,1,"Title");
                     var placematData = new PlacematModel{
                         title = "Title",
                         positionInView = dmaPosRect
@@ -213,7 +217,7 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
                     AddPlacemat(placematData);
 
                 });
-                if (this.selection.Any()){
+                if (selection.Any()){
                     evt.menu.AppendAction("Comment", dma => {
                         BuildCommentForSelected();
                     });
@@ -229,9 +233,7 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
             var selection  = this.selection.OfType<IBaseNodeView>().ToList();
             foreach (var baseNodeView in selection){
                 var comment = new CommentView();
-                comment.Bind(new Comment(){
-                    
-                });
+                comment.Bind(new Comment());
                 ((GraphElement)baseNodeView).Add(comment);
                 comment.Data.CommentedModel = baseNodeView.GetNodeData();
                 this._data.EditorModels.Add(comment.Data);
@@ -257,17 +259,19 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
         }
 
         private void OnInit(){
-            ConstructDefaultBehaviour();
+            ConstructView();
             
             CheckDataAfterInit();
             
             OnGraphViewCreate();
 
             BuildUndo();
+            
+            SetDetachedFromPanel();
 
             _loaded = true;
 
-            SetDetachedFromPanel();
+            
             
         }
 
@@ -290,10 +294,12 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
         }
         
         protected void CreateMenu(){
+            
             if (this.Q("TopMenu") != null) return;
             var visualElement = new VisualElement{
                 name = "TopMenu"
             };
+            visualElement.Clear();
             visualElement.style.position = Position.Absolute;
             visualElement.style.top = 0;
             visualElement.style.backgroundColor = new StyleColor(new Color(0.1f, 0.1f, 0.1f, 1));
@@ -323,9 +329,9 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
             };
             runButton.RegisterCallback<ClickEvent>(evt => {
          
-                if (IsRuntimeGraph){
+                if (IsRuntimeGraph && _runtimeNodeGraph is RuntimeGraph runtimeGraph){
                 
-                    _runtimeGraph.TraverseAll();
+                    runtimeGraph.TraverseAll();
                     AfterGraphResolved?.Invoke();
                 }
             });
@@ -340,8 +346,25 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
                     CreateBlackboard();
             });
             visualElement.Add(blackboardButton);
+            
+            //Add a button to toggle the GraphWatcher
+            var graphWatcherButton = new Button{
+                name = "graphWatcherButton",
+                text = "Graph Watcher"
+            };
+            graphWatcherButton.RegisterCallback<ClickEvent>(evt => {
+                if(_graphWatcher==null)
+                    CreateGraphWatcher();
+            });
+            
+            visualElement.Add(graphWatcherButton);
         }
-        
+
+        private void CreateGraphWatcher(){
+            _graphWatcher = new GraphWatcherView.GraphWatcherView();
+            this.AddElement(_graphWatcher);
+        }
+
         public void RegisterDragEvent(){
             RegisterCallback<DragUpdatedEvent>(OnDragUpdated);
             RegisterCallback<DragPerformEvent>(OnDragPerform);
@@ -440,7 +463,7 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
                     }
                     else{
             
-                        var node = _runtimeGraph.GetRuntimeNode(runtimeNodeData.id).NodeData as SceneNode;
+                        var node = _runtimeNodeGraph.GetRuntimeNode(runtimeNodeData.id).NodeData as SceneNode;
                         AddPersistentNode(node);
                     }
                 }
@@ -479,6 +502,10 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
                 if (node != null){
                     node.Add(res);
                 }
+            }
+
+            if (IsRuntimeGraph == false){
+                _runtimeNodeGraph = new StaticGraph(_data);
             }
             _nodeDict.Clear();
         }
@@ -656,7 +683,6 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
             }
             else{
                 var inputPorts = ports.ToList().Where(x => x.direction == Direction.Input).ToList();
-                
                 foreach (var inputPort in inputPorts){
                     //check if start port could implicitly convert to input port type
                     if (HasImplicitConversion(startPort.portType,inputPort.portType)){
@@ -668,11 +694,6 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
                     }
                 }
             }
-            
-            
-   
-            
-            
             
             return compatiblePorts;
 
@@ -803,15 +824,15 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
 
         public BlackboardData GetBlackboardData(){
             if (IsRuntimeGraph){
-                return _runtimeGraph.runtimeBlackboardData;
+                return _runtimeNodeGraph.GetBlackboardData();
             }
             return _data.blackboardData;
         }
 
         public bool IsRuntimeGraph{ get; set; }
 
-        public RuntimeGraph GetRuntimeGraph(){
-            return _runtimeGraph;
+        public IRuntimeNodeGraph GetRuntimeNodeGraph(){
+            return _runtimeNodeGraph;
         }
 
         public void SetGraphData(GraphData graph){

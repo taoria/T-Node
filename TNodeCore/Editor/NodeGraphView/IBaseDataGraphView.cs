@@ -2,6 +2,7 @@
 using TNodeCore.Runtime;
 using TNodeCore.Runtime.Components;
 using TNodeCore.Runtime.Models;
+using TNodeCore.Runtime.RuntimeModels;
 using UnityEngine;
 
 namespace TNodeCore.Editor.NodeGraphView{
@@ -65,7 +66,7 @@ namespace TNodeCore.Editor.NodeGraphView{
         /// Null if it is not a runtime graph
         /// </summary>
         /// <returns></returns>
-        public RuntimeGraph GetRuntimeGraph();
+        public IRuntimeNodeGraph GetRuntimeNodeGraph();
         /// <summary>
         /// Edit a graph data.
         /// </summary>

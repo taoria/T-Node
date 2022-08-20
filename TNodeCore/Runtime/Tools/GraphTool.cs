@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TNodeCore.Runtime;
 using TNodeCore.Runtime.Components;
+using TNodeCore.Runtime.Extensions;
 using TNodeCore.Runtime.Models;
 using TNodeCore.Runtime.RuntimeModels;
 using UnityEngine;
@@ -81,23 +82,27 @@ namespace TNode.TNodeCore.Runtime.Tools{
         }
         public IEnumerator<RuntimeNode> BreathFirstSearch(){
             Queue<RuntimeNode> queue = new Queue<RuntimeNode>();
+            HashSet<RuntimeNode> alreadyContained = new HashSet<RuntimeNode>();
+            HashSet<RuntimeNode> visited = new HashSet<RuntimeNode>();
             foreach (var runtimeNode in NonDependencyNode){
                 queue.Enqueue(runtimeNode);
+                alreadyContained.Add(runtimeNode);
             }
             while (queue.Count > 0){
                 var node = queue.Dequeue();
+                visited.Add(node);
                 if (node is ConditionalRuntimeNode conditionalRuntimeNode){
                     var ids = conditionalRuntimeNode.GetConditionalNextIds();
                     
                     var nextNodes =  ids.Select(id=>RuntimeNodes[id]).ToList();
                     
                     foreach (var runtimeNode in nextNodes){
-                        queue.Enqueue(runtimeNode);
+                        AddNodeToQueueIfMeetCondition(alreadyContained, runtimeNode, queue);
                     }
                 }
                 else{
                     foreach (var runtimeNode in node.OutputLinks.Select(link => RuntimeNodes[link.inPort.nodeDataId])){
-                        queue.Enqueue(runtimeNode);
+                        AddNodeToQueueIfMeetCondition(alreadyContained, runtimeNode, queue);
                     }
                     node.OutputLinks.ForEach(HandlingLink);
                 }
@@ -105,9 +110,22 @@ namespace TNode.TNodeCore.Runtime.Tools{
                 yield return node;
             }
         }
-        
-        
 
+        private void AddNodeToQueueIfMeetCondition(HashSet<RuntimeNode> alreadyContained, RuntimeNode runtimeNode, Queue<RuntimeNode> queue){
+            //Check if the node is already contained in the queue
+            if (alreadyContained.Contains(runtimeNode)) return;
+            
+            //Check if the visited node has all previous node of the node
+            var dependentNodes = runtimeNode.GetDependentNodesId().Select(x => RuntimeNodes[x]);
+            var allDependenciesVisited = dependentNodes.Aggregate(true, (a, b) =>
+                alreadyContained.Contains(b) && a
+            );
+            if (allDependenciesVisited == false) return;
+            
+            //If all conditions are met, add the node to the queue
+            queue.Enqueue(runtimeNode);
+            alreadyContained.Add(runtimeNode);
+        }
 
 
         /// <summary>

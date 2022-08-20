@@ -38,7 +38,7 @@ namespace Tests{
             graphData.NodeDictionary.Add(node.id,node);
             Assert.AreEqual(1,graphData.NodeDictionary.Count);
             
-            var staticGraph = new StaticGraph(graphData.NodeDictionary.Values.ToList(),graphData.NodeLinks);
+            var staticGraph = new StaticGraph(graphData);
             Assert.NotNull(staticGraph);
             Assert.AreEqual(1,staticGraph.GetRuntimeNodes().Count);
         }
@@ -50,7 +50,7 @@ namespace Tests{
             graphData.NodeDictionary.Add(node.id,node);
           
             
-            var staticGraph = new StaticGraph(graphData.NodeDictionary.Values.ToList(),graphData.NodeLinks);
+            var staticGraph = new StaticGraph(graphData);
 
             
             Assert.AreEqual(staticGraph.GetRuntimeNodes().First(),staticGraph.CurrentRuntimeNode());
@@ -97,7 +97,7 @@ namespace Tests{
             
 
 
-            var staticGraph = new StaticGraph(graphData.NodeDictionary.Values.ToList(),graphData.NodeLinks);
+            var staticGraph = new StaticGraph(graphData);
             
             Assert.AreEqual(node1,staticGraph.CurrentNode());
             staticGraph.MoveNext();
@@ -157,7 +157,7 @@ namespace Tests{
 
             node3.TestCondition = true;
             
-            var staticGraph = new StaticGraph(graphData.NodeDictionary.Values.ToList(),graphData.NodeLinks);
+            var staticGraph = new StaticGraph(graphData);
             Assert.AreEqual(node1,staticGraph.CurrentNode());
             staticGraph.MoveNext();
             Assert.AreEqual(node4,staticGraph.CurrentNode());
@@ -172,7 +172,7 @@ namespace Tests{
             
             node3.TestCondition = false;
             
-            var staticGraph2 = new StaticGraph(graphData.NodeDictionary.Values.ToList(),graphData.NodeLinks);
+            var staticGraph2 = new StaticGraph(graphData);
             Assert.AreEqual(node1,staticGraph2.CurrentNode());
             staticGraph2.MoveNext();
             Assert.AreEqual(node4,staticGraph2.CurrentNode());
