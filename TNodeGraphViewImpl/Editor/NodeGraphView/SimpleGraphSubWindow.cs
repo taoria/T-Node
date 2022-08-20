@@ -32,12 +32,6 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
             ConstructWindowBasicSetting();
             BuildWindow(visualTreeAsset);
         }
-
-        public string GetPersistenceId(){
-            throw new System.NotImplementedException();
-        }
-
-
     }
 
 

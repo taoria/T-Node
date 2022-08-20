@@ -1,0 +1,21 @@
+﻿<ui:UXML xmlns:ui="UnityEngine.UIElements" 
+         xmlns:uie="UnityEditor.UIElements" 
+         xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         engine="UnityEngine.UIElements" 
+         editor="UnityEditor.UIElements" 
+         noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:VisualElement name="GraphWatcher" style="height: 300px; width: 300px; background-color: rgb(65, 65, 65);">
+        <ui:VisualElement name="GraphOptions" >
+        <ui:Button name="Next" text="Next">
+            
+        </ui:Button>
+        <ui:Button name="Reset" text="Reset">
+
+        </ui:Button>
+        </ui:VisualElement>
+        <ui:Label name="CurrentNode">
+
+        </ui:Label>
+    </ui:VisualElement>
+    
+</ui:UXML>

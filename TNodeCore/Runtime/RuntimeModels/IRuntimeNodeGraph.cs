@@ -6,7 +6,7 @@ namespace TNodeCore.Runtime.RuntimeModels{
     public interface IRuntimeNodeGraph{
         public RuntimeNode GetRuntimeNode(NodeData nodeData);
         public RuntimeNode GetRuntimeNode(string id);
-
+        public BlackboardData GetBlackboardData();
         public List<RuntimeNode> GetRuntimeNodes();
         public Dictionary<string,RuntimeNode> GetRuntimeNodesDictionary();
 
@@ -19,11 +19,10 @@ namespace TNodeCore.Runtime.RuntimeModels{
         /// </summary>
         /// <returns></returns>
         public void ResetState();
-        public NodeData CurrentNode();
 
-        public RuntimeNode MoveNext();
-        public RuntimeNode CurrentRuntimeNode();
-        
-       
+
+        RuntimeNode MoveNext();
+        NodeData CurrentNode();
+        RuntimeNode CurrentRuntimeNode();
     }
 }
