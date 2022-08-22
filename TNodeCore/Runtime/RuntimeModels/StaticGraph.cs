@@ -8,7 +8,7 @@ using TNodeCore.Runtime.Models;
 namespace TNodeCore.Runtime.RuntimeModels{
     public class StaticGraph:IRuntimeNodeGraph{
         private Dictionary<string,RuntimeNode> _nodes;
-        private IEnumerator<RuntimeNode> _breathFirstEnumerator;
+        private IEnumerator<RuntimeNode> _runtimeNodeEnumerator;
         
         private readonly GraphTool _graphTool;
         private readonly GraphData _originalData;
@@ -47,12 +47,28 @@ namespace TNodeCore.Runtime.RuntimeModels{
                 ModifyLinks(link);
             }
             _graphTool = new GraphTool(this);
-            _breathFirstEnumerator = _graphTool.BreathFirstSearch();
+            _runtimeNodeEnumerator = _graphTool.BreathFirstSearch();
         }
 
         public void ResetState(){
-            _breathFirstEnumerator = _graphTool.BreathFirstSearch();
+            switch (AccessMethod){
+                case AccessMethod.Bfs:
+                    _runtimeNodeEnumerator = _graphTool.BreathFirstSearch();
+                    break;
+                case AccessMethod.Dfs:
+                    _runtimeNodeEnumerator = _graphTool.DeepFirstSearchWithCondition();
+                    break;
+                case AccessMethod.StateTransition:
+                    _runtimeNodeEnumerator = _graphTool.IterateDirectlyTraversal();
+                    break;
+                case AccessMethod.Dependency:
+                    _runtimeNodeEnumerator = _graphTool.IterateNext();
+                    break;
+            }
+
         }
+
+        public AccessMethod AccessMethod{ get; set; } = AccessMethod.Bfs;
 
         public RuntimeNode GetRuntimeNode(NodeData nodeData){
             return _nodes[nodeData.id];
@@ -92,15 +108,15 @@ namespace TNodeCore.Runtime.RuntimeModels{
         }
 
         public RuntimeNode MoveNext(){
-           _breathFirstEnumerator.MoveNext();
-           return _breathFirstEnumerator.Current;
+           _runtimeNodeEnumerator.MoveNext();
+           return _runtimeNodeEnumerator.Current;
         }
 
         public RuntimeNode CurrentRuntimeNode(){
-            if (_breathFirstEnumerator.Current == null){
-                _breathFirstEnumerator.MoveNext();
+            if (_runtimeNodeEnumerator.Current == null){
+                _runtimeNodeEnumerator.MoveNext();
             }
-            return _breathFirstEnumerator.Current;
+            return _runtimeNodeEnumerator.Current;
         }
     }
 

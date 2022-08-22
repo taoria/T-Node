@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using TNode.TNodeCore.Runtime.Components;
 using TNodeCore.Runtime;
 using TNodeCore.Runtime.Components;
 using TNodeCore.Runtime.Extensions;
@@ -51,45 +54,62 @@ namespace TNode.TNodeCore.Runtime.Tools{
                 node.NodeData.Process();
             }
         }
+        //A IEnumerator version of the DirectlyTraversal,used to run the graph in a coroutine or somewhere you need
+        public IEnumerator<RuntimeNode> IterateDirectlyTraversal(){
+            if (TopologicalSorted==false){
+                throw new Exception("The graph is not sorted,there may be a circular dependency,use another access method instead");
+            }
+            foreach (var node in TopologicalOrder){
+                var links = node.InputLinks;
+                foreach (var link in links){
+                    HandlingLink(link);
+                }
+                node.NodeData.Process();
+                yield return node;
+            }
+        }
+        /// <summary>
+        /// usually used in state transition 
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerator<RuntimeNode> IterateNext(){
+            var currentNode = NonDependencyNode.FirstOrDefault();
+            if (currentNode == null){
+                yield break;
+            }
+
+            currentNode.NodeData.Process();
+            yield return currentNode;
+
+            while(currentNode.OutputLinks.Any()){
+                if (currentNode is ConditionalRuntimeNode conditionalRuntimeNode){
+                    currentNode = RuntimeNodes[conditionalRuntimeNode.GetNextNodeId()];
+                }
+                else{
+                    var link = currentNode.OutputLinks.FirstOrDefault();
+                    if (link != null){
+                        HandlingLink(link);
+                        currentNode = RuntimeNodes[link.inPort.nodeDataId];     
+                    }
+                }
+                currentNode.NodeData.Process();
+                yield return currentNode;
+            }
+
+           
+        }
         //Try to enable state transition from node to node.
         public IEnumerator<RuntimeNode> DeepFirstSearchWithCondition(){
+            //Define the basic data structure for a traversal of the graph
             Stack<RuntimeNode> stack = new Stack<RuntimeNode>();
+            HashSet<RuntimeNode> alreadyContained = new HashSet<RuntimeNode>();
+            HashSet<RuntimeNode> visited = new HashSet<RuntimeNode>();
             foreach (var runtimeNode in NonDependencyNode){
                 stack.Push(runtimeNode);
             }
             while (stack.Count > 0){
                 var node = stack.Pop();
                 
-                if (node is ConditionalRuntimeNode conditionalRuntimeNode){
-                    var ids = conditionalRuntimeNode.GetConditionalNextIds();
-                    
-                    var nextNodes =  ids.Select(id=>RuntimeNodes[id]).ToList();
-                    
-                    foreach (var runtimeNode in nextNodes){
-                        stack.Push(runtimeNode);
-                    }
-                }
-                else{
-                    var nextNodes = node.OutputLinks.Select(link => RuntimeNodes[link.inPort.nodeDataId]);
-                    foreach (var runtimeNode in nextNodes){
-                        stack.Push(runtimeNode);
-                    }
-                    node.OutputLinks.ForEach(HandlingLink);
-                }
-                node.NodeData.Process();
-                yield return node;
-            }
-        }
-        public IEnumerator<RuntimeNode> BreathFirstSearch(){
-            Queue<RuntimeNode> queue = new Queue<RuntimeNode>();
-            HashSet<RuntimeNode> alreadyContained = new HashSet<RuntimeNode>();
-            HashSet<RuntimeNode> visited = new HashSet<RuntimeNode>();
-            foreach (var runtimeNode in NonDependencyNode){
-                queue.Enqueue(runtimeNode);
-                alreadyContained.Add(runtimeNode);
-            }
-            while (queue.Count > 0){
-                var node = queue.Dequeue();
                 visited.Add(node);
                 if (node is ConditionalRuntimeNode conditionalRuntimeNode){
                     var ids = conditionalRuntimeNode.GetConditionalNextIds();
@@ -97,21 +117,100 @@ namespace TNode.TNodeCore.Runtime.Tools{
                     var nextNodes =  ids.Select(id=>RuntimeNodes[id]).ToList();
                     
                     foreach (var runtimeNode in nextNodes){
-                        AddNodeToQueueIfMeetCondition(alreadyContained, runtimeNode, queue);
+                        AddToCollectionIfMeetCondition(alreadyContained, visited,runtimeNode, stack);
                     }
                 }
                 else{
                     foreach (var runtimeNode in node.OutputLinks.Select(link => RuntimeNodes[link.inPort.nodeDataId])){
-                        AddNodeToQueueIfMeetCondition(alreadyContained, runtimeNode, queue);
+                        AddToCollectionIfMeetCondition(alreadyContained, visited,runtimeNode, stack);
                     }
-                    node.OutputLinks.ForEach(HandlingLink);
                 }
+                node.OutputLinks.ForEach(HandlingLink);
                 node.NodeData.Process();
                 yield return node;
             }
         }
+        /// <summary>
+        /// Breath first search for the graph.Not a standard BFS algorithm since all entries will be executed first.
+        /// </summary>
+        /// <returns>The IEnumerator to iterate the node</returns>
+        public IEnumerator<RuntimeNode> BreathFirstSearch(){
+            //Define the basic data structure for a traversal of the graph
+            Queue<RuntimeNode> queue = new Queue<RuntimeNode>();
+            //Already contained method to avoid duplicate traversal
+            HashSet<RuntimeNode> alreadyContained = new HashSet<RuntimeNode>();
+            //Visited method to avoid duplicate traversal
+            HashSet<RuntimeNode> visited = new HashSet<RuntimeNode>();
+            //Firstly add all entry node to the queue
+            foreach (var runtimeNode in NonDependencyNode){
+                queue.Enqueue(runtimeNode);
+                alreadyContained.Add(runtimeNode);
+            }
+            //Iterate the queue to implement bfs
+            while (queue.Count > 0){
+                var node = queue.Dequeue();
+                visited.Add(node);
+                //Conditional node will be traversed in a special way,only links fit the condition will be traversed
+                if (node is ConditionalRuntimeNode conditionalRuntimeNode){
+                    var ids = conditionalRuntimeNode.GetConditionalNextIds();
+                    
+                    var nextNodes =  ids.Select(id=>RuntimeNodes[id]).ToList();
+                    
+                    foreach (var runtimeNode in nextNodes){
+                        AddToCollectionIfMeetCondition(alreadyContained, visited,runtimeNode, queue);
+                    }
+                }
+                else{
+                    foreach (var runtimeNode in node.OutputLinks.Select(link => RuntimeNodes[link.inPort.nodeDataId])){
+                        AddToCollectionIfMeetCondition(alreadyContained, visited,runtimeNode, queue);
+                    }
+                }
+                node.NodeData.Process();
+                //Handle the links of the node
+                node.OutputLinks.ForEach(HandlingLink);
+                yield return node;
+            }
+        }
 
-        private void AddNodeToQueueIfMeetCondition(HashSet<RuntimeNode> alreadyContained, RuntimeNode runtimeNode, Queue<RuntimeNode> queue){
+        private void AddToCollectionIfMeetCondition(HashSet<RuntimeNode> alreadyContained,HashSet<RuntimeNode> visited, RuntimeNode runtimeNode, Queue<RuntimeNode> queue){
+            //Check if the node is already contained in the queue or already visited
+     
+            if (visited.Contains(runtimeNode)) return;
+            //the already contained guard is used to avoid duplicate traversal because the graph may start with multiple entries and all entry node should be run first.
+            //Thus cause the same node could be add to the queue multiple times.
+            if (alreadyContained.Contains(runtimeNode)) return;
+ 
+            //Check if the visited node has all previous node of the node
+            var dependentNodes = runtimeNode.GetDependentNodesId().Select(x => RuntimeNodes[x]);
+            var allDependenciesVisited = dependentNodes.Aggregate(true, (a, b) =>
+                alreadyContained.Contains(b) && a
+            );
+            //If the current node is not prepared,another routine will execute it when all is ready
+            if (allDependenciesVisited == false) return;
+            
+            //If all conditions are met, add the node to the queue
+            queue.Enqueue(runtimeNode);
+            alreadyContained.Add(runtimeNode);
+        }
+        private void AddToCollectionIfMeetCondition(HashSet<RuntimeNode> alreadyContained,HashSet<RuntimeNode> visited, RuntimeNode runtimeNode, Stack<RuntimeNode> stack){
+            //Check if the node is already contained in the stack
+            if (alreadyContained.Contains(runtimeNode)) return;
+            if (visited.Contains(runtimeNode)) return;
+            //Check if the visited node has all previous node of the node
+            var dependentNodes = runtimeNode.GetDependentNodesId().Select(x => RuntimeNodes[x]);
+            var allDependenciesVisited = dependentNodes.Aggregate(true, (a, b) =>
+                alreadyContained.Contains(b) && a
+            );
+            //If the current node is not prepared,run it dependently.
+            if (allDependenciesVisited == false){
+                RunNodeDependently(runtimeNode,0,false);
+            }
+            
+            //If all conditions are met, add the node to the stack
+            stack.Push(runtimeNode);
+            alreadyContained.Add(runtimeNode);
+        }
+        private void AddNodeToStackIfMeetCondition(HashSet<RuntimeNode> alreadyContained, RuntimeNode runtimeNode, Stack<RuntimeNode> stack){
             //Check if the node is already contained in the queue
             if (alreadyContained.Contains(runtimeNode)) return;
             
@@ -123,7 +222,7 @@ namespace TNode.TNodeCore.Runtime.Tools{
             if (allDependenciesVisited == false) return;
             
             //If all conditions are met, add the node to the queue
-            queue.Enqueue(runtimeNode);
+            stack.Push(runtimeNode);
             alreadyContained.Add(runtimeNode);
         }
 
@@ -146,10 +245,14 @@ namespace TNode.TNodeCore.Runtime.Tools{
         /// </summary>
         /// <param name="runtimeNode">The node you want to resolve dependency</param>
         /// <param name="dependencyLevel">search depth,no need provide a number when use outside</param>
-        public void RunNodeDependently(RuntimeNode runtimeNode,int dependencyLevel=0){
+        /// <param name="processTargetNode">if the the node of the 0 level should be processed,which is the node you want to run,be processed by the method</param>
+        public void RunNodeDependently(RuntimeNode runtimeNode,int dependencyLevel=0,bool processTargetNode=true){
             var links = runtimeNode.InputLinks;
             foreach (var link in links){
                 var outputNode = RuntimeNodes[link.outPort.nodeDataId];
+                if (outputNode is ConditionalRuntimeNode){
+                    continue;
+                }
                 RunNodeDependently(outputNode,dependencyLevel+1);
                 HandlingLink(link);
             }
@@ -163,8 +266,13 @@ namespace TNode.TNodeCore.Runtime.Tools{
             if (runtimeNode.OutputLinks.Count == 0 && dependencyLevel != 0){
                 return;
             }
-            runtimeNode.NodeData.Process();
+
+            if (processTargetNode||dependencyLevel != 0){
+                runtimeNode.NodeData.Process();
+            }
+            
         }
+
         /// <summary>
         /// Max depth of dependency traversal,in case of some special situation. the dependency level bigger than this number will be considered as a loop.
         /// </summary>
@@ -196,15 +304,7 @@ namespace TNode.TNodeCore.Runtime.Tools{
         /// <param name="list">List of nodes you need to traversal to build graph tool</param>
         /// <param name="graphNodes">Map stores the mapping of node data id to runtime node</param>
         /// <param name="graph">The graph you want to build graph tool for</param>
-        public GraphTool(List<NodeData> list){
-            CreateDummyRuntimeGraph();
-        }
 
-        private void CreateDummyRuntimeGraph(){
-            
-            
-            
-        }
 
         public GraphTool(IRuntimeNodeGraph graph){
             RuntimeNodes = graph.GetRuntimeNodesDictionary();
