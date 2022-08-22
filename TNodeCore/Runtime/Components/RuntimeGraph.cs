@@ -70,7 +70,7 @@ namespace TNodeCore.Runtime.Components{
 #if UNITY_EDITOR
             BuildSceneNode();
 #endif
-            _runtimeNodeEnumerator = _graphTool.BreathFirstSearch();
+            ResetState();
             _build = true;
         }
 
@@ -171,7 +171,21 @@ namespace TNodeCore.Runtime.Components{
         }
 
         public void ResetState(){
-            _runtimeNodeEnumerator = _graphTool.BreathFirstSearch();
+            switch (AccessMethod){
+                case AccessMethod.Bfs:
+                    _runtimeNodeEnumerator = _graphTool.BreathFirstSearch();
+                    break;
+                case AccessMethod.Dfs:
+                    _runtimeNodeEnumerator = _graphTool.DeepFirstSearchWithCondition();
+                    break;
+                case AccessMethod.StateTransition:
+                    _runtimeNodeEnumerator = _graphTool.IterateDirectlyTraversal();
+                    break;
+                case AccessMethod.Dependency:
+                    _runtimeNodeEnumerator = _graphTool.IterateNext();
+                    break;
+            }
+
         }
 
         public NodeData CurrentNode(){
@@ -268,6 +282,8 @@ namespace TNodeCore.Runtime.Components{
             _graphTool.DirectlyTraversal();
         }
 
+        public AccessMethod AccessMethod{ get; set; } = AccessMethod.Dependency;
+
         public RuntimeNode GetRuntimeNode(NodeData nodeData){
             if(!_build)
                 Build();
@@ -333,8 +349,4 @@ namespace TNodeCore.Runtime.Components{
         }
     }
     
-    public enum ProcessingStrategy{
-        BreadthFirst,
-        DepthFirst
-    }
 }
