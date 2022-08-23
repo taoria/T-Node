@@ -10,8 +10,8 @@ namespace TNode.Samples{
     public class HelloBlackboard:BlackboardData{
         public string HelloString;
         public GameObject HelloGameObject;
-        public List<Vector3> V3S;
-        public List<Vector2> V2S;
+        public List<float> Value;
+
 
     }
 }

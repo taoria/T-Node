@@ -59,10 +59,10 @@ namespace TNodeCore.Runtime.RuntimeModels{
                     _runtimeNodeEnumerator = _graphTool.DeepFirstSearchWithCondition();
                     break;
                 case AccessMethod.StateTransition:
-                    _runtimeNodeEnumerator = _graphTool.IterateDirectlyTraversal();
+                    _runtimeNodeEnumerator = _graphTool.IterateNext();
                     break;
                 case AccessMethod.Dependency:
-                    _runtimeNodeEnumerator = _graphTool.IterateNext();
+                    _runtimeNodeEnumerator = _graphTool.IterateDirectlyTraversal();
                     break;
             }
 

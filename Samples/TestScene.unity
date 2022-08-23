@@ -219,7 +219,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 325720a2ce64404d917fff20d22e80f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  graphData: {fileID: 11400000, guid: f55ebad0b05015a4f873ac78896d95d3, type: 2}
+  graphData: {fileID: 0}
   runtimeBlackboardData:
     id: 0
   references:

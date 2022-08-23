@@ -17,64 +17,31 @@ MonoBehaviour:
   - id: 1
   - id: 2
   - id: 3
-  - id: 4
-  - id: 5
-  - id: 6
   nodeLinks:
   - inPort:
-      portEntryName: B
-      nodeDataId: 94327133-34e1-47bb-a365-0782120c581e
+      portEntryName: A
+      nodeDataId: 4300534d-023d-4b56-a0cb-39e197e68845
     outPort:
       portEntryName: Value
-      nodeDataId: 07c1f545-719b-4f9b-9f4c-dc3883c02423
-  - inPort:
-      portEntryName: A
-      nodeDataId: 94327133-34e1-47bb-a365-0782120c581e
-    outPort:
-      portEntryName: Value
-      nodeDataId: 72477a0c-2399-47c1-ba04-495add218335
-  - inPort:
-      portEntryName: A
-      nodeDataId: 134adf78-f8ba-4888-8362-4a2ca0df2c69
-    outPort:
-      portEntryName: Res
-      nodeDataId: 94327133-34e1-47bb-a365-0782120c581e
+      nodeDataId: 6dba1aab-0db9-45a0-b3f7-e8fe9c47c168
   - inPort:
       portEntryName: B
-      nodeDataId: 134adf78-f8ba-4888-8362-4a2ca0df2c69
+      nodeDataId: 4300534d-023d-4b56-a0cb-39e197e68845
     outPort:
       portEntryName: Value
-      nodeDataId: 9b6e59e3-cc30-4697-a310-8f1195631ec9
+      nodeDataId: 5fd53e10-e727-45e3-8458-04a6ec8581c4
   - inPort:
       portEntryName: A
-      nodeDataId: 8d01abf2-f69a-4884-a6a1-99903ed96b7a
+      nodeDataId: f236a611-cc64-4fce-88d2-40baf7f4a490
     outPort:
-      portEntryName: Value
-      nodeDataId: 72477a0c-2399-47c1-ba04-495add218335
-  - inPort:
-      portEntryName: B
-      nodeDataId: 8d01abf2-f69a-4884-a6a1-99903ed96b7a
-    outPort:
-      portEntryName: Value
-      nodeDataId: 07c1f545-719b-4f9b-9f4c-dc3883c02423
-  - inPort:
-      portEntryName: A
-      nodeDataId: d4ff4eb9-dd02-4712-90dc-898223d1758f
-    outPort:
-      portEntryName: Res
-      nodeDataId: 8d01abf2-f69a-4884-a6a1-99903ed96b7a
-  - inPort:
-      portEntryName: B
-      nodeDataId: d4ff4eb9-dd02-4712-90dc-898223d1758f
-    outPort:
-      portEntryName: Value
-      nodeDataId: 07c1f545-719b-4f9b-9f4c-dc3883c02423
+      portEntryName: C
+      nodeDataId: 4300534d-023d-4b56-a0cb-39e197e68845
   blackboardData:
-    id: 7
+    id: 4
   sceneReference: 
   editorModels: []
   graphViewModel:
-    id: 8
+    id: 5
   references:
     version: 1
     00000000:
@@ -82,105 +49,62 @@ MonoBehaviour:
       data:
         positionInView:
           serializedVersion: 2
-          x: 550
-          y: 218
+          x: 674
+          y: 261
           width: 0
           height: 0
-        id: 72477a0c-2399-47c1-ba04-495add218335
+        id: 6dba1aab-0db9-45a0-b3f7-e8fe9c47c168
         nodeName: 
         entryPoint: 0
         isTest: 0
-        blackboardDragTypeString: UnityEngine.Vector3, UnityEngine.CoreModule, Version=0.0.0.0,
-          Culture=neutral, PublicKeyToken=null
-        blackDragData: V3S.0
+        blackboardDragTypeString: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+          PublicKeyToken=b77a5c561934e089
+        blackDragData: Value.0
         isListElement: 1
     00000001:
-      type: {class: AddNode, ns: Samples, asm: Assembly-CSharp}
-      data:
-        positionInView:
-          serializedVersion: 2
-          x: 906
-          y: 29
-          width: 0
-          height: 0
-        id: d4ff4eb9-dd02-4712-90dc-898223d1758f
-        nodeName: AddNode
-        entryPoint: 0
-        isTest: 0
-    00000002:
       type: {class: BlackboardDragNode, ns: TNodeCore.Runtime.Models, asm: Taoria.TNodeCore.Runtime}
       data:
         positionInView:
           serializedVersion: 2
-          x: 574
-          y: 306
+          x: 674
+          y: 330
           width: 0
           height: 0
-        id: 07c1f545-719b-4f9b-9f4c-dc3883c02423
+        id: 5fd53e10-e727-45e3-8458-04a6ec8581c4
         nodeName: 
         entryPoint: 0
         isTest: 0
-        blackboardDragTypeString: UnityEngine.Vector2, UnityEngine.CoreModule, Version=0.0.0.0,
-          Culture=neutral, PublicKeyToken=null
-        blackDragData: V2S.0
+        blackboardDragTypeString: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+          PublicKeyToken=b77a5c561934e089
+        blackDragData: Value.1
         isListElement: 1
-    00000003:
-      type: {class: AddNode, ns: Samples, asm: Assembly-CSharp}
+    00000002:
+      type: {class: AddNode, ns: Samples.Nodes, asm: Assembly-CSharp}
       data:
         positionInView:
           serializedVersion: 2
-          x: 733
-          y: 52
+          x: 774
+          y: 252
           width: 0
           height: 0
-        id: 8d01abf2-f69a-4884-a6a1-99903ed96b7a
+        id: 4300534d-023d-4b56-a0cb-39e197e68845
         nodeName: AddNode
+        entryPoint: 0
+        isTest: 0
+    00000003:
+      type: {class: CheckSizeNode, ns: Samples.Nodes, asm: Assembly-CSharp}
+      data:
+        positionInView:
+          serializedVersion: 2
+          x: 904
+          y: 252
+          width: 0
+          height: 0
+        id: f236a611-cc64-4fce-88d2-40baf7f4a490
+        nodeName: CheckSizeNode
         entryPoint: 0
         isTest: 0
     00000004:
-      type: {class: BlackboardDragNode, ns: TNodeCore.Runtime.Models, asm: Taoria.TNodeCore.Runtime}
-      data:
-        positionInView:
-          serializedVersion: 2
-          x: 817
-          y: 387
-          width: 0
-          height: 0
-        id: 9b6e59e3-cc30-4697-a310-8f1195631ec9
-        nodeName: 
-        entryPoint: 0
-        isTest: 0
-        blackboardDragTypeString: UnityEngine.Vector2, UnityEngine.CoreModule, Version=0.0.0.0,
-          Culture=neutral, PublicKeyToken=null
-        blackDragData: V2S.0
-        isListElement: 1
-    00000005:
-      type: {class: AddNode, ns: Samples, asm: Assembly-CSharp}
-      data:
-        positionInView:
-          serializedVersion: 2
-          x: 669.5
-          y: 198.5
-          width: 0
-          height: 0
-        id: 94327133-34e1-47bb-a365-0782120c581e
-        nodeName: AddNode
-        entryPoint: 0
-        isTest: 0
-    00000006:
-      type: {class: AddNode, ns: Samples, asm: Assembly-CSharp}
-      data:
-        positionInView:
-          serializedVersion: 2
-          x: 1007
-          y: 199
-          width: 0
-          height: 0
-        id: 134adf78-f8ba-4888-8362-4a2ca0df2c69
-        nodeName: AddNode
-        entryPoint: 0
-        isTest: 0
-    00000007:
       type: {class: HelloBlackboard, ns: TNode.Samples, asm: Assembly-CSharp}
       data:
         positionInView:
@@ -192,11 +116,10 @@ MonoBehaviour:
         id: 
         HelloString: 
         HelloGameObject: {fileID: 0}
-        V3S:
-        - {x: 0, y: 0, z: 0}
-        V2S:
-        - {x: 4, y: 4}
-    00000008:
+        Value:
+        - 11
+        - 102.1
+    00000005:
       type: {class: GraphViewModel, ns: TNode.TNodeCore.Editor.Models, asm: Taoria.TNodeCore.Runtime}
       data:
         positionInView:
@@ -207,5 +130,5 @@ MonoBehaviour:
           height: 0
         id: 
         persistScale: 1
-        persistOffset: {x: -169, y: 62}
+        persistOffset: {x: -136, y: 40}
         isBlackboardOn: 1

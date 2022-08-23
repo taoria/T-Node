@@ -19,8 +19,8 @@ namespace TNodeCore.Editor.Tools.GraphEditorCreator{
         private TextField _graphClassNameTextField;
         private Button _createButton;
         private readonly SourceGeneratorForGraphEditor _sourceGeneratorForGraphEditor = new SourceGeneratorForGraphEditor();
-        [MenuItem("Assets/CreateProp/TNodeCore/CreateProp New Graph Editor")]
-        [MenuItem("TNodeCore/CreateProp New Graph Editor")]
+        [MenuItem("Assets/Create/TNodeCore/Create New Graph Editor")]
+        [MenuItem("TNodeCore/Create New Graph Editor")]
         public static void ShowExample()
         {
             GraphEditorCreator wnd = GetWindow<GraphEditorCreator>();

@@ -31,14 +31,8 @@ namespace TNodeCore.Runtime.RuntimeCache{
                 if (method == null){
                     throw new Exception("Method not found for name " + name);
                 }
-                if (method.ReturnType != typeof(void)){
-                    Type = method.ReturnType;
-                    Get = (Func<T1, T2>)Delegate.CreateDelegate(typeof(Func<T1, T2>), null, method);
-                }
-                else{
-                    Type = method.GetParameters()[0].ParameterType;
-                    Set = (Action<T1, T2>)Delegate.CreateDelegate(typeof(Action<T1, T2>), null, method);
-                }
+                Type = method.MethodPortType();
+                Get = (Func<T1, T2>)Delegate.CreateDelegate(typeof(Func<T1, T2>), null, method);
             }
 
         }
@@ -447,6 +441,47 @@ namespace TNodeCore.Runtime.RuntimeCache{
         public static void SetValue(this Model data,string path,object value,Type type=null){
             var method = RuntimeCache.Instance.CachedDelegatesForSettingValue[type??data.GetType()][path];
             method.Invoke(data,value);
+        }
+
+        public static Type MethodPortType(this MethodInfo info){
+            if (info.ReturnType == typeof(void)){
+                return info.GetParameters()[0].ParameterType;
+            }
+            else{
+                return info.ReturnType;
+            }
+        }
+
+        public static Type MemberPortType(this MemberInfo memberInfo){
+            if (memberInfo is FieldInfo){
+                throw new Exception("FieldInfo is not supported as Port");
+            }
+
+            if (memberInfo is MethodInfo methodInfo){
+                return MethodPortType(methodInfo);
+            }
+
+            if (memberInfo is PropertyInfo propertyInfo){
+                return propertyInfo.PropertyType;
+            }
+
+            return memberInfo.DeclaringType;
+        }
+
+        public static object GetPortValue(this MemberInfo memberInfo,Model data){
+            if (memberInfo is FieldInfo){
+                throw new Exception("FieldInfo is not supported as Port");
+            }
+
+            if (memberInfo is MethodInfo methodInfo){
+                return methodInfo.Invoke(data, null);
+            }
+
+            if (memberInfo is PropertyInfo propertyInfo){
+                return propertyInfo.GetValue(data);
+            }
+
+            return null;
         }
     }
 

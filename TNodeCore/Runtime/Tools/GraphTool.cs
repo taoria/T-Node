@@ -83,7 +83,12 @@ namespace TNode.TNodeCore.Runtime.Tools{
 
             while(currentNode.OutputLinks.Any()){
                 if (currentNode is ConditionalRuntimeNode conditionalRuntimeNode){
-                    currentNode = RuntimeNodes[conditionalRuntimeNode.GetNextNodeId()];
+                    var id = conditionalRuntimeNode.GetNextNodeId();
+                    if (id != null && id.Trim(' ').Length > 0){
+                        Debug.Log(currentNode.NodeData+" is going to run "+id);
+                        currentNode = RuntimeNodes[conditionalRuntimeNode.GetNextNodeId()];
+                    }
+                
                 }
                 else{
                     var link = currentNode.OutputLinks.FirstOrDefault();
