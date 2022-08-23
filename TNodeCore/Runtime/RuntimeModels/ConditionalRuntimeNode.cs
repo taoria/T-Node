@@ -22,7 +22,10 @@ namespace TNodeCore.Runtime{
                 }
                 foreach (var port in transitionPort){
                     if(GetPortDirection(port)==Direction.Input) continue;
-                    _possibleTransition.Add(new Tuple<string, Func<TransitionCondition>>(port,() => (TransitionCondition)GetOutput(port)) );
+                    var ids = OutputLinks.Where(x => x.outPort.portEntryName == port).Select(x => x.inPort.nodeDataId);
+                    var enumerable1 = ids as string[] ?? ids.ToArray();
+                    if(enumerable1.FirstOrDefault()!=null)
+                        _possibleTransition.Add(new Tuple<string, Func<TransitionCondition>>(enumerable1.FirstOrDefault(),() => (TransitionCondition)GetOutput(port)) );
                 }
             }
             else{
@@ -32,10 +35,7 @@ namespace TNodeCore.Runtime{
 
         public string[] GetConditionalNextIds(){
             var ports = _possibleTransition.Where(x => x.Item2().Condition);
-            var portNames = ports.Select(x => x.Item1);
-            //Search output links to found the link contains portNames as outport's name
-            var outputLinks = OutputLinks.Where(x => portNames.Contains(x.outPort.portEntryName));
-            return outputLinks.Select(x => x.inPort.nodeDataId).ToArray();
+            return ports.Select(x => x.Item1).ToArray();
         }
 
         public string GetNextNodeId(){

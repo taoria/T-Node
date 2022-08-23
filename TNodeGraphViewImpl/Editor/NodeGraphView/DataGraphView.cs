@@ -191,7 +191,7 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
                 Vector2 editorPosition = Owner==null?Vector2.zero:Owner.position.position;
                 //Remove all the previous menu items
                 evt.menu.MenuItems().Clear();
-                evt.menu.AppendAction("CreateProp Node", dma => {
+                evt.menu.AppendAction("Create Node", dma => {
                     var dmaPos = dma.eventInfo.mousePosition+editorPosition;
                     var searchWindow = ScriptableObject.CreateInstance<NodeSearchWindowProvider>();
                     var targetPos = this.viewTransform.matrix.inverse.MultiplyPoint(dma.eventInfo.localMousePosition);
@@ -200,10 +200,9 @@ namespace TNodeGraphViewImpl.Editor.NodeGraphView{
 
                     searchWindow.Setup(typeof(T),this,Owner,targetPos);
              
-                    Debug.Log(targetPos);
                     SearchWindow.Open(searchWindowContext, searchWindow);
                 });
-                evt.menu.AppendAction("CreateProp PlacematModel",dma=> {
+                evt.menu.AppendAction("Create PlacematModel",dma=> {
                     //find placemat container 
                     var container = GetPlacematContainer();
                     var targetPos = this.viewTransform.matrix.inverse.MultiplyPoint(dma.eventInfo.localMousePosition);

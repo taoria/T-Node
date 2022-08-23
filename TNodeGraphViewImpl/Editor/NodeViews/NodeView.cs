@@ -116,18 +116,18 @@ namespace TNodeGraphViewImpl.Editor.NodeViews{
             this.RefreshExpandedState();
         }
 
-        protected virtual string BuildPortName(PortAttribute portAttribute,PropertyInfo propertyInfo,params object[] args){
+        protected virtual string BuildPortName(PortAttribute portAttribute,MemberInfo memberInfo,params object[] args){
             switch (portAttribute.NameHandling){
                 case PortNameHandling.Auto:
-                    return portAttribute.Name.Trim(' ').Length>0?portAttribute.Name:propertyInfo.Name;
+                    return portAttribute.Name.Trim(' ').Length>0?portAttribute.Name:memberInfo.Name;
                 case PortNameHandling.Manual:
                     return portAttribute.Name;
                 case PortNameHandling.MemberName:
-                    return propertyInfo.Name;
+                    return memberInfo.Name;
                 case PortNameHandling.Format:
-                    return String.Format(propertyInfo.Name, args);
+                    return String.Format(memberInfo.Name, args);
                 case PortNameHandling.MemberType:
-                    return propertyInfo.PropertyType.Name;
+                    return memberInfo.MemberPortType().Name;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -152,28 +152,32 @@ namespace TNodeGraphViewImpl.Editor.NodeViews{
       
             throw new Exception("Member is not a property or field");
         }
-        protected virtual Type BuildPortType(PortAttribute portAttribute,PropertyInfo propertyInfo){
-      
-        
-                switch (portAttribute.TypeHandling){
+        protected virtual Type BuildPortType(PortAttribute portAttribute,MemberInfo propertyInfo){
+            
+            switch (portAttribute.TypeHandling){
                     case TypeHandling.Declared :
-                        return propertyInfo.PropertyType;
+                        return propertyInfo.MemberPortType();
                     case TypeHandling.Implemented:
-                        return propertyInfo.GetValue(_data)?.GetType();
+                        return propertyInfo.GetPortValue(_data)?.GetType();
                     case TypeHandling.Specified:
                         return portAttribute.HandledType??typeof(object);
                     case TypeHandling.Path:
                         var type = GetDataType(portAttribute.TypePath);
-                
                         return type;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
-            
         }
 
-        protected virtual Type BuildGroupPortType(PortAttribute portAttribute,PropertyInfo propertyInfo,int index){
-            var iList = propertyInfo.GetValue(_data) as IList;
+
+        protected virtual Type BuildGroupPortType(PortAttribute portAttribute,MemberInfo propertyInfo,int index){
+            IList iList = null;
+            if (propertyInfo is PropertyInfo propertyInfo1){
+                iList = propertyInfo1.GetValue(_data) as IList;
+            }
+            else if (propertyInfo is MethodInfo methodInfo){
+               iList = methodInfo.Invoke(_data,null) as IList;
+            }
             if (iList is Array array){
                 switch (portAttribute.TypeHandling){
                     case TypeHandling.Declared:
@@ -204,9 +208,7 @@ namespace TNodeGraphViewImpl.Editor.NodeViews{
                         throw new ArgumentOutOfRangeException();
                 }
             }
-
             return null;
-
         }
         
         /// <summary>
@@ -214,67 +216,71 @@ namespace TNodeGraphViewImpl.Editor.NodeViews{
         /// </summary>
         protected virtual void BuildInputAndOutputPort(){
             var propertyInfos = _data.GetType().GetProperties();
-   
+            var methodInfos = _data.GetType().GetMethods();
             foreach (var propertyInfo in propertyInfos){
                 if (propertyInfo.GetCustomAttributes(typeof(OutputAttribute),true).FirstOrDefault() is OutputAttribute attribute){
-                    if (attribute.Group == false){
-                        Port port = new CustomPort(Orientation.Horizontal, Direction.Output,
-                            attribute.Multiple ? Port.Capacity.Multi : Port.Capacity.Single,
-                            BuildPortType(attribute, propertyInfo));
-                        BuildPort(port, attribute, propertyInfo,outputContainer);
-                    }
-                    else{
-                        var propertyValue = propertyInfo.GetValue(_data);
-                        if (propertyValue is IList list){
-                            for (var i = 0; i < list.Count; i++){
-                                var port = new CustomPort(Orientation.Horizontal, Direction.Output,
-                                    Port.Capacity.Single,
-                                    BuildGroupPortType(attribute, propertyInfo,i));
-                                BuildGroupPort(port, attribute, propertyInfo,outputContainer,list[i],i);
-                            }
-                        }
-                    }
+                    BuildPortFromAttributeAndPropertyInfo(attribute,propertyInfo,Direction.Output);
 
                 }
             }
             foreach (var propertyInfo in propertyInfos){
                 if(propertyInfo.GetCustomAttributes(typeof(InputAttribute),true).FirstOrDefault() is InputAttribute attribute){
-                    if (attribute.Group == false){
-                        Port port = new CustomPort
-                        (Orientation.Horizontal, 
-                            Direction.Input,attribute.Multiple?Port.Capacity.Multi: Port.Capacity.Single,BuildPortType(attribute,propertyInfo));
-                        BuildPort(port,attribute,propertyInfo,inputContainer);
+                    BuildPortFromAttributeAndPropertyInfo(attribute, propertyInfo);
+                }
+            }
+
+            foreach (var method in methodInfos){
+                if (method.GetCustomAttribute<PortAttribute>() != null){
+                    var portAtt = method.GetCustomAttribute<PortAttribute>();
+                    if (portAtt is InputAttribute input){
+                        BuildPortFromAttributeAndPropertyInfo(input,method);
                     }
-                    else{
-                        var propertyValue = propertyInfo.GetValue(_data);
-                        if (propertyValue is IList list){
-                           
-                            for (var i = 0; i < list.Count; i++){
-                                var port = new CustomPort(Orientation.Horizontal, Direction.Input,
-                                    Port.Capacity.Single,
-                                    BuildGroupPortType(attribute, propertyInfo,i));
-                                BuildGroupPort(port, attribute, propertyInfo,inputContainer,list[i],i);
-                               
-                            }
-                        }
+
+                    if (portAtt is OutputAttribute output){
+                        BuildPortFromAttributeAndPropertyInfo(output,method,Direction.Output);
+                    }
+                    
+                }
+                
+            }
+        }
+
+        private void BuildPortFromAttributeAndPropertyInfo(PortAttribute attribute, MemberInfo propertyInfo,Direction direction = Direction.Input){
+            if (attribute.Group == false){
+                Port port = new CustomPort
+                (Orientation.Horizontal,
+                    direction, attribute.Multiple ? Port.Capacity.Multi : Port.Capacity.Single,
+                    BuildPortType(attribute, propertyInfo));
+                BuildPort(port, attribute, propertyInfo, direction==Direction.Input?inputContainer:outputContainer);
+            }
+            else{
+                var propertyValue = propertyInfo.GetPortValue(_data);
+         
+                if (propertyValue is IList list){
+                    for (var i = 0; i < list.Count; i++){
+                        var port = new CustomPort(Orientation.Horizontal, direction,
+                            attribute.Multiple ? Port.Capacity.Multi : Port.Capacity.Single,
+                            BuildGroupPortType(attribute, propertyInfo, i));
+                        BuildGroupPort(port, attribute, propertyInfo, direction==Direction.Input?inputContainer:outputContainer, list[i], i);
                     }
                 }
             }
         }
 
-        private void BuildPort(Port port, PortAttribute attribute, PropertyInfo propertyInfo,VisualElement portContainer){
+
+        private void BuildPort(Port port, PortAttribute attribute, MemberInfo memberInfo,VisualElement portContainer){
             portContainer.Add(port);
-            var portName = ObjectNames.NicifyVariableName(BuildPortName(attribute, propertyInfo));
+            var portName = ObjectNames.NicifyVariableName(BuildPortName(attribute, memberInfo));
             port.portName = portName;
-            port.name = propertyInfo.Name;
-            var colorAtt = propertyInfo.PropertyType.GetCustomAttribute<PortColorAttribute>();
+            port.name = memberInfo.Name;
+            PortColorAttribute colorAtt = null;
+            colorAtt =  memberInfo.MemberPortType().GetCustomAttribute<PortColorAttribute>();
             if (colorAtt != null){
                 var color = colorAtt.Color;
                 port.portColor = color;
             }
         }
-
-        private void BuildGroupPort(Port port, PortAttribute attribute, PropertyInfo propertyInfo,
+        private void BuildGroupPort(Port port, PortAttribute attribute, MemberInfo propertyInfo,
             VisualElement portContainer,object currentElement,int index = 0){
             portContainer.Add(port);
             port.name = propertyInfo.Name + ":" + index;
@@ -286,26 +292,23 @@ namespace TNodeGraphViewImpl.Editor.NodeViews{
                     port.portName = ObjectNames.NicifyVariableName(BuildGroupPortName(attribute, propertyInfo, index));
                 }
             }
-            
         }
-
-        private string BuildGroupPortName(PortAttribute attribute, PropertyInfo propertyInfo, int index){
+        private string BuildGroupPortName(PortAttribute attribute, MemberInfo memberInfo, int index){
             switch (attribute.NameHandling){
                 case PortNameHandling.Auto:
-                    return (attribute.Name.Trim(' ').Length>0?attribute.Name:propertyInfo.Name)+":"+index;
+                    return (attribute.Name.Trim(' ').Length>0?attribute.Name:memberInfo.Name)+":"+index;
                 case PortNameHandling.Manual:
                     return attribute.Name+":"+index;;
                 case PortNameHandling.MemberName:
-                    return propertyInfo.Name+":"+index;
+                    return memberInfo.Name+":"+index;
                 case PortNameHandling.Format:
                     throw new NotImplementedException();
                 case PortNameHandling.MemberType:
-                    return propertyInfo.PropertyType.Name+":"+index;
+                    return memberInfo.MemberPortType().Name + ":" + index;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
-
         public void StartARenameTitleTextField(){
             var textField = new TextField{
                 value = title,
