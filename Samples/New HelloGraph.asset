@@ -17,6 +17,7 @@ MonoBehaviour:
   - id: 1
   - id: 2
   - id: 3
+  - id: 4
   nodeLinks:
   - inPort:
       portEntryName: A
@@ -37,11 +38,11 @@ MonoBehaviour:
       portEntryName: C
       nodeDataId: 4300534d-023d-4b56-a0cb-39e197e68845
   blackboardData:
-    id: 4
+    id: 5
   sceneReference: 
   editorModels: []
   graphViewModel:
-    id: 5
+    id: 6
   references:
     version: 1
     00000000:
@@ -83,7 +84,7 @@ MonoBehaviour:
       data:
         positionInView:
           serializedVersion: 2
-          x: 774
+          x: 781
           y: 252
           width: 0
           height: 0
@@ -96,7 +97,7 @@ MonoBehaviour:
       data:
         positionInView:
           serializedVersion: 2
-          x: 904
+          x: 908
           y: 252
           width: 0
           height: 0
@@ -105,6 +106,19 @@ MonoBehaviour:
         entryPoint: 0
         isTest: 0
     00000004:
+      type: {class: AddNode, ns: Samples.Nodes, asm: Assembly-CSharp}
+      data:
+        positionInView:
+          serializedVersion: 2
+          x: 1119
+          y: 210
+          width: 0
+          height: 0
+        id: 926f2eea-3403-4663-88bd-7ed16ce029fa
+        nodeName: AddNode
+        entryPoint: 0
+        isTest: 0
+    00000005:
       type: {class: HelloBlackboard, ns: TNode.Samples, asm: Assembly-CSharp}
       data:
         positionInView:
@@ -119,7 +133,7 @@ MonoBehaviour:
         Value:
         - 11
         - 102.1
-    00000005:
+    00000006:
       type: {class: GraphViewModel, ns: TNode.TNodeCore.Editor.Models, asm: Taoria.TNodeCore.Runtime}
       data:
         positionInView:
@@ -130,5 +144,5 @@ MonoBehaviour:
           height: 0
         id: 
         persistScale: 1
-        persistOffset: {x: -136, y: 40}
+        persistOffset: {x: -212, y: 19}
         isBlackboardOn: 1
