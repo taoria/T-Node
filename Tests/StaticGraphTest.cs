@@ -27,6 +27,7 @@ namespace Tests{
             public object In{ get; set; }
             [Output]
             public TransitionCondition Output(){
+                Debug.Log($"Test Condition is {TestCondition}");
                 return new TransitionCondition(){
                     Condition =  TestCondition
                 };
@@ -160,6 +161,7 @@ namespace Tests{
             node3.TestCondition = true;
             
             var staticGraph = new StaticGraph(graphData);
+            staticGraph.AccessMethod = AccessMethod.Bfs;
             Assert.AreEqual(node1,staticGraph.CurrentNode());
             staticGraph.MoveNext();
             Assert.AreEqual(node4,staticGraph.CurrentNode());
@@ -170,22 +172,8 @@ namespace Tests{
             staticGraph.MoveNext();
             Assert.AreEqual(node3,staticGraph.CurrentNode());
             staticGraph.MoveNext();
-            Assert.AreEqual(node6,staticGraph.CurrentNode());
-            
-            node3.TestCondition = false;
-            
-            var staticGraph2 = new StaticGraph(graphData);
-            Assert.AreEqual(node1,staticGraph2.CurrentNode());
-            staticGraph2.MoveNext();
-            Assert.AreEqual(node4,staticGraph2.CurrentNode());
-            staticGraph2.MoveNext();
-            Assert.AreEqual(node5,staticGraph2.CurrentNode());
-            staticGraph2.MoveNext();
-            Assert.AreEqual(node2,staticGraph2.CurrentNode());
-            staticGraph2.MoveNext();
-            Assert.AreEqual(node3,staticGraph2.CurrentNode());
-            staticGraph2.MoveNext();
-            Assert.AreNotEqual(node6,staticGraph2.CurrentNode());
+            Assert.AreEqual(node3,staticGraph.CurrentNode());
+
         }
 
         [Test]

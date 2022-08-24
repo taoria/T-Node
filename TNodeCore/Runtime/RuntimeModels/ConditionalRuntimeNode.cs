@@ -20,6 +20,7 @@ namespace TNodeCore.Runtime{
                                    $" TransitionCondition found {transitionPort.Count()} output port with" +
                                    $" type of TransitionCondition but totally {enumerable.Count()} output port found");
                 }
+                
                 foreach (var port in transitionPort){
                     if(GetPortDirection(port)==Direction.Input) continue;
                     var ids = OutputLinks.Where(x => x.outPort.portEntryName == port).Select(x => x.inPort.nodeDataId);
@@ -34,6 +35,7 @@ namespace TNodeCore.Runtime{
         }
 
         public string[] GetConditionalNextIds(){
+         
             var ports = _possibleTransition.Where(x => x.Item2().Condition);
             return ports.Select(x => x.Item1).ToArray();
         }

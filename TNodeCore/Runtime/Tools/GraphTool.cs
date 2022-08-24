@@ -158,10 +158,11 @@ namespace TNode.TNodeCore.Runtime.Tools{
                 //Conditional node will be traversed in a special way,only links fit the condition will be traversed
                 if (node is ConditionalRuntimeNode conditionalRuntimeNode){
                     var ids = conditionalRuntimeNode.GetConditionalNextIds();
-                    
+       
                     var nextNodes =  ids.Select(id=>RuntimeNodes[id]).ToList();
-                    
+      
                     foreach (var runtimeNode in nextNodes){
+              
                         AddToCollectionIfMeetCondition(alreadyContained, visited,runtimeNode, queue);
                     }
                 }
