@@ -4,6 +4,7 @@ using System.Linq;
 using TNode.TNodeCore.Runtime.Models;
 using TNode.TNodeCore.Runtime.Tools;
 using TNodeCore.Runtime.Models;
+using UnityEngine;
 
 namespace TNodeCore.Runtime.RuntimeModels{
     public class StaticGraph:IRuntimeNodeGraph{
@@ -17,8 +18,10 @@ namespace TNodeCore.Runtime.RuntimeModels{
             var outNodeId = linkData.outPort.nodeDataId;
             var outNode = _nodes[outNodeId];
             outNode.OutputLinks.Add(linkData);
+         
             var inNodeId = linkData.inPort.nodeDataId;
             var inNode = _nodes[inNodeId];
+            Debug.Log($"{inNode},{outNode}");
             inNode.InputLinks.Add(linkData);
         }
         public StaticGraph(GraphData graphData){
@@ -45,6 +48,7 @@ namespace TNodeCore.Runtime.RuntimeModels{
             }
             foreach (var link in links){
                 ModifyLinks(link);
+                
             }
             _graphTool = new GraphTool(this);
             _runtimeNodeEnumerator = _graphTool.BreathFirstSearch();

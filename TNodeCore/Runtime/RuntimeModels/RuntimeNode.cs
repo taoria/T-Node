@@ -18,6 +18,7 @@ namespace TNodeCore.Runtime{
         //Cache node data type for fast access
         private readonly Type _type;
         public Type NodeType => _type;
+        
 
         public Type GetElementTypeOfPort(string portName,bool multi = false){
             var type = _portAccessors[portName].Type;
