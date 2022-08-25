@@ -20,13 +20,9 @@ namespace TNodeCore.Runtime{
                                    $" TransitionCondition found {transitionPort.Count()} output port with" +
                                    $" type of TransitionCondition but totally {enumerable.Count()} output port found");
                 }
-                
                 foreach (var port in transitionPort){
                     if(GetPortDirection(port)==Direction.Input) continue;
-                    var ids = OutputLinks.Where(x => x.outPort.portEntryName == port).Select(x => x.inPort.nodeDataId);
-                    var enumerable1 = ids as string[] ?? ids.ToArray();
-                    if(enumerable1.FirstOrDefault()!=null)
-                        _possibleTransition.Add(new Tuple<string, Func<TransitionCondition>>(enumerable1.FirstOrDefault(),() => (TransitionCondition)GetOutput(port)) );
+                    _possibleTransition.Add(new Tuple<string, Func<TransitionCondition>>(port,() => (TransitionCondition)GetOutput(port)) );
                 }
             }
             else{
@@ -35,9 +31,11 @@ namespace TNodeCore.Runtime{
         }
 
         public string[] GetConditionalNextIds(){
-         
             var ports = _possibleTransition.Where(x => x.Item2().Condition);
-            return ports.Select(x => x.Item1).ToArray();
+            var portNames = ports.Select(x => x.Item1);
+            //Search output links to found the link contains portNames as outport's name
+            var outputLinks = OutputLinks.Where(x => portNames.Contains(x.outPort.portEntryName));
+            return outputLinks.Select(x => x.inPort.nodeDataId).ToArray();
         }
 
         public string GetNextNodeId(){
@@ -48,7 +46,8 @@ namespace TNodeCore.Runtime{
                  var compareTo = b.Item2.Priority.CompareTo(a.Item2.Priority);
                  return compareTo;
              });
-             return possibleCondition.FirstOrDefault()?.Item1;
+             var portName = possibleCondition.FirstOrDefault()?.Item1;
+             return OutputLinks.Where(x => x.outPort.portEntryName == portName).Select(x => x.inPort.nodeDataId).FirstOrDefault();
         }
         
     }

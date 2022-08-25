@@ -172,7 +172,7 @@ namespace Tests{
             staticGraph.MoveNext();
             Assert.AreEqual(node3,staticGraph.CurrentNode());
             staticGraph.MoveNext();
-            Assert.AreEqual(node3,staticGraph.CurrentNode());
+            Assert.AreEqual(node6,staticGraph.CurrentNode());
 
         }
 
