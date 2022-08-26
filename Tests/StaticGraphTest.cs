@@ -1,13 +1,12 @@
 ﻿using System.Linq;
 using NUnit.Framework;
-using TNode.TNodeCore.Runtime.Models;
 using TNodeCore.Editor.Tools.NodeCreator;
 using TNodeCore.Runtime;
 using TNodeCore.Runtime.Attributes;
 using TNodeCore.Runtime.Attributes.Ports;
 using TNodeCore.Runtime.Models;
 using TNodeCore.Runtime.RuntimeModels;
-using UnityEditor.VersionControl;
+
 using UnityEngine;
 
 namespace Tests{

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using TNode.TNodeCore.Runtime.Models;
 using TNode.TNodeCore.Runtime.Tools;
 using TNodeCore.Runtime.Models;
 using UnityEngine;
@@ -29,8 +28,6 @@ namespace TNodeCore.Runtime.RuntimeModels{
             var nodes = graphData.NodeDictionary.Values.ToList();
             var links = graphData.NodeLinks;
             _nodes = new Dictionary<string, RuntimeNode>();
-    
-
             foreach (var nodeData in nodes){
                 if(_nodes.ContainsKey(nodeData.id)) continue;
                 

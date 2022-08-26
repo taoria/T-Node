@@ -1,9 +1,6 @@
-﻿using TNodeCore.Runtime;
-using TNodeCore.Runtime.Attributes.Ports;
-using TNodeCore.Runtime.Models;
-using Unity.Plastic.Newtonsoft.Json.Serialization;
+﻿using Unity.Plastic.Newtonsoft.Json.Serialization;
 
-namespace TNode.TNodeCore.Runtime.Models{
+namespace TNodeCore.Runtime.Models{
     public class ConditionalNode:NodeData{
 
     }
@@ -24,6 +21,10 @@ namespace TNode.TNodeCore.Runtime.Models{
         public int Priority{ get; set; }
         public object GetValue(){
             return DataFunc.Invoke();
+        }
+        
+        public static implicit operator T(TransitionCondition<T> condition){
+            return condition.DataFunc.Invoke();
         }
     }
     public interface IBaseTransition{

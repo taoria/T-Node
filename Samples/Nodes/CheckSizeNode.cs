@@ -1,5 +1,4 @@
-﻿using TNode.TNodeCore.Runtime.Models;
-using TNodeCore.Runtime.Attributes;
+﻿using TNodeCore.Runtime.Attributes;
 using TNodeCore.Runtime.Attributes.Ports;
 using TNodeCore.Runtime.Models;
 
