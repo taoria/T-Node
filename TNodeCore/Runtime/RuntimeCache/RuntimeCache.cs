@@ -214,19 +214,21 @@ namespace TNodeCore.Runtime.RuntimeCache{
         
 
         private void CachingImplicitConversion(Type baseType, Type targetType){
-            if (HasImplicitConversion(baseType, targetType)) return;
-            
+            if (!HasImplicitConversion(baseType, targetType)) return;
+            if (CachedPortConverters.ContainsKey(baseType)&&CachedPortConverters[baseType].ContainsKey(targetType)) return;
             //Create Implicit Conversion Helper that caches the implicit cast function
             var typeConverter = Activator.CreateInstance(typeof(ImplicitConversionHelper<,>).MakeGenericType(baseType, targetType)) as IPortConverterHelper;
             
             if (!CachedPortConverters.ContainsKey(baseType)){
                 CachedPortConverters.Add(baseType,new Dictionary<Type,IPortConverterHelper>());
             }
+     
             CachedPortConverters[baseType].Add(targetType,typeConverter);
           
         }
         
         public object GetConvertedValue(Type from,Type to,object value){
+
             if(!CachedPortConverters.ContainsKey(from)){
                 //Find the cached port failed ,check if there is an implicit conversion
                 //This inner cache method would only run once,so add a guard to prevent it run again,even though the function itself has a guard statement.
@@ -384,14 +386,20 @@ namespace TNodeCore.Runtime.RuntimeCache{
             var method = typeof(T2).GetMethod("op_Implicit", BindingFlags.Public | BindingFlags.Static, null, new[] { typeof(T1) }, null);
             if (method == null){
                 //Search it in T1
-                method = typeof(T1).GetMethod("op_Implicit", BindingFlags.Public | BindingFlags.Static, null, new[] { typeof(T2) }, null);
+                Debug.Log($"{typeof(T1)}");
+                method = typeof(T1).GetMethods(BindingFlags.Public | BindingFlags.Static).FirstOrDefault(x => x.ReturnType==typeof(T2) && x.Name=="op_Implicit");
             }
             //Create the delegate
             if (method != null) 
                 ConvertFunc = (Func<T1, T2>) Delegate.CreateDelegate(typeof(Func<T1, T2>), method);
+            if (ConvertFunc == null){
+                Debug.Log($"{method==null}");
+               
+            }
         }
 
         public object Convert(object value){
+      
             return ConvertFunc((T1) value);
         }
     }

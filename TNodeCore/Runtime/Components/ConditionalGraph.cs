@@ -17,9 +17,6 @@ namespace TNode.TNodeCore.Runtime.Components{
             }
             EntryNode = entry.FirstOrDefault() as ConditionalRuntimeNode;
         }
-
- 
-        
         public void Run(){
             var res = StepForward();
             while (StepForward().MoveNext()){

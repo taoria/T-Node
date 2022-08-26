@@ -20,7 +20,6 @@ namespace TNodeCore.Runtime.RuntimeModels{
          
             var inNodeId = linkData.inPort.nodeDataId;
             var inNode = _nodes[inNodeId];
-            Debug.Log($"{inNode},{outNode}");
             inNode.InputLinks.Add(linkData);
         }
         public StaticGraph(GraphData graphData){

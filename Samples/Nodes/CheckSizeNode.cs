@@ -9,17 +9,19 @@ namespace Samples.Nodes{
         public float A{ get; set; }
 
         [Output]
-        public TransitionCondition Bigger(){
-            return new TransitionCondition(){
+        public TransitionCondition<float> Bigger(){
+            return new TransitionCondition<float>(){
                 Condition = A>0,
-                Priority = 0
+                Priority = 0,
+                DataFunc = ()=>A
             };
         }
         [Output]
-        public TransitionCondition SmallerOrEqual(){
-            return new TransitionCondition(){
+        public TransitionCondition<float> SmallerOrEqual(){
+            return new TransitionCondition<float>(){
                 Condition = A<=0,
-                Priority = 0
+                Priority = 0,
+                DataFunc = ()=>A
             };
         }
    

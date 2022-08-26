@@ -37,6 +37,12 @@ MonoBehaviour:
     outPort:
       portEntryName: C
       nodeDataId: 4300534d-023d-4b56-a0cb-39e197e68845
+  - inPort:
+      portEntryName: A
+      nodeDataId: 926f2eea-3403-4663-88bd-7ed16ce029fa
+    outPort:
+      portEntryName: Bigger
+      nodeDataId: f236a611-cc64-4fce-88d2-40baf7f4a490
   blackboardData:
     id: 5
   sceneReference: 
@@ -84,7 +90,7 @@ MonoBehaviour:
       data:
         positionInView:
           serializedVersion: 2
-          x: 781
+          x: 784
           y: 252
           width: 0
           height: 0
@@ -93,29 +99,29 @@ MonoBehaviour:
         entryPoint: 0
         isTest: 0
     00000003:
-      type: {class: CheckSizeNode, ns: Samples.Nodes, asm: Assembly-CSharp}
-      data:
-        positionInView:
-          serializedVersion: 2
-          x: 908
-          y: 252
-          width: 0
-          height: 0
-        id: f236a611-cc64-4fce-88d2-40baf7f4a490
-        nodeName: CheckSizeNode
-        entryPoint: 0
-        isTest: 0
-    00000004:
       type: {class: AddNode, ns: Samples.Nodes, asm: Assembly-CSharp}
       data:
         positionInView:
           serializedVersion: 2
-          x: 1119
-          y: 210
+          x: 1121
+          y: 187
           width: 0
           height: 0
         id: 926f2eea-3403-4663-88bd-7ed16ce029fa
         nodeName: AddNode
+        entryPoint: 0
+        isTest: 0
+    00000004:
+      type: {class: CheckSizeNode, ns: Samples.Nodes, asm: Assembly-CSharp}
+      data:
+        positionInView:
+          serializedVersion: 2
+          x: 900
+          y: 228
+          width: 0
+          height: 0
+        id: f236a611-cc64-4fce-88d2-40baf7f4a490
+        nodeName: CheckSizeNode
         entryPoint: 0
         isTest: 0
     00000005:
@@ -143,6 +149,6 @@ MonoBehaviour:
           width: 0
           height: 0
         id: 
-        persistScale: 1
-        persistOffset: {x: -212, y: 19}
+        persistScale: 0.8695652
+        persistOffset: {x: -76, y: 126.00001}
         isBlackboardOn: 1

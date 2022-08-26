@@ -1,4 +1,6 @@
-﻿using Unity.Plastic.Newtonsoft.Json.Serialization;
+﻿
+
+using System;
 
 namespace TNodeCore.Runtime.Models{
     public class ConditionalNode:NodeData{
