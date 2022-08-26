@@ -28,7 +28,6 @@ namespace TNodeGraphViewImpl.Editor.GraphWatcherView{
                     }
                     var baseNodeViews = gv.nodes.ToList().Select(x=>(IBaseNodeView)x);
                     var node = baseNodeViews.First(x=>x.GetNodeData().id==runtimeNodeGraph.CurrentNode().id);
-                    Debug.Log(node.GetNodeData().id);
                     var nodeView = (Node)node;
                     _highlightedNode = nodeView;
                     _highlightedNode.AddToClassList("highlightNode");
