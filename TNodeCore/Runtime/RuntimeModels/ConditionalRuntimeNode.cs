@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using TNode.TNodeCore.Runtime.Models;
 using TNodeCore.Runtime.Models;
 using UnityEngine;
 
 namespace TNodeCore.Runtime{
     public class ConditionalRuntimeNode:RuntimeNode{
-        private readonly List<Tuple<string,Func<TransitionCondition>>> _possibleTransition;
+        private readonly List<Tuple<string,Func<IBaseTransition>>> _possibleTransition;
         public ConditionalRuntimeNode(NodeData nodeData) : base(nodeData){
         
             if (nodeData is ConditionalNode conditionalNode){
-                var transitionPort = GetPortsOfType<TransitionCondition>();
-                _possibleTransition = new List<Tuple<string,Func<TransitionCondition>>>();
+                var transitionPort = GetPortsOfType<IBaseTransition>();
+                _possibleTransition = new List<Tuple<string,Func<IBaseTransition>>>();
                 var allOutput = GetPortsOfType<object>().Where(x => GetPortDirection(x) == Direction.Output);
                 var enumerable = allOutput as string[] ?? allOutput.ToArray();
                 if (enumerable.Count() != transitionPort.Length){
@@ -22,7 +21,7 @@ namespace TNodeCore.Runtime{
                 }
                 foreach (var port in transitionPort){
                     if(GetPortDirection(port)==Direction.Input) continue;
-                    _possibleTransition.Add(new Tuple<string, Func<TransitionCondition>>(port,() => (TransitionCondition)GetOutput(port)) );
+                    _possibleTransition.Add(new Tuple<string, Func<IBaseTransition>>(port,() => (IBaseTransition)GetOutput(port)) );
                 }
             }
             else{
@@ -39,8 +38,8 @@ namespace TNodeCore.Runtime{
         }
 
         public string GetNextNodeId(){
-            List<Tuple<string,TransitionCondition>> possibleCondition = _possibleTransition
-                .Select(x=>new Tuple<string,TransitionCondition>(x.Item1,x.Item2()))
+            List<Tuple<string,IBaseTransition>> possibleCondition = _possibleTransition
+                .Select(x=>new Tuple<string,IBaseTransition>(x.Item1,x.Item2()))
                 .Where(x=>x.Item2.Condition).ToList();
              possibleCondition.Sort((a, b) => {
                  var compareTo = b.Item2.Priority.CompareTo(a.Item2.Priority);
