@@ -13,6 +13,8 @@ namespace TNodeCore.Runtime.RuntimeCache{
     public class PortAccessor<T1, T2>:IModelPortAccessor{
         public readonly Func<T1, T2> Get;
         public readonly Action<T1, T2> Set;
+        private readonly Action<T1> _resetFunc;
+        private readonly T2 _defaultValue;
         public PortAccessor(string name,bool property){
             if (property){
                 Type t = typeof(T1);
@@ -20,10 +22,18 @@ namespace TNodeCore.Runtime.RuntimeCache{
                 MethodInfo getter = t.GetMethod("get_" + name);
                 MethodInfo setter = t.GetMethod("set_" + name);
                 Type = getter?.ReturnType??setter?.GetParameters()[0].ParameterType;
+                
                 if(getter!=null)
                     Get = (Func<T1, T2>)Delegate.CreateDelegate(typeof(Func<T1, T2>), null, getter);
                 if(setter!=null)
                     Set = (Action<T1, T2>)Delegate.CreateDelegate(typeof(Action<T1, T2>), null, setter);
+                if (Set != null){
+                    var dummy = Activator.CreateInstance<T1>();
+                    if (Get != null) _defaultValue = Get(dummy);
+                    _resetFunc = (obj) => {
+                        Set(obj, _defaultValue);
+                    };
+                }
             }
             else{
                 Type t = typeof(T1);
@@ -46,6 +56,12 @@ namespace TNodeCore.Runtime.RuntimeCache{
         public void SetValue(object model, object value){
             Set((T1)model,(T2)value);
         }
+
+        public void Reset(object model){
+            //Get 
+            _resetFunc((T1)model);
+        }
+
         public Type Type{ get; set; }
     }
 
