@@ -121,6 +121,12 @@ namespace TNodeCore.Runtime{
             _portAccessors = RuntimeCache.RuntimeCache.Instance.CachedPortAccessors[_type];
             
         }
+
+        public void ResetPortValue(){
+            foreach (var modelPortAccessor in _portAccessors){
+                modelPortAccessor.Value.Reset(this);
+            }
+        }
         public List<string> GetInputNodesId(){
             List<string> dependencies = new List<string>();
             foreach (NodeLink link in InputLinks)
@@ -129,7 +135,6 @@ namespace TNodeCore.Runtime{
             }
             return dependencies;
         }
-        
     }
     public enum Direction{
         Input,

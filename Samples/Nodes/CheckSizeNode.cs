@@ -1,6 +1,8 @@
-﻿using TNodeCore.Runtime.Attributes;
+﻿using TNodeCore.Runtime;
+using TNodeCore.Runtime.Attributes;
 using TNodeCore.Runtime.Attributes.Ports;
 using TNodeCore.Runtime.Models;
+using UnityEngine;
 
 namespace Samples.Nodes{
     [GraphUsage(typeof(HelloGraph),"Math")]
@@ -24,6 +26,9 @@ namespace Samples.Nodes{
                 DataFunc = ()=>A
             };
         }
-   
+
+        public override void Process(){
+            this.Log($"{A}");
+        }
     }
 }

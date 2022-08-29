@@ -99,29 +99,29 @@ MonoBehaviour:
         entryPoint: 0
         isTest: 0
     00000003:
-      type: {class: AddNode, ns: Samples.Nodes, asm: Assembly-CSharp}
-      data:
-        positionInView:
-          serializedVersion: 2
-          x: 1121
-          y: 187
-          width: 0
-          height: 0
-        id: 926f2eea-3403-4663-88bd-7ed16ce029fa
-        nodeName: AddNode
-        entryPoint: 0
-        isTest: 0
-    00000004:
       type: {class: CheckSizeNode, ns: Samples.Nodes, asm: Assembly-CSharp}
       data:
         positionInView:
           serializedVersion: 2
-          x: 900
+          x: 917
           y: 228
           width: 0
           height: 0
         id: f236a611-cc64-4fce-88d2-40baf7f4a490
         nodeName: CheckSizeNode
+        entryPoint: 0
+        isTest: 0
+    00000004:
+      type: {class: AddNode, ns: Samples.Nodes, asm: Assembly-CSharp}
+      data:
+        positionInView:
+          serializedVersion: 2
+          x: 1145.4003
+          y: 188.50003
+          width: 0
+          height: 0
+        id: 926f2eea-3403-4663-88bd-7ed16ce029fa
+        nodeName: AddNode
         entryPoint: 0
         isTest: 0
     00000005:
@@ -137,7 +137,7 @@ MonoBehaviour:
         HelloString: 
         HelloGameObject: {fileID: 0}
         Value:
-        - 11
+        - 24.41
         - 102.1
     00000006:
       type: {class: GraphViewModel, ns: TNode.TNodeCore.Editor.Models, asm: Taoria.TNodeCore.Runtime}
@@ -150,5 +150,5 @@ MonoBehaviour:
           height: 0
         id: 
         persistScale: 0.8695652
-        persistOffset: {x: -76, y: 126.00001}
+        persistOffset: {x: -125, y: 184}
         isBlackboardOn: 1
