@@ -124,7 +124,7 @@ namespace TNodeCore.Runtime{
 
         public void ResetPortValue(){
             foreach (var modelPortAccessor in _portAccessors){
-                modelPortAccessor.Value.Reset(this);
+                modelPortAccessor.Value.Reset(this.NodeData);
             }
         }
         public List<string> GetInputNodesId(){

@@ -10,7 +10,7 @@ namespace TNodeCore.Runtime{
             if (!Loggers.ContainsKey(t.id)) return;
             var nodeLoggerImpl = Loggers[t.id];
             nodeLoggerImpl.Log(message);
-            Debug.Log(message);
+
             
         }
     }
