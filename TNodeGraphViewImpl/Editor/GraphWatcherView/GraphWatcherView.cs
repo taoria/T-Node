@@ -49,6 +49,9 @@ namespace TNodeGraphViewImpl.Editor.GraphWatcherView{
                             _highlightedNode.style.borderRightWidth = _highlightedNode.style.borderTopWidth = 0;
                     }
                     runtimeNodeGraph.ResetState();
+                    foreach (var runtimeNode in runtimeNodeGraph.GetRuntimeNodes()){
+                        runtimeNode.ResetPortValue();
+                    }
                 }
             };
 

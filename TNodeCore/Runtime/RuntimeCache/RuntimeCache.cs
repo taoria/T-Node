@@ -29,8 +29,11 @@ namespace TNodeCore.Runtime.RuntimeCache{
                     Set = (Action<T1, T2>)Delegate.CreateDelegate(typeof(Action<T1, T2>), null, setter);
                 if (Set != null){
                     var dummy = Activator.CreateInstance<T1>();
-                    if (Get != null) _defaultValue = Get(dummy);
-                    _resetFunc = (obj) => {
+        
+                    if (Get != null)
+                        _defaultValue = Get(dummy);
+           
+                    _resetFunc += (obj) => {
                         Set(obj, _defaultValue);
                     };
                 }
@@ -59,7 +62,7 @@ namespace TNodeCore.Runtime.RuntimeCache{
 
         public void Reset(object model){
             //Get 
-            _resetFunc((T1)model);
+            _resetFunc?.Invoke((T1)model);
         }
 
         public Type Type{ get; set; }

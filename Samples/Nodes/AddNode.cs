@@ -12,7 +12,7 @@ namespace Samples.Nodes{
 
         [Output] public float C => A + B;
         public override void Process(){
-
+            this.Log($"{C}");
         }
     }
 }
