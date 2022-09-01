@@ -88,8 +88,11 @@ namespace TNodeGraphViewImpl.Editor.GraphBlackboard{
             bool isRuntimeGraph,
             BlackboardSection blackboardSection, int index){
             var property = serializedObject.FindProperty("data");
-                property =  property.FindPropertyRelative(field.Name).GetArrayElementAtIndex(index);
-            
+            property =  property.FindPropertyRelative(field.Name)?.GetArrayElementAtIndex(index);
+            if (property == null){
+                
+                Debug.LogError($"Can not find property {field.Name} in {serializedObject.targetObject.name}");
+            }
             BlackboardDataEntry entry = new BlackboardDataEntry(field.FieldType){
                 propertyPath = field.Name+"."+index,
             };
